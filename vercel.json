@@ -1,6 +1,6 @@
 {
+  "framework": "express",
   "buildCommand": "npm install",
-  "framework": "nodejs",
   "functions": {
     "server.js": {
       "memory": 1024,
