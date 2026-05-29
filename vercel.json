@@ -1,20 +1,8 @@
 {
-  "framework": "express",
-  "buildCommand": "npm install",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "server.js": {
-      "memory": 1024,
+    "api/**/*.js": {
       "maxDuration": 10
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
-  ]
+  }
 }

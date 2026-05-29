@@ -244,6 +244,11 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (action === "refresh-sheets") {
+    refreshSheetsFromServer();
+    return;
+  }
+
   if (action === "open-sheet") {
     state.activeId = button.dataset.id;
     state.view = "editor";
@@ -625,7 +630,11 @@ function renderHome() {
       <section class="panel">
         <div class="panel-title">
           <h2>Personagens</h2>
-          <span class="badge hot">${state.sheets.length} fichas</span>
+          <div class="card-actions">
+            <span class="badge ${serverOnline ? "hot" : ""}">${databaseStatusText()}</span>
+            <span class="badge hot">${state.sheets.length} fichas</span>
+            <button type="button" class="ghost-button" data-action="refresh-sheets">Atualizar</button>
+          </div>
         </div>
         <div class="sheets-grid">
           ${sheets || `<div class="empty-state">Nenhuma ficha criada.</div>`}
@@ -1557,13 +1566,16 @@ async function loadState() {
   try {
     const serverSheets = await loadServerSheets();
     serverOnline = true;
+    const sheets = mergeSheetLists(local.sheets, serverSheets);
+    await uploadLocalSheetsNewerThanServer(local.sheets, serverSheets);
     return {
       ...local,
-      sheets: serverSheets,
-      activeId: local.activeId || serverSheets[0]?.id || null,
+      sheets,
+      activeId: sheets.some((sheet) => sheet.id === local.activeId) ? local.activeId : sheets[0]?.id || null,
     };
   } catch (error) {
     console.warn("Servidor de fichas indisponível, usando armazenamento local.", error);
+    serverOnline = false;
     return local;
   }
 }
@@ -1580,6 +1592,67 @@ async function loadServerSheets() {
   const response = await apiRequest("/sheets");
   const sheets = await response.json();
   return Array.isArray(sheets) ? sheets.map(normalizeSheet) : [];
+}
+
+function mergeSheetLists(localSheets, serverSheets) {
+  const merged = new Map();
+  for (const sheet of serverSheets) merged.set(sheet.id, sheet);
+
+  for (const sheet of localSheets) {
+    const serverSheet = merged.get(sheet.id);
+    if (!serverSheet || isNewerSheet(sheet, serverSheet)) {
+      merged.set(sheet.id, sheet);
+    }
+  }
+
+  return [...merged.values()].sort((a, b) => timestampValue(b.updatedAt) - timestampValue(a.updatedAt));
+}
+
+async function uploadLocalSheetsNewerThanServer(localSheets, serverSheets) {
+  const serverById = new Map(serverSheets.map((sheet) => [sheet.id, sheet]));
+  const pending = localSheets.filter((sheet) => {
+    const serverSheet = serverById.get(sheet.id);
+    return !serverSheet || isNewerSheet(sheet, serverSheet);
+  });
+
+  for (const sheet of pending) {
+    await saveSheetOnServer(sheet);
+  }
+}
+
+function isNewerSheet(left, right) {
+  return timestampValue(left?.updatedAt) > timestampValue(right?.updatedAt);
+}
+
+function timestampValue(value) {
+  const parsed = Date.parse(value || "");
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+async function refreshSheetsFromServer() {
+  try {
+    setSaveStatus("Atualizando...");
+    if (serverOnline) {
+      const sheet = getActiveSheet();
+      if (sheet) await saveSheetOnServer(sheet);
+    }
+
+    const serverSheets = await loadServerSheets();
+    serverOnline = true;
+    state.sheets = serverSheets;
+    if (!state.sheets.some((sheet) => sheet.id === state.activeId)) {
+      state.activeId = state.sheets[0]?.id || null;
+      if (!state.activeId) state.view = "home";
+    }
+    persistLocalOnly();
+    renderApp();
+    setSaveStatus("Banco atualizado");
+  } catch (error) {
+    console.warn("Não foi possível atualizar fichas do servidor.", error);
+    serverOnline = false;
+    renderApp();
+    setSaveStatus("Usando local");
+  }
 }
 
 async function saveSheetOnServer(sheet) {
@@ -1615,7 +1688,7 @@ function persistSoon() {
 }
 
 function persistNow() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  persistLocalOnly();
   setSaveStatus("Auto salvo");
   const sheet = getActiveSheet();
   if (serverOnline && sheet) {
@@ -1628,6 +1701,14 @@ function persistNow() {
 function setSaveStatus(text) {
   const status = document.querySelector("[data-save-status]");
   if (status) status.textContent = text;
+}
+
+function persistLocalOnly() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function databaseStatusText() {
+  return serverOnline ? "Banco compartilhado" : "Armazenamento local";
 }
 
 function touchSheet(sheet) {
@@ -1994,8 +2075,6 @@ function getAbilityRequirement(sheet, row, sourceKey) {
     if (!["Mago", "Híbrido"].includes(sheet.className)) return { ok: false, reason: "Apenas Mago ou Híbrido podem aprender magias arcanas." };
     const arcanism = getSubclassLevel(sheet, "Arcanismo");
     if (arcanism < 1) return { ok: false, reason: "Requer pelo menos 1 nível em Arcanismo." };
-    const min = getArcaneTierMin(row.Tier);
-    if (arcanism < min) return { ok: false, reason: `Requer Arcanismo nível ${min} para tier ${row.Tier || "Básico"}.` };
     const used = sheet.abilities.filter((ability) => ability.type === "Magia").length;
     if (used >= arcanism) return { ok: false, reason: `Limite de magias por Arcanismo atingido: ${used}/${arcanism}.` };
   }
@@ -2003,14 +2082,6 @@ function getAbilityRequirement(sheet, row, sourceKey) {
     return { ok: false, reason: "Apenas Ki ou Híbrido podem aprender técnicas de Ki." };
   }
   return { ok: true, reason: "" };
-}
-
-function getArcaneTierMin(tier) {
-  const normalized = normalizeText(tier || "Basico");
-  if (normalized.includes("supremo")) return 25;
-  if (normalized.includes("avanc")) return 20;
-  if (normalized.includes("intermedi")) return 10;
-  return 1;
 }
 
 function normalizeText(value) {

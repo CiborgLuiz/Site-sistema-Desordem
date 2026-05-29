@@ -7,7 +7,7 @@ Sistema de gerenciamento de fichas de personagem para o RPG Desordem, com armaze
 - 📄 Criação e edição de fichas de personagem
 - 🎮 Sistema de atributos, perícias e recursos dinâmicos
 - 📚 Biblioteca compartilhada de itens, magias e técnicas
-- ☁️ Sincronização em tempo real via Supabase
+- ☁️ Sincronização compartilhada via Supabase
 - 🚀 Deploy simples no Vercel (sem servidor para configurar)
 - 💾 Fallback para armazenamento local se o servidor estiver indisponível
 
@@ -37,17 +37,17 @@ Sistema de gerenciamento de fichas de personagem para o RPG Desordem, com armaze
    - `Project URL` → `SUPABASE_URL`
    - `anon public` → `SUPABASE_ANON_KEY`
 
-4. Crie a tabela de fichas no SQL Editor:
+4. Crie a tabela de fichas no SQL Editor executando o arquivo `setup-supabase.sql`.
 
 ```sql
 CREATE TABLE sheets (
   id TEXT PRIMARY KEY,
   data JSONB NOT NULL,
-  createdAt TIMESTAMP DEFAULT NOW(),
-  updatedAt TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_sheets_updated_at ON sheets(updatedAt DESC);
+CREATE INDEX idx_sheets_updated_at ON sheets(updated_at DESC);
 ```
 
 #### 2. Deploy no Vercel
@@ -66,7 +66,7 @@ Pronto! Seu site estará disponível em `https://seu-projeto.vercel.app`
 
 ### Pré-requisitos
 
-- Node.js 16+
+- Node.js 20+
 - npm ou yarn
 
 ### Instalação
@@ -129,6 +129,7 @@ O servidor iniciará em `http://localhost:3000`
 desordem-fichas/
 ├── app.js                 # Aplicação browser (SPA)
 ├── server.js              # Backend Node.js + Express
+├── api/[...path].js       # Entrada da API no Vercel
 ├── index.html             # Página principal
 ├── styles.css             # Estilos
 ├── package.json           # Dependências npm
@@ -149,7 +150,8 @@ Supabase (banco de dados)
 
 ## 🔄 Sincronização
 
-- **Criação/Edição**: Salva automaticamente a cada mudança (com debounce de 350ms)
+- **Criação/Edição**: salva automaticamente a cada mudança (com debounce de 350ms)
+- **Listagem pública**: todas as fichas salvas no Supabase aparecem para todos que acessarem o site
 - **Fallback**: Se o Supabase estiver offline, usa `localStorage`
 - **Compatibilidade**: Suporta múltiplos dispositivos/navegadores
 

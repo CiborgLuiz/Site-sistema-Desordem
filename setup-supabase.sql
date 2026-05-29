@@ -1,29 +1,70 @@
--- SQL para criar a tabela de fichas no Supabase
--- Execute este script no SQL Editor do seu projeto Supabase
+-- SQL para criar a tabela publica de fichas no Supabase.
+-- Execute este script no SQL Editor do projeto Supabase.
 
-CREATE TABLE sheets (
+CREATE TABLE IF NOT EXISTS public.sheets (
   id TEXT PRIMARY KEY,
   data JSONB NOT NULL,
-  createdAt TIMESTAMP DEFAULT NOW(),
-  updatedAt TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Índice para melhor performance nas buscas por data
-CREATE INDEX idx_sheets_updated_at ON sheets(updatedAt DESC);
+-- Se uma versao antiga criou createdAt/updatedAt sem aspas, o PostgreSQL
+-- salvou como createdat/updatedat. Este bloco copia esses valores.
+ALTER TABLE public.sheets ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.sheets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
--- Política de segurança (RLS) - Permitir leitura/escrita anônima (ajuste conforme necessário)
-ALTER TABLE sheets ENABLE ROW LEVEL SECURITY;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'sheets' AND column_name = 'createdat'
+  ) THEN
+    EXECUTE 'UPDATE public.sheets SET created_at = COALESCE(createdat, created_at)';
+  END IF;
 
--- Política para permitir leitura pública
-CREATE POLICY "Enable read access for all users" ON sheets
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'sheets' AND column_name = 'updatedat'
+  ) THEN
+    EXECUTE 'UPDATE public.sheets SET updated_at = COALESCE(updatedat, updated_at)';
+  END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_sheets_updated_at ON public.sheets(updated_at DESC);
+
+CREATE OR REPLACE FUNCTION public.set_sheets_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_sheets_updated_at ON public.sheets;
+CREATE TRIGGER set_sheets_updated_at
+BEFORE UPDATE ON public.sheets
+FOR EACH ROW
+EXECUTE FUNCTION public.set_sheets_updated_at();
+
+ALTER TABLE public.sheets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Enable read access for all users" ON public.sheets;
+DROP POLICY IF EXISTS "Enable insert for all users" ON public.sheets;
+DROP POLICY IF EXISTS "Enable update for all users" ON public.sheets;
+DROP POLICY IF EXISTS "Enable delete for all users" ON public.sheets;
+
+DROP POLICY IF EXISTS "Sheets are readable by everyone" ON public.sheets;
+CREATE POLICY "Sheets are readable by everyone" ON public.sheets
   FOR SELECT USING (true);
 
--- Política para permitir insert/update/delete
-CREATE POLICY "Enable insert for all users" ON sheets
+DROP POLICY IF EXISTS "Sheets can be created by everyone" ON public.sheets;
+CREATE POLICY "Sheets can be created by everyone" ON public.sheets
   FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Enable update for all users" ON sheets
-  FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Sheets can be updated by everyone" ON public.sheets;
+CREATE POLICY "Sheets can be updated by everyone" ON public.sheets
+  FOR UPDATE USING (true) WITH CHECK (true);
 
-CREATE POLICY "Enable delete for all users" ON sheets
+DROP POLICY IF EXISTS "Sheets can be deleted by everyone" ON public.sheets;
+CREATE POLICY "Sheets can be deleted by everyone" ON public.sheets
   FOR DELETE USING (true);
