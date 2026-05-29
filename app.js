@@ -1,6 +1,7 @@
 "use strict";
 
 const STORAGE_KEY = "desordem.fichas.v1";
+const API_BASE = "/api";
 const SAVE_DELAY = 350;
 const MAX_LEVEL = 50;
 const MAX_SUBCLASS_LEVEL = 25;
@@ -193,15 +194,36 @@ const library = {
   data: { items: [], arcane: [], ki: [], powers: [], subclasses: [], postures: [], enchantments: [] },
 };
 
-let state = loadState();
+let state = getInitialState();
 let saveTimer = 0;
+let serverOnline = false;
 
-renderApp();
-loadLibrary();
+initializeApp();
 
 window.addEventListener("resize", () => {
   window.requestAnimationFrame(drawRadar);
 });
+
+async function initializeApp() {
+  renderApp();
+  loadLibrary();
+  const persisted = await loadState();
+  state = { ...getInitialState(), ...persisted };
+  renderApp();
+}
+
+function getInitialState() {
+  return {
+    sheets: [],
+    activeId: null,
+    view: "home",
+    activeTab: "ficha",
+    libraryTab: "items",
+    librarySearch: "",
+    libraryCategory: "",
+    onlyCompatible: true,
+  };
+}
 
 document.addEventListener("click", (event) => {
   const button = event.target.closest("[data-action]");
@@ -1501,7 +1523,7 @@ function normalizeModifier(modifier) {
   };
 }
 
-function loadState() {
+function loadLocalState() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     const sheets = Array.isArray(raw.sheets) ? raw.sheets.map(normalizeSheet) : [];
@@ -1530,6 +1552,62 @@ function loadState() {
   }
 }
 
+async function loadState() {
+  const local = loadLocalState();
+  try {
+    const serverSheets = await loadServerSheets();
+    serverOnline = true;
+    return {
+      ...local,
+      sheets: serverSheets,
+      activeId: local.activeId || serverSheets[0]?.id || null,
+    };
+  } catch (error) {
+    console.warn("Servidor de fichas indisponível, usando armazenamento local.", error);
+    return local;
+  }
+}
+
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${API_BASE}${path}`, options);
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+  }
+  return response;
+}
+
+async function loadServerSheets() {
+  const response = await apiRequest("/sheets");
+  const sheets = await response.json();
+  return Array.isArray(sheets) ? sheets.map(normalizeSheet) : [];
+}
+
+async function saveSheetOnServer(sheet) {
+  if (!sheet?.id) return;
+  try {
+    await apiRequest(`/sheets/${encodeURIComponent(sheet.id)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sheet),
+    });
+    serverOnline = true;
+  } catch (error) {
+    serverOnline = false;
+    throw error;
+  }
+}
+
+async function deleteSheetOnServer(id) {
+  if (!id) return;
+  try {
+    await apiRequest(`/sheets/${encodeURIComponent(id)}`, { method: "DELETE" });
+    serverOnline = true;
+  } catch (error) {
+    serverOnline = false;
+    throw error;
+  }
+}
+
 function persistSoon() {
   clearTimeout(saveTimer);
   setSaveStatus("Salvando...");
@@ -1539,6 +1617,12 @@ function persistSoon() {
 function persistNow() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   setSaveStatus("Auto salvo");
+  const sheet = getActiveSheet();
+  if (serverOnline && sheet) {
+    saveSheetOnServer(sheet).catch(() => {
+      serverOnline = false;
+    });
+  }
 }
 
 function setSaveStatus(text) {
@@ -1567,6 +1651,7 @@ function createSheetFromForm() {
   state.view = "editor";
   state.activeTab = "ficha";
   persistNow();
+  if (serverOnline) saveSheetOnServer(sheet).catch(() => { serverOnline = false; });
   renderApp();
 }
 
@@ -1578,6 +1663,7 @@ function deleteSheet(id) {
   if (state.activeId === id) state.activeId = state.sheets[0]?.id || null;
   state.view = state.activeId ? state.view : "home";
   persistNow();
+  if (serverOnline) deleteSheetOnServer(id).catch(() => { serverOnline = false; });
   renderApp();
 }
 
@@ -1593,6 +1679,7 @@ function duplicateSheet(id) {
   state.activeId = copy.id;
   state.view = "editor";
   persistNow();
+  if (serverOnline) saveSheetOnServer(copy).catch(() => { serverOnline = false; });
   renderApp();
 }
 
