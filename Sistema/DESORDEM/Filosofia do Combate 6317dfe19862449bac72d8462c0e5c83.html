@@ -1,0 +1,743 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Filosofia do Combate</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="6317dfe1-9862-449b-ac72-d8462c0e5c83" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">⚔️</span></div><h1 class="page-title" dir="auto">Filosofia do Combate</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="auto"><h2 id="32b33ec0-8728-4e39-9735-b8d11d5c2c85" class="">Princípios</h2></div><div style="display:contents" dir="auto"><ul id="1190c370-fc5d-46eb-820b-3298586821fb" class="bulleted-list"><li style="list-style-type:disc">Combate é decisão, não reação automática</li></ul></div><div style="display:contents" dir="auto"><ul id="03a0113a-045e-465e-8777-ee3871168124" class="bulleted-list"><li style="list-style-type:disc">Coordenação supera poder isolado</li></ul></div><div style="display:contents" dir="auto"><ul id="d3faf09d-d829-4df6-a992-b512f83fddf5" class="bulleted-list"><li style="list-style-type:disc">Recursos limitados definem o ritmo do confronto</li></ul></div><div style="display:contents" dir="auto"><ul id="40297328-9dad-4532-ab2a-4164cf243e85" class="bulleted-list"><li style="list-style-type:disc">Risco elevado gera momentos dramáticos reais</li></ul></div><div style="display:contents" dir="auto"><h2 id="7e21f370-016e-47e3-a502-c4f022f6ca76" class="">Eixos táticos</h2></div><div style="display:contents" dir="auto"><ul id="dcd705dc-a49f-468a-b0d8-8ef70a7f6d19" class="bulleted-list"><li style="list-style-type:disc">Posicionamento</li></ul></div><div style="display:contents" dir="auto"><ul id="0ebc9add-e931-4873-b189-5cb6b46af38f" class="bulleted-list"><li style="list-style-type:disc">Controle de campo</li></ul></div><div style="display:contents" dir="auto"><ul id="7baf4930-efab-4fac-b027-f0bd0e01bba2" class="bulleted-list"><li style="list-style-type:disc">Gestão de recursos</li></ul></div><div style="display:contents" dir="auto"><ul id="96d17636-0e83-49d3-a778-532f6b002884" class="bulleted-list"><li style="list-style-type:disc">Leitura de vulnerabilidades</li></ul></div><div style="display:contents" dir="auto"><ul id="a0dc6e53-d1b6-47c4-a534-aee183d217b7" class="bulleted-list"><li style="list-style-type:disc">Sinergia entre personagens</li></ul></div><div style="display:contents" dir="auto"><h2 id="7184bc3f-39d8-4603-87b2-4152b279faa2" class="">Sistema de custos de postura</h2></div><div style="display:contents" dir="auto"><ul id="266379db-3d46-47d6-aa5f-08679946ef8d" class="bulleted-list"><li style="list-style-type:disc">Entrar em uma postura normalmente custa <strong>Ação Secundária</strong></li></ul></div><div style="display:contents" dir="auto"><ul id="4d17576a-a6d9-490a-bcba-e1de08941fb3" class="bulleted-list"><li style="list-style-type:disc">Cada postura possui <strong>custo de ativação</strong> e, quando indicado, <strong>manutenção por turno</strong></li></ul></div><div style="display:contents" dir="auto"><ul id="ef4f2e2b-d2a0-4fed-8512-0763eb787c69" class="bulleted-list"><li style="list-style-type:disc">Só é possível manter <strong>1 postura principal</strong> por vez</li></ul></div><div style="display:contents" dir="auto"><ul id="10e81ef5-5c31-4ee7-99c9-e7a678be4f1c" class="bulleted-list"><li style="list-style-type:disc">Se o recurso acabar, a postura se desfaz imediatamente</li></ul></div><div style="display:contents" dir="auto"><ul id="d85bba94-c8d4-4ce9-b6b3-ae2919475ac0" class="bulleted-list"><li style="list-style-type:disc">Efeitos de colapso, ancoragem, desarme ou quebra de canalização podem encerrar a postura antes do fim</li></ul></div><div style="display:contents" dir="auto"><h2 id="0d2a9fde-e549-4118-b9ea-4fb76784ae34" class="">Função das posturas</h2></div><div style="display:contents" dir="auto"><p id="bb31d94f-d135-48b2-9002-999f29018411" class="">Posturas mudam o ritmo do combate.</p></div><div style="display:contents" dir="auto"><p id="71c29a94-3a88-4f53-a810-58342cce751c" class="">Elas não são só bônus: também impõem penalidades reais e moldam o estilo da build.</p></div><div style="display:contents" dir="ltr"><div id="e17f923d-e35f-4859-98bc-52c8fa613f72" class="collection-content"><h4 class="collection-title">Posturas</h4><div class="collection-content-wrapper"><table class="collection-content"><colgroup><col style="width:18.91891891891892%"/><col style="width:13.513513513513514%"/><col style="width:13.513513513513514%"/><col style="width:13.513513513513514%"/><col style="width:13.513513513513514%"/><col style="width:13.513513513513514%"/><col style="width:13.513513513513502%"/></colgroup><thead><tr><th><span class="icon property-icon"><img src="https://www.notion.so/icons/font_gray.svg" style="width:14px;height:14px;display:block"/></span>Nome</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Bônus</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Penalidade</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Estilo</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Escalonamento</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Ativação</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Custo de Postura</th></tr></thead><tbody><tr id="5c89cbfb-38bd-4723-9999-f1a955f679aa"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Ofensiva%205c89cbfb38bd47239999f1a955f679aa.html">Postura Ofensiva</a></td><td class="cell-DYDS">+20% do atributo ofensivo principal no dano final e +10% na margem de pressão ofensiva</td><td class="cell-\YJV">-15% da Defesa final</td><td class="cell-ag?C">Alta pressão, alto risco e foco em finalizar rapidamente.</td><td class="cell-[cS`">Nos níveis 10, 20, 30, 40 e 50, o bônus cresce em +5% e a penalidade em Defesa reduz 1% a cada 10 níveis se o usuário mantiver postura agressiva com sucesso.</td><td class="cell-OUYx"></td><td class="cell-dRV`"></td></tr><tr id="318d588d-cddd-4101-83fa-fe7a63de6a16"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Defensiva%20318d588dcddd410183fafe7a63de6a16.html">Postura Defensiva</a></td><td class="cell-DYDS">+20% do atributo defensivo principal aplicado à Defesa final e resistências de guarda</td><td class="cell-\YJV">-15% do dano final</td><td class="cell-ag?C">Sobrevivência, mitigação e controle do ritmo.</td><td class="cell-[cS`">Nos níveis 10, 20, 30, 40 e 50, o bônus defensivo cresce em +5% e a penalidade ofensiva cai gradualmente para manter relevância em nível alto.</td><td class="cell-OUYx"></td><td class="cell-dRV`"></td></tr><tr id="d4681be4-a1b5-4b34-952b-b2bbb99c0289"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20de%20Ca%C3%A7ador%20d4681be4a1b54b34952bb2bbb99c0289.html">Postura de Caçador</a></td><td class="cell-DYDS">+15% do atributo ofensivo contra alvos feridos e +20% em rastreio de combate</td><td class="cell-\YJV">-10% de precisão contra alvos íntegros ou inalcançados</td><td class="cell-ag?C">Pressão sobre inimigos desgastados e perseguição tática.</td><td class="cell-[cS`">Nos níveis 15, 30 e 45, o bônus sobe +5% e passa a conceder dano adicional progressivo contra alvos abaixo de 50% da Vida.</td><td class="cell-OUYx"></td><td class="cell-dRV`"></td></tr><tr id="4bd85eaa-43f3-4dcf-adff-1cb1b56098a1"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Estrat%C3%A9gica%204bd85eaa43f34dcfadff1cb1b56098a1.html">Postura Estratégica</a></td><td class="cell-DYDS">+20% do atributo mental principal em leitura de campo, precisão tática e exploração de fraquezas</td><td class="cell-\YJV">-10% do dano explosivo imediato</td><td class="cell-ag?C">Leitura de campo, preparação e coordenação.</td><td class="cell-[cS`">Nos níveis 10, 20, 30, 40 e 50, o bônus tático cresce em +5% e passa a ampliar críticos, cobertura e eficiência de suporte.</td><td class="cell-OUYx"></td><td class="cell-dRV`"></td></tr><tr id="ae247063-d2a8-4195-a38c-b7df2a643c44"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Impulsiva%20ae247063d2a84195a38cb7df2a643c44.html">Postura Impulsiva</a></td><td class="cell-DYDS">+15% do atributo ofensivo principal e crítico ampliado em armas compatíveis</td><td class="cell-\YJV">Falhas naturais ampliam o dano recebido ou a perda de controle em 15%</td><td class="cell-ag?C">Alta variância, agressão e improviso perigoso.</td><td class="cell-[cS`">Nos níveis 20, 35 e 50, o bônus ofensivo sobe +5% e a margem crítica melhora em armas de estilo agressivo, mantendo risco equivalente.</td><td class="cell-OUYx"></td><td class="cell-dRV`"></td></tr><tr id="36c54f18-8b98-413f-8028-4e1ccf5410a6"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Zen%2036c54f188b98413f80284e1ccf5410a6.html">Postura Zen</a></td><td class="cell-DYDS">+20% regeneração de Mana/Ki e +15% resistência mental.</td><td class="cell-\YJV">-15% dano ofensivo.</td><td class="cell-ag?C">Controle, paciência e equilíbrio.</td><td class="cell-[cS`">Níveis 10, 20, 30, 40 e 50: reduz custo de habilidades em +5% por marco.</td><td class="cell-OUYx">Ação Secundária; não pode ser ativada se estiver em Frenesi.</td><td class="cell-dRV`">Ativação: 2 Mana ou 2 Ki; manutenção: 1 por turno.</td></tr><tr id="63e5da22-9da0-48ad-81c1-0619c8e6b393"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Guardi%C3%A3o%2063e5da229da048ad81c10619c8e6b393.html">Postura Guardião</a></td><td class="cell-DYDS">+25% Defesa e +15% proteção para aliados próximos.</td><td class="cell-\YJV">-20% mobilidade.</td><td class="cell-ag?C">Tank raiz, estilo segura o boss enquanto o time bate.</td><td class="cell-[cS`">Níveis 15, 30 e 45: ganha habilidade de redirecionar dano.</td><td class="cell-OUYx">Ação Secundária; termina se o usuário ficar Desarmado e cair sem se levantar.</td><td class="cell-dRV`">Ativação: 3 Energia Física; manutenção: 1 por turno.</td></tr><tr id="389d3f46-0875-4458-898c-18f56b3d17aa"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Precisa%20389d3f4608754458898c18f56b3d17aa.html">Postura Precisa</a></td><td class="cell-DYDS">+20% chance de crítico e +25% precisão.</td><td class="cell-\YJV">-15% velocidade de ataque.</td><td class="cell-ag?C">Sniper, cada golpe importa.</td><td class="cell-[cS`">Níveis 10, 25 e 40: críticos causam dano adicional progressivo.</td><td class="cell-OUYx">Ação Secundária; perde o efeito se entrar em combate caótico corpo a corpo sem foco.</td><td class="cell-dRV`">Ativação: 2 Energia Física ou 2 Mana; manutenção: 1 por turno.</td></tr><tr id="bf06ba1c-23ca-4036-bf70-1fed7c57bb68"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20%C3%81gil%20bf06ba1c23ca4036bf701fed7c57bb68.html">Postura Ágil</a></td><td class="cell-DYDS">+25% esquiva e +20% velocidade.</td><td class="cell-\YJV">-15% Defesa base.</td><td class="cell-ag?C">Hit and run, estilo assassino.</td><td class="cell-[cS`">Níveis 10, 20, 30, 40 e 50: ganha chance de ataque extra após esquiva.</td><td class="cell-OUYx">Ação Secundária; termina se ficar Imobilizado, Enraizado ou Sobrecarregado.</td><td class="cell-dRV`">Ativação: 2 Energia Física ou 1 Ki; manutenção: 1 por turno.</td></tr><tr id="7da2373f-4df4-4a8a-9276-669aa5c1f9c6"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Berserker%207da2373f4df44a8a9276669aa5c1f9c6.html">Postura Berserker</a></td><td class="cell-DYDS">+25% dano corpo a corpo e +10% velocidade de ataque.</td><td class="cell-\YJV">-20% Defesa e não pode recuar facilmente.</td><td class="cell-ag?C">Agressividade total, sem pensar duas vezes.</td><td class="cell-[cS`">Níveis 10, 25, 40 e 50: dano aumenta +5% por marco e ganha roubo de vida leve.</td><td class="cell-OUYx">Ação Secundária para entrar; sair é livre no início do turno.</td><td class="cell-dRV`">Ativação: 2 Energia Física ou 2 Ki; manutenção: 1 por turno.</td></tr><tr id="4f02bc80-7ff9-434e-9471-b17bc8dac3a4"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Arcana%204f02bc807ff9434e9471b17bc8dac3a4.html">Postura Arcana</a></td><td class="cell-DYDS">+30% poder mágico.</td><td class="cell-\YJV">+20% custo de Mana.</td><td class="cell-ag?C">Mago explosivo, alto risco.</td><td class="cell-[cS`">Níveis 15, 30 e 45: chance de ignorar resistência mágica.</td><td class="cell-OUYx">Ação Secundária; termina ao entrar em Vazio Arcano ou Sobrecarga Mágica.</td><td class="cell-dRV`">Ativação: 3 Mana; manutenção: 2 Mana por turno.</td></tr><tr id="66e681a3-f034-4b19-94f4-1a60ef3c27ab"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Anal%C3%ADtica%2066e681a3f0344b1994f41a60ef3c27ab.html">Postura Analítica</a></td><td class="cell-DYDS">+25% Inteligência e revela fraquezas do inimigo.</td><td class="cell-\YJV">-10% dano direto.</td><td class="cell-ag?C">Controle de batalha, tipo jogador xadrez 5D.</td><td class="cell-[cS`">Níveis 10, 20, 30 e 40: ganha bônus contra inimigos já analisados.</td><td class="cell-OUYx">Ação Secundária; exige linha de visão ou leitura prévia do alvo.</td><td class="cell-dRV`">Ativação: 2 Mana ou 2 Energia Mental; manutenção: 1 por turno.</td></tr><tr id="e09adbe6-5100-4470-b570-e6f8025e721a"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Sombria%20e09adbe651004470b570e6f8025e721a.html">Postura Sombria</a></td><td class="cell-DYDS">+20% dano em inimigos desprevenidos e +15% furtividade.</td><td class="cell-\YJV">-20% eficiência em combate direto.</td><td class="cell-ag?C">Assassino stealth.</td><td class="cell-[cS`">Níveis 15, 30 e 45: ataques surpresa causam efeitos adicionais.</td><td class="cell-OUYx">Ação Secundária; perde o efeito ao ficar Rastreado ou Exposto.</td><td class="cell-dRV`">Ativação: 2 Energia Física ou 2 Ki; manutenção: 1 por turno.</td></tr><tr id="d574f9e9-40ec-4088-b748-d5731b657e41"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Inst%C3%A1vel%20d574f9e940ec4088b748d5731b657e41.html">Postura Instável</a></td><td class="cell-DYDS">+30% em todos os atributos em eixo aleatório por turno.</td><td class="cell-\YJV">-20% em um atributo aleatório.</td><td class="cell-ag?C">Caos total, build meme que pode solar ou morrer sozinho.</td><td class="cell-[cS`">Níveis 10, 25 e 40: reduz aleatoriedade negativa.</td><td class="cell-OUYx">Ação Secundária; cada turno rola novamente os eixos positivos e negativos.</td><td class="cell-dRV`">Ativação: 3 Mana ou 3 Ki; manutenção: 1dado ou 2 recursos por turno.</td></tr><tr id="64a05b27-bf3d-4b46-9884-72ad045a8558"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Sincronizada%2064a05b27bf3d4b46988472ad045a8558.html">Postura Sincronizada</a></td><td class="cell-DYDS">+15% em todos os atributos quando em grupo.</td><td class="cell-\YJV">-20% quando sozinho.</td><td class="cell-ag?C">Suporte cooperativo e combate em equipe.</td><td class="cell-[cS`">Níveis 10, 20, 30, 40 e 50: bônus compartilhado com aliados.</td><td class="cell-OUYx">Ação Secundária; exige pelo menos um aliado consciente em alcance médio.</td><td class="cell-dRV`">Ativação: 2 Energia Física ou 2 Mana; manutenção: 1 por turno por vínculo ativo.</td></tr><tr id="d53475d1-1d9c-46b9-8aab-38ee80276488"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Vamp%C3%ADrica%20d53475d11d9c46b98aab38ee80276488.html">Postura Vampírica</a></td><td class="cell-DYDS">+20% roubo de vida.</td><td class="cell-\YJV">-15% regeneração natural.</td><td class="cell-ag?C">Sustentação em combate contínuo.</td><td class="cell-[cS`">Níveis 15, 30 e 45: roubo de vida aumenta progressivamente.</td><td class="cell-OUYx">Ação Secundária; termina se o usuário for curado à força por purificação absoluta.</td><td class="cell-dRV`">Ativação: 2 Vida e 1 recurso principal; manutenção: 1 Vida por turno.</td></tr><tr id="4d8b0b17-e3ef-4888-a667-f45d7619501d"><td class="cell-title"><a href="Mec%C3%A2nicas/Posturas/Postura%20Dimensional%204d8b0b17e3ef4888a667f45d7619501d.html">Postura Dimensional</a></td><td class="cell-DYDS">+15% chance de ignorar ataques e +20% mobilidade.</td><td class="cell-\YJV">-10% estabilidade, com chance de falha em ações.</td><td class="cell-ag?C">Quase bugado, com micro teleporte e leitura estranha do espaço.</td><td class="cell-[cS`">Níveis 20, 35 e 50: ganha micro-teleportes reativos.</td><td class="cell-OUYx">Ação Secundária; termina ao ficar Ancorado ou sob quebra dimensional.</td><td class="cell-dRV`">Ativação: 3 Mana ou 3 Ki; manutenção: 2 por turno.</td></tr></tbody></table></div><br/><br/></div></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

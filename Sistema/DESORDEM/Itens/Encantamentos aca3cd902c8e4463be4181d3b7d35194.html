@@ -1,0 +1,743 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Encantamentos</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="aca3cd90-2c8e-4463-be41-81d3b7d35194" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">✨</span></div><h1 class="page-title" dir="auto">Encantamentos</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="ltr"><figure class="block-color-purple_background callout" style="white-space:pre-wrap;display:flex" id="9f03f015-579d-49d0-ac47-c7896faee459"><div style="font-size:1.5em"><span class="icon">✨</span></div><div style="width:100%"><div style="display:contents" dir="auto"><p id="5c500723-c8c7-419b-9432-a83b2eb1422c" class=""><strong>Encantamentos</strong> é o espaço exclusivo para melhorias permanentes ou semi-permanentes em armas, armaduras, focos e acessórios.</p></div></div></figure></div><div style="display:contents" dir="auto"><hr id="56004dad-63b9-4c1d-9502-608ab2b11f5a"/></div><div style="display:contents" dir="auto"><h2 id="1ac6844c-28b4-4d94-9ec5-52933e2217c6" class="">O que entra aqui</h2></div><div style="display:contents" dir="auto"><ul id="1d779ba7-9e15-49ef-be35-63c98af4794c" class="bulleted-list"><li style="list-style-type:disc">encantamentos de arma</li></ul></div><div style="display:contents" dir="auto"><ul id="25eafc79-edb4-4edb-a6c0-3682d89115e2" class="bulleted-list"><li style="list-style-type:disc">encantamentos de armadura</li></ul></div><div style="display:contents" dir="auto"><ul id="6e99513e-85f3-4973-b080-afd524d6b769" class="bulleted-list"><li style="list-style-type:disc">selos anti-magia</li></ul></div><div style="display:contents" dir="auto"><ul id="2e06aff1-ae23-4ae8-962c-f6cdaec64161" class="bulleted-list"><li style="list-style-type:disc">reforços táticos</li></ul></div><div style="display:contents" dir="auto"><ul id="cc8c234d-5deb-4b1c-83ef-1afe0936afc1" class="bulleted-list"><li style="list-style-type:disc">efeitos contra condições especiais</li></ul></div><div style="display:contents" dir="auto"><h2 id="1bd58112-3f94-4d4c-8685-fa8ff9571060" class="">Papel em jogo</h2></div><div style="display:contents" dir="auto"><p id="8f15ef6e-337c-437a-b826-34c1dcd7b5d0" class="">Encantamentos alteram a performance de itens existentes sem exigir a troca completa do arsenal.</p></div><div style="display:contents" dir="ltr"><div id="5d146139-8399-43bd-840e-0d05aecc7c97" class="collection-content"><h4 class="collection-title">Equipamentos</h4><div class="collection-content-wrapper"><table class="collection-content"><colgroup><col style="width:5.303030303030303%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.787878787878788%"/><col style="width:3.7878787878788245%"/></colgroup><thead><tr><th><span class="icon property-icon"><img src="https://www.notion.so/icons/font_gray.svg" style="width:14px;height:14px;display:block"/></span>Nome</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Subtipo</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Raridade</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Bônus</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Efeito</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Requisitos</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Limite de uso</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Escalonamento</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Observações</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Classes</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Alcance</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Amplificação Mágica Extra</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Atributo Afetado</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Ação Secundária Extra</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Categoria</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Crítico</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Custo</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Dano</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Defesa</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Defesa Extra</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Durabilidade</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Escala com</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Penalidade</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Peso</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Reação Extra</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/hashtag_gray.svg" style="width:14px;height:14px;display:block"/></span>Valor do Modificador</th></tr></thead><tbody><tr id="f71929f1-276b-47bc-90a3-d32fcc50c627"><td class="cell-title"><a href="Equipamentos/Amea%C3%A7adora%20f71929f1276b47bc90a3d32fcc50c627.html">Ameaçadora</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Duplica margem de ameaça</td><td class="cell-=^wq">A arma encantada ameaça crítico com muito mais frequência.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento central para builds de crítico.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">Aplicação por ferreiro arcano</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="2925846e-c520-4aa4-91fb-08bc0fd26d31"><td class="cell-title"><a href="Equipamentos/Anticriatura%202925846ec5204aa491fb08bc0fd26d31.html">Anticriatura</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Bônus contra um tipo de criatura</td><td class="cell-=^wq">Concede bônus de ataque e dano contra uma categoria específica.</td><td class="cell-Jodb">Definir tipo de criatura</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Muito forte em campanhas temáticas.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">Aplicação por alvo escolhido</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="e8073657-af0e-460f-a2ab-dd8ca5509e01"><td class="cell-title"><a href="Equipamentos/Assassina%20e8073657af0e460fa2abdd8ca5509e01.html">Assassina</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Aumenta ataque furtivo</td><td class="cell-=^wq">Amplia dano extra em ataques furtivos ou de surpresa.</td><td class="cell-Jodb">Arma leve ou finesse</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento ideal para assassinos e infiltradores.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="76b8c56c-6e79-446a-828a-9e9a7cb4ce22"><td class="cell-title"><a href="Equipamentos/Ca%C3%A7adora%2076b8c56c6e79446a828a9e9a7cb4ce22.html">Caçadora</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Ignora camuflagem e cobertura</td><td class="cell-=^wq">Ataques sofrem menos penalidade contra alvos ocultos.</td><td class="cell-Jodb">Arco, arma de arremesso ou lâmina leve</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Excelente para rastreadores e arqueiros.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="0d863276-44e3-4de3-9050-044b3509bde8"><td class="cell-title"><a href="Equipamentos/Arremesso%200d86327644e34de39050044b3509bde8.html">Arremesso</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-green">Incomum</span></td><td class="cell-Lu@E">Pode ser arremessada</td><td class="cell-=^wq">Permite lançar arma corpo a corpo sem perder sua eficácia básica.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Ótimo para versatilidade tática.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="28f2740c-71ce-42a3-9298-872247e29bd4"><td class="cell-title"><a href="Equipamentos/Congelante%2028f2740c71ce42a39298872247e29bd4.html">Congelante</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">+1d6 de dano de frio</td><td class="cell-=^wq">Golpes podem aplicar Lentidão leve.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Ótimo para controle de mobilidade.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="9c90fe73-3924-443a-b3a7-5968feb08b85"><td class="cell-title"><a href="Equipamentos/Conjuradora%209c90fe733924443ab3a75968feb08b85.html">Conjuradora</a></td><td class="cell-m{=@">Encantamento de Foco</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Pode guardar e lançar magias</td><td class="cell-=^wq">Armazena uma magia e permite liberá-la depois pelo item encantado.</td><td class="cell-Jodb">Foco, cajado ou arma arcana</td><td class="cell-u&lt;RI">1 magia armazenada</td><td class="cell-nBku"></td><td class="cell-YZL]">Excelente sinergia com Encantador.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="3a80a37e-129b-4cef-9583-166e28749350"><td class="cell-title"><a href="Equipamentos/Corrosiva%203a80a37e129b4cef9583166e28749350.html">Corrosiva</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">+1d6 de dano ácido</td><td class="cell-=^wq">Pode reduzir Defesa ou durabilidade do alvo.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Forte contra armaduras e construtos.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="49309a36-b1d8-45c9-b79c-04290cc8fc36"><td class="cell-title"><a href="Equipamentos/Dan%C3%A7arina%2049309a36b1d845c9b79c04290cc8fc36.html">Dançarina</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Ataca sozinha</td><td class="cell-=^wq">A arma realiza um ataque autônomo simples por turno.</td><td class="cell-Jodb">Arma leve ou média</td><td class="cell-u&lt;RI">3 turnos por combate</td><td class="cell-nBku"></td><td class="cell-YZL]">Versão tática de arma viva controlada.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">2 Mana por ativação</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="e550394d-43b4-4a8d-93b6-2e263bf747cc"><td class="cell-title"><a href="Equipamentos/Defensora%20e550394d43b44a8d93b62e263bf747cc.html">Defensora</a></td><td class="cell-m{=@">Encantamento de Armadura</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Defesa +2</td><td class="cell-=^wq">Concede bônus fixo de Defesa ao equipamento encantado.</td><td class="cell-Jodb">Armadura, manto ou escudo</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento simples e universalmente útil.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="b19f4774-a467-4270-a57a-6c455b9bfd25"><td class="cell-title"><a href="Equipamentos/Destruidora%20b19f4774a4674270a57a6c455b9bfd25.html">Destruidora</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Bônus contra construtos</td><td class="cell-=^wq">Aumenta ataque e dano contra construtos, portas e barreiras artificiais.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Excelente em campanhas de ruínas e autômatos.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="a0652685-b8eb-4fed-9875-974d4f04fee0"><td class="cell-title"><a href="Equipamentos/Drenante%20a0652685b8eb4fed9875974d4f04fee0.html">Drenante</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Crítico drena a vítima</td><td class="cell-=^wq">Acertos críticos drenam Vida, Mana ou Ki do alvo.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Muito forte em builds de crítico ou sustain.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="820928ea-bf02-4bb6-a5e1-e9fa8797eb8c"><td class="cell-title"><a href="Equipamentos/Excruciante%20820928eabf024bb6a5e1e9fa8797eb8c.html">Excruciante</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Causa fraqueza</td><td class="cell-=^wq">Golpes podem impor fraqueza física ou mental por curto período.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento de debuff pesado.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="f3480b26-0c21-479d-8de3-4497d2a04809"><td class="cell-title"><a href="Equipamentos/Energ%C3%A9tica%20f3480b260c21479d8de34497d2a04809.html">Energética</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Bônus em ataque</td><td class="cell-=^wq">Concede bônus consistente em testes de ataque.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Versátil e eficiente em qualquer build ofensiva.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="c22efb44-10c0-4598-8dba-cdb862a0bea4"><td class="cell-title"><a href="Equipamentos/El%C3%A9trica%20c22efb4410c045988dbacdb862a0bea4.html">Elétrica</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">+1d6 de dano de eletricidade</td><td class="cell-=^wq">Pode retirar reação ou aplicar choque leve.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento ofensivo de interrupção.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="7b6824e6-cbd4-426b-a774-8f13e82a411d"><td class="cell-title"><a href="Equipamentos/Flamejante%207b6824e6cbd4426ba7748f13e82a411d.html">Flamejante</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">+1d6 de dano de fogo</td><td class="cell-=^wq">Pode aplicar Queimando leve.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento clássico de dano elemental.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="bc65b361-7b21-46ef-a20b-2ee0364c343b"><td class="cell-title"><a href="Equipamentos/Formid%C3%A1vel%20bc65b3617b2146efa20b2ee0364c343b.html">Formidável</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Ataque e dano +2</td><td class="cell-=^wq">Melhora geral de precisão e impacto da arma encantada.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento premium de consistência ofensiva.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="e5835ed7-4c0d-4d56-8192-d8f9976f0d2a"><td class="cell-title"><a href="Equipamentos/Lancinante%20e5835ed74c0d4d568192d8f9976f0d2a.html">Lancinante</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Causa crítico terrível</td><td class="cell-=^wq">Críticos causam dano agravado e chance de debilitação adicional.</td><td class="cell-Jodb">Arma cortante ou perfurante</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Perfeito para duelistas de finalização.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="d44b569f-87d2-4a6c-9184-3136a96a121e"><td class="cell-title"><a href="Equipamentos/Magn%C3%ADfica%20d44b569f87d24a6c91843136a96a121e.html">Magnífica</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-red">Lendário</span></td><td class="cell-Lu@E">Ataque e dano +4</td><td class="cell-=^wq">Amplia drasticamente o desempenho base da arma ou foco encantado.</td><td class="cell-Jodb">Arma ou foco de alto tier</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento topo de linha de consistência pura.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="897cd795-c2ca-4eab-9f5b-4c04621eb067"><td class="cell-title"><a href="Equipamentos/Piedosa%20897cd795c2ca4eab9f5b4c04621eb067.html">Piedosa</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-green">Incomum</span></td><td class="cell-Lu@E">Dano não letal</td><td class="cell-=^wq">Converte dano letal em não letal com eficiência total.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Ideal para captura, justiça e campanhas urbanas.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="2a07f232-ed51-44e3-906e-7cb42d8cc6b8"><td class="cell-title"><a href="Equipamentos/Profana%202a07f232ed5144e3906e7cb42d8cc6b8.html">Profana</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Bônus contra devotos do Bem</td><td class="cell-=^wq">Aumenta ataque e dano contra alvos sagrados ou devotos do Bem.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento sombrio e especializado.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="790241ce-015f-4fb9-9ea9-88c0295a35de"><td class="cell-title"><a href="Equipamentos/Trovejante%20790241ce015f4fb99ea988c0295a35de.html">Trovejante</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Causa atordoamento</td><td class="cell-=^wq">Acertos importantes podem deixar o alvo Atordoado por 1 turno.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento de alto valor contra elites.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="1b5a620f-165e-4198-b061-5951df713b52"><td class="cell-title"><a href="Equipamentos/Tumular%201b5a620f165e4198b0615951df713b52.html">Tumular</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">+1d8 de dano de trevas</td><td class="cell-=^wq">Golpes invocam energia mortuária que enfraquece vitalidade.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Encantamento sombrio de dano elevado.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="1a4bacb7-55cb-4ba4-bcf5-fae5f056b0d7"><td class="cell-title"><a href="Equipamentos/Sagrada%201a4bacb755cb4ba4bcf5fae5f056b0d7.html">Sagrada</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-purple">Épico</span></td><td class="cell-Lu@E">Bônus contra devotos do Mal</td><td class="cell-=^wq">Aumenta ataque e dano contra criaturas malignas, profanas ou corrompidas.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Contraponto luminoso de Profana.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="04518c22-73e4-4233-981a-f9bb04973a10"><td class="cell-title"><a href="Equipamentos/Sanguin%C3%A1ria%2004518c2273e44233981af9bb04973a10.html">Sanguinária</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Causa sangramento</td><td class="cell-=^wq">Golpes passam a aplicar Sangramento em acertos fortes ou críticos.</td><td class="cell-Jodb">Arma cortante ou perfurante</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Muito eficiente para pressão prolongada.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="66ab428f-abc2-4fd3-8ee3-847e7d73ea43"><td class="cell-title"><a href="Equipamentos/Veloz%2066ab428fabc24fd38ee3847e7d73ea43.html">Veloz</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-red">Lendário</span></td><td class="cell-Lu@E">Fornece ataque extra</td><td class="cell-=^wq">Concede um ataque adicional por turno com penalidade reduzida.</td><td class="cell-Jodb">Arma leve ou média</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Top tier para duelistas e marciais rápidos.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="6f2e88f2-8904-43be-a471-aa3377aa52b8"><td class="cell-title"><a href="Equipamentos/Venenosa%206f2e88f2890443bea471aa3377aa52b8.html">Venenosa</a></td><td class="cell-m{=@">Encantamento de Arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Causa envenenamento</td><td class="cell-=^wq">Acertos aplicam Envenenado com toxina persistente.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Ótima contra alvos de alta Vida.</td><td class="cell-mFGG"></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr><tr id="dbd707a3-da95-4247-99b8-51a4d1fccdc9"><td class="cell-title"><a href="Equipamentos/Selo%20Rompedor%20Arcano%20dbd707a3da95424799b851a4d1fccdc9.html">Selo Rompedor Arcano</a></td><td class="cell-m{=@">Encantamento de arma</td><td class="cell-:Vbi"><span class="selected-value select-value-color-blue">Raro</span></td><td class="cell-Lu@E">Chance de quebrar Canalização Quebrada do alvo</td><td class="cell-=^wq">Arma encantada interrompe sustentação mágica e amplia pressão anti-conjuração.</td><td class="cell-Jodb">Arma compatível</td><td class="cell-u&lt;RI">Passivo</td><td class="cell-nBku"></td><td class="cell-YZL]">Perfeito para caçar magos e usuários instáveis.</td><td class="cell-mFGG"><a href="../Criar%20Personagem/Classes/Ki%20ec27f579c6cb4ff8b30faa1a340adab0.html">Ki</a>, <a href="../Criar%20Personagem/Classes/Restri%C3%A7%C3%A3o%20Celestial%20280949ab67c74aceba16774b4427722d.html">Restrição Celestial</a></td><td class="cell-uaJc"></td><td class="cell-@T~x"></td><td class="cell-:bEj"></td><td class="cell-rnhs"></td><td class="cell-WzV&lt;"><span class="selected-value select-value-color-brown">Encantamento</span></td><td class="cell-&gt;NI&gt;"></td><td class="cell-eZXH">—</td><td class="cell-;I}M"></td><td class="cell-?dcr"></td><td class="cell-zVFg"></td><td class="cell-X?Hq"></td><td class="cell-yD^d"></td><td class="cell-=B_f"></td><td class="cell-|\z^"></td><td class="cell-chOe"></td><td class="cell-cq\@"></td></tr></tbody></table></div><br/><br/></div></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>

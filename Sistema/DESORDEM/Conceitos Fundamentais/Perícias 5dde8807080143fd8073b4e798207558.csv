@@ -1,0 +1,24 @@
+﻿Nome,Atributo base,Cálculo,Função,Tipo
+Atletismo,Força,,"Escalar, nadar, levantar e superar obstáculos físicos.",Física
+Fortitude,Constituição,,"Resistir veneno, doença, exaustão e desgaste extremo.",Física
+Luta,Força,,"Combate corpo a corpo pesado, agarrões e impacto direto.",Física
+Vigor,Constituição,,"Suportar dor, sangramento e impactos contínuos.",Física
+Sobrevivência,Sabedoria,,"Resistência ambiental, fome, frio e desgaste de jornada.",Mental
+Acrobacia,Destreza,,"Saltos, equilíbrio, reposicionamento e controle corporal fino.",Física
+Furtividade,Destreza,,"Esconder-se, infiltrar-se e evitar detecção.",Física
+Ladinagem,Destreza,,"Abrir trancas, lidar com armadilhas e manipular mecanismos delicados.",Técnica
+Reflexos,Destreza,,"Esquiva ativa, reação rápida e resposta instantânea.",Física
+Pontaria,Destreza,,Uso eficiente de ataques à distância e precisão de disparo.,Técnica
+Conhecimento,Inteligência,,"Saber acadêmico, teoria e acervo geral de informação.",Intelectual
+Investigação,Inteligência,,"Analisar pistas, padrões, cenas e evidências.",Intelectual
+Misticismo,Inteligência,,"Compreender magia, inscrições, rituais e estruturas arcanas.",Intelectual
+Percepção,Sabedoria,,"Notar detalhes, perigos, presença hostil e pistas sensoriais.",Mental
+Intuição,Sabedoria,,"Julgar intenções, risco oculto e leitura emocional.",Mental
+Cura,Sabedoria,,"Medicina prática, estabilização e tratamento de ferimentos.",Técnica
+Vontade,Sabedoria,,"Resistência mental, espiritual e emocional contra coerção.",Mental
+Diplomacia,Carisma,,"Negociação, conciliação e condução social favorável.",Social
+Enganação,Carisma,,"Mentir, blefar, distrair e conduzir falsas leituras.",Social
+Persuasão,Carisma,,"Convencer, liderar, negociar e mover pessoas sem coerção direta.",Social
+Jogatina,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Blefar, ler apostas, manipular mesa e ganhar vantagem em jogos de risco.",Social
+Tática de Sobrevivência,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Ler terreno hostil, improvisar rota segura, administrar recursos e manter o grupo vivo.",Técnica
+Iniciativa,Destreza,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Determina velocidade de resposta, abertura de turno e leitura imediata de combate.",Técnica

@@ -1,0 +1,743 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Subclasses</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+/* Override strong tags inside headings to maintain consistent weight */
+h1 strong,
+h2 strong,
+h3 strong {
+	font-weight: 600;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 10px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+
+	table.collection-content {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	table.collection-content th,
+	table.collection-content td {
+		overflow-wrap: anywhere;
+	}
+
+	table.collection-content td > .user,
+	table.collection-content td > time {
+		white-space: pre-wrap;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content-wrapper {
+	overflow-x: auto;
+}
+
+@media only print {
+	.collection-content-wrapper {
+		overflow-x: visible;
+	}
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	gap: 46px;
+}
+
+.column {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.column > *:first-child {
+	margin-top: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+table {
+	border-collapse: collapse;
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol.numbered-list.numbered-list-digits-2 {
+	padding-inline-start: 2em;
+}
+
+ol.numbered-list.numbered-list-digits-3plus {
+	padding-inline-start: 2.4em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.callout img.notion-static-icon {
+	width: 1em;
+	height: 1em;
+}
+
+.callout p {
+	margin: 0;
+}
+
+.callout h1,
+.callout h2,
+.callout h3 {
+	margin: 0 0 0.6rem;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+blockquote.quote-large {
+	font-size: 1.25em;
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", "Noto Sans Arabic", "Noto Sans Hebrew", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.highlight-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.highlight-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.highlight-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.highlight-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.highlight-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.highlight-default_background {
+	color: rgba(44, 44, 43, 1);
+}
+.highlight-gray_background {
+	background: rgba(42, 28, 0, 0.07);
+}
+.highlight-brown_background {
+	background: rgba(139, 46, 0, 0.086);
+}
+.highlight-orange_background {
+	background: rgba(224, 101, 1, 0.129);
+}
+.highlight-yellow_background {
+	background: rgba(211, 168, 0, 0.137);
+}
+.highlight-teal_background {
+	background: rgba(0, 100, 45, 0.09);
+}
+.highlight-blue_background {
+	background: rgba(0, 124, 215, 0.094);
+}
+.highlight-purple_background {
+	background: rgba(102, 0, 178, 0.078);
+}
+.highlight-pink_background {
+	background: rgba(197, 0, 93, 0.086);
+}
+.highlight-red_background {
+	background: rgba(223, 22, 0, 0.094);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(125, 122, 117, 1);
+	fill: rgba(125, 122, 117, 1);
+}
+.block-color-brown {
+	color: rgba(159, 118, 90, 1);
+	fill: rgba(159, 118, 90, 1);
+}
+.block-color-orange {
+	color: rgba(210, 123, 45, 1);
+	fill: rgba(210, 123, 45, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 148, 52, 1);
+	fill: rgba(203, 148, 52, 1);
+}
+.block-color-teal {
+	color: rgba(80, 148, 110, 1);
+	fill: rgba(80, 148, 110, 1);
+}
+.block-color-blue {
+	color: rgba(56, 125, 201, 1);
+	fill: rgba(56, 125, 201, 1);
+}
+.block-color-purple {
+	color: rgba(154, 107, 180, 1);
+	fill: rgba(154, 107, 180, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(207, 81, 72, 1);
+	fill: rgba(207, 81, 72, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(240, 239, 237, 1);
+}
+.block-color-brown_background {
+	background: rgba(245, 237, 233, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 235, 222, 1);
+}
+.block-color-yellow_background {
+	background: rgba(249, 243, 220, 1);
+}
+.block-color-teal_background {
+	background: rgba(232, 241, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(229, 242, 252, 1);
+}
+.block-color-purple_background {
+	background: rgba(243, 235, 249, 1);
+}
+.block-color-pink_background {
+	background: rgba(250, 233, 241, 1);
+}
+.block-color-red_background {
+	background: rgba(252, 233, 231, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(127, 51, 0, 0.156); }
+.select-value-color-orange { background-color: rgba(196, 88, 0, 0.203); }
+.select-value-color-yellow { background-color: rgba(209, 156, 0, 0.282); }
+.select-value-color-green { background-color: rgba(0, 96, 38, 0.156); }
+.select-value-color-blue { background-color: rgba(0, 118, 217, 0.203); }
+.select-value-color-purple { background-color: rgba(92, 0, 163, 0.141); }
+.select-value-color-pink { background-color: rgba(183, 0, 78, 0.152); }
+.select-value-color-red { background-color: rgba(206, 24, 0, 0.164); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="fa23d144-257d-4e36-a3e2-2bb34cd621e0" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">🧩</span></div><h1 class="page-title" dir="auto">Subclasses</h1><p class="page-description" dir="auto"></p></header><div class="page-body"><div style="display:contents" dir="auto"><h2 id="caaef5a6-1e31-4929-bcee-8d9c9bbb0769" class="">Papel das subclasses</h2></div><div style="display:contents" dir="auto"><p id="244e50ec-9f51-46a3-9c3c-d114db54f9fb" class="">Subclasses são o verdadeiro eixo de construção de build em DESORDEM.</p></div><div style="display:contents" dir="auto"><p id="91246ab6-cfc3-4bf3-a0f9-b1821c0aae36" class="">Elas determinam como a classe funciona em combate, progressão e tomada de decisão.</p></div><div style="display:contents" dir="auto"><h2 id="2a75c9e2-7f85-403e-ab99-18cfc411aaf0" class="">Regras de investimento</h2></div><div style="display:contents" dir="auto"><ul id="48fd4a1a-2f98-4afd-b9c1-ebd578478cea" class="bulleted-list"><li style="list-style-type:disc">Cada nível geral concede <strong>1 ponto de subclasse</strong></li></ul></div><div style="display:contents" dir="auto"><ul id="40066716-ea0d-4680-b162-97a8ee59f434" class="bulleted-list"><li style="list-style-type:disc">O personagem pode investir em várias subclasses compatíveis</li></ul></div><div style="display:contents" dir="auto"><ul id="7d64f492-bc4f-41a8-a421-e0510c352df0" class="bulleted-list"><li style="list-style-type:disc">Uma mesma subclasse não pode ultrapassar <strong>nível 25</strong></li></ul></div><div style="display:contents" dir="auto"><ul id="f7de3520-7fac-46f1-b625-4f50c4c41055" class="bulleted-list"><li style="list-style-type:disc">O nível geral continua limitado a <strong>50</strong></li></ul></div><div style="display:contents" dir="auto"><h2 id="cce86529-789d-4c41-bd6a-cfaa9a3fa363" class="">Bônus por marcos de subclasse</h2></div><div style="display:contents" dir="auto"><ul id="2b1765b8-66e6-4b89-afd0-a4a89c0a3ebd" class="bulleted-list"><li style="list-style-type:disc"><strong>Nível 1</strong> → identidade base e ação central da subclasse</li></ul></div><div style="display:contents" dir="auto"><ul id="83ed2e93-79b3-4489-a853-96e8fa2f406f" class="bulleted-list"><li style="list-style-type:disc"><strong>Nível 5</strong> → melhoria estável de custo, alcance ou pressão</li></ul></div><div style="display:contents" dir="auto"><ul id="e3342519-fb0f-471b-89d6-263bd877bee9" class="bulleted-list"><li style="list-style-type:disc"><strong>Nível 10</strong> → primeiro salto forte de escalonamento</li></ul></div><div style="display:contents" dir="auto"><ul id="8e3b39ee-303a-4311-9ce7-11a1ef6c038b" class="bulleted-list"><li style="list-style-type:disc"><strong>Nível 15</strong> → especialização tática ou defensiva</li></ul></div><div style="display:contents" dir="auto"><ul id="3145b322-d92f-4c0a-917a-76ebdfb8842e" class="bulleted-list"><li style="list-style-type:disc"><strong>Nível 20</strong> → domínio avançado da build</li></ul></div><div style="display:contents" dir="auto"><ul id="fd19e00d-c636-403b-8ca5-7e0a4a5366e5" class="bulleted-list"><li style="list-style-type:disc"><strong>Nível 25</strong> → expressão máxima da subclasse</li></ul></div><div style="display:contents" dir="auto"><h2 id="ea2c657c-1184-4028-a2fe-28027c77b0d5" class="">Subclasses de Ki</h2></div><div style="display:contents" dir="auto"><ul id="ca69cf03-4da6-4574-a7e2-063f5649a404" class="bulleted-list"><li style="list-style-type:disc"><strong>Mestre das Armas</strong> → infunde Ki em armas e objetos para intensificar efeitos, alcance e dano</li></ul></div><div style="display:contents" dir="auto"><ul id="110421d0-e2bb-4b1c-9c94-2fcd148d6345" class="bulleted-list"><li style="list-style-type:disc"><strong>Lutador Marcial</strong> → infunde Ki nos músculos para fortalecer golpes; a cada nível pega um poder de Ki, com exceção das transformações</li></ul></div><div style="display:contents" dir="auto"><ul id="7b47696c-73f6-4023-82b1-0dc5b426e569" class="bulleted-list"><li style="list-style-type:disc"><strong>Guerreiro Espiritual</strong> → lança Ki para fora do corpo em rajadas, ondas, muralhas e projéteis</li></ul></div><div style="display:contents" dir="auto"><ul id="eef6f7e9-ced4-4f76-bf4b-9954b9e444a5" class="bulleted-list"><li style="list-style-type:disc"><strong>Monge</strong> → usa técnicas de Ki voltadas a transformação, disciplina corporal, evasão e estados avançados</li></ul></div><div style="display:contents" dir="auto"><h2 id="de333ef6-5a53-47cb-8072-311f48aa29c0" class="">Uniões de subclasse já definidas</h2></div><div style="display:contents" dir="auto"><ul id="e60e4d4c-40a2-4904-8e2a-503b6fd60e05" class="bulleted-list"><li style="list-style-type:disc"><strong>Músico Gospel</strong> → Bardo + Clérigo</li></ul></div><div style="display:contents" dir="auto"><ul id="b29d33e4-c4f4-4305-aea9-e34afcabe102" class="bulleted-list"><li style="list-style-type:disc"><strong>Avatar do Fluxo</strong> → Monge + Guerreiro Espiritual</li></ul></div><div style="display:contents" dir="auto"><ul id="0d29178b-b061-4af5-8cee-a99a8bab8095" class="bulleted-list"><li style="list-style-type:disc"><strong>Quebra-Feitiço Absoluto</strong> → Titã Corporal + Inimigo Energético</li></ul></div><div style="display:contents" dir="auto"><ul id="a05f1e73-22d8-4119-b46c-fd23a3f5583c" class="bulleted-list"><li style="list-style-type:disc"><strong>Arquimago Cinético</strong> → Arcanismo + Manipulação</li></ul></div><div style="display:contents" dir="auto"><ul id="7dd8b3a5-831f-4ddf-94d0-218251b0aa5f" class="bulleted-list"><li style="list-style-type:disc"><strong>Forjador Arcano</strong> → Transmutação + Encantador</li></ul></div><div style="display:contents" dir="auto"><ul id="cbc2a2a7-2a80-47cc-bf0a-854cf2008886" class="bulleted-list"><li style="list-style-type:disc"><strong>Avatar do Convergente</strong> → Canalizador Dual + Guerreiro Espiritual</li></ul></div><div style="display:contents" dir="auto"><ul id="ca5d8031-9a7a-4970-92af-465a4b524997" class="bulleted-list"><li style="list-style-type:disc"><strong>Tecelão da Realidade</strong> → Arcanismo + Projeção</li></ul></div><div style="display:contents" dir="auto"><ul id="f1f6a7f3-b524-4275-9df6-1fbf7858d380" class="bulleted-list"><li style="list-style-type:disc"><strong>Arquiteto Arcano</strong> → Encantador + Transmutação</li></ul></div><div style="display:contents" dir="auto"><ul id="d776a15b-80c0-4cc8-b91a-5473c5629bed" class="bulleted-list"><li style="list-style-type:disc"><strong>Lâmina Arcana</strong> → Mestre das Armas + Arcanismo</li></ul></div><div style="display:contents" dir="auto"><h2 id="29bddfc9-4565-451b-82c0-14350b237184" class="">Tabela de bônus das uniões</h2></div><div style="display:contents" dir="ltr"><table id="fd5ea57b-bebc-4953-8644-6d65126744ff" class="simple-table"><thead class="simple-table-header"><div style="display:contents" dir="ltr"><tr id="8ce78de6-d93e-4cfa-ba9d-29c7bd2527e0"><th id="`H?M" class="simple-table-header-color simple-table-header">União</th><th id="DBRP" class="simple-table-header-color simple-table-header">Bônus</th><th id="A&gt;]m" class="simple-table-header-color simple-table-header">Habilidades extras</th><th id="exu`" class="simple-table-header-color simple-table-header">Valores</th></tr></div></thead><tbody><div style="display:contents" dir="ltr"><tr id="5063b28b-9440-4929-b63d-6e8356ea4f87"><td id="`H?M" class="">Músico Gospel</td><td id="DBRP" class="">+2 em cura e suporte sagrado; +2 resistência mental para aliados próximos</td><td id="A&gt;]m" class="">Hino Restaurador; Salmo de Purificação; Julgamento Harmônico</td><td id="exu`" class="">Cura em área: 2d8 + Mod. Inteligência; remove 1 condição mental/espiritual; dano sagrado: 2d10 em cone de 6 m</td></tr></div><div style="display:contents" dir="ltr"><tr id="640af464-d905-4d41-8d96-03015068953e"><td id="`H?M" class="">Avatar do Fluxo</td><td id="DBRP" class="">+2 Defesa; +2 m deslocamento; +1d8 em técnicas espirituais</td><td id="A&gt;]m" class="">Soco de Onda Expandida; Passo Fantasma; Explosão de Centro</td><td id="exu`" class="">Empurra 3 m; teleporte curto de 4 m; explosão central de 2d10 em área de 3 m</td></tr></div><div style="display:contents" dir="ltr"><tr id="4c826d39-8aa2-4612-a904-8f6a3c5853cd"><td id="`H?M" class="">Quebra-Feitiço Absoluto</td><td id="DBRP" class="">+3 resistência contra Mana/Ki; +2 dano contra conjuradores</td><td id="A&gt;]m" class="">Impacto Disruptivo; Resistência Suprema; Zona Morta</td><td id="exu`" class="">Reduz dano mágico em 50%; quebra sustentação; zona de 4 m bloqueia magia por 1 turno</td></tr></div><div style="display:contents" dir="ltr"><tr id="50074424-17ac-41d9-8e47-efa858f276e3"><td id="`H?M" class="">Arquimago Cinético</td><td id="DBRP" class="">+2 precisão arcana; +1 alvo em manipulação leve</td><td id="A&gt;]m" class="">Bola de Fogo Guiada; Compressão Arcana; Campo de Distorção</td><td id="exu`" class="">Projétil guiado de 3d8; compressão imobiliza por 1 turno; campo reduz Defesa em 2 numa área de 3 m</td></tr></div><div style="display:contents" dir="ltr"><tr id="fadd4ecc-a440-42b7-8d4c-55c1ca5dda51"><td id="`H?M" class="">Forjador Arcano</td><td id="DBRP" class="">+2 potência de encantamento; +1 duração base</td><td id="A&gt;]m" class="">Encantamento Permanente; Reforço Estrutural Instantâneo; Conversão Arcana</td><td id="exu`" class="">Dobra a duração de 1 encantamento; reforço concede +2 Defesa ou +2 dano; conversão troca o elemento do item</td></tr></div><div style="display:contents" dir="ltr"><tr id="64023fca-9022-4d54-a93a-aa0d26c97403"><td id="`H?M" class="">Avatar do Convergente</td><td id="DBRP" class="">+1 Amplificação Mágica; +1 escala de Ki; -1 no custo híbrido principal</td><td id="A&gt;]m" class="">Rajada Convergente; Campo de Harmonia Instável; Colapso Convergente</td><td id="exu`" class="">Rajada híbrida de 2d10; campo de 3 m afeta aliados e inimigos; colapso final causa 3d12 e gera Exaustão</td></tr></div><div style="display:contents" dir="ltr"><tr id="d9ae95e1-9ae2-4a5e-924e-1ba403b1bbef"><td id="`H?M" class="">Tecelão da Realidade</td><td id="DBRP" class="">+2 potência ilusória; +1 camada sensorial em projeções</td><td id="A&gt;]m" class="">Ilusão Tangível; Distorção Perceptiva; Sobreposição Arcana</td><td id="exu`" class="">Ilusão ofensiva causa 2d8 psíquico; distorção impõe Desorientado por 2 turnos; sobreposição cobre 4 m</td></tr></div><div style="display:contents" dir="ltr"><tr id="6caa3382-ac4d-4f7d-925c-65f14d905da6"><td id="`H?M" class="">Arquiteto Arcano</td><td id="DBRP" class="">+2 criação estrutural; -1 custo em combo de transmutação + encantamento</td><td id="A&gt;]m" class="">Construção Instantânea; Reconfiguração Estrutural; Núcleo Arcano</td><td id="exu`" class="">Cria cobertura de 3 m; reconfigura terreno em 6 m; núcleo concede +1 AM ou +2 Defesa a um objeto</td></tr></div><div style="display:contents" dir="ltr"><tr id="e0a30750-1e74-4dad-b211-51cb2b0b6284"><td id="`H?M" class="">Lâmina Arcana</td><td id="DBRP" class="">+1d8 elemental na arma; +1 na ameaça crítica da arma imbuída</td><td id="A&gt;]m" class="">Elemento Alternável; Corte à Distância; Explosão no Crítico</td><td id="exu`" class="">Troca o elemento 1 vez por turno; corte alcança 8 m; crítico cria explosão de 2 m com 2d8 extras</td></tr></div></tbody></table></div><div style="display:contents" dir="ltr"><div id="09caa0c2-4541-49d8-9538-14d0d1ba0549" class="collection-content"><h4 class="collection-title">Subclasses</h4><div class="collection-content-wrapper"><table class="collection-content"><colgroup><col style="width:9.722222222222223%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444445%"/><col style="width:6.944444444444457%"/></colgroup><thead><tr><th><span class="icon property-icon"><img src="https://www.notion.so/icons/font_gray.svg" style="width:14px;height:14px;display:block"/></span>Nome</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Grupo</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Função</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-circle-down_gray.svg" style="width:14px;height:14px;display:block"/></span>Recurso usado</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Escala com</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Descrição</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Progressão</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Observações</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Classe</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Técnicas de Ki</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Uniões A</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;display:block"/></span>Uniões B</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Bônus por nível</th><th><span class="icon property-icon"><img src="https://www.notion.so/icons/description_gray.svg" style="width:14px;height:14px;display:block"/></span>Identidade Mecânica</th></tr></thead><tbody><tr id="826cc73c-f8a3-4915-824a-433dfbcb806c"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Arcanismo%20826cc73cf8a34915824a433dfbcb806c.html">Arcanismo</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-red">Dano</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência, precisão mágica e controle de Mana</td><td class="cell-b_S@">Especialização em repertório elemental, rajadas arcanas e conjuração ofensiva de alta pressão.</td><td class="cell-y[Uz">N1: aprende 1 elementos básicos e +1 alcance em magias elementais; N5: +1 precisão mágica e AM 1 sem penalidade leve; N10: libera elementos intermediários e +1 dado em magias básicas; N15: reduz em 10% o custo da primeira magia elemental do turno; N20: amplia área ou alvo secundário em magias elementais; N25: domina composição arcana, soma +2 dados em magias elementais avançadas e supremas.</td><td class="cell-Mx}=">Requisitos de magia passam a depender de domínio elemental e repertório, não de nível explícito de Arcanismo.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="781530d0-a52c-445c-8c0d-227c8702dc58"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Transmuta%C3%A7%C3%A3o%20781530d0a52c445c8c0d227c8702dc58.html">Transmutação</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-yellow">Controle</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência e complexidade do material ou elemento alterado</td><td class="cell-b_S@">Alteração de matéria, corpo e propriedades físicas por conversão elemental controlada.</td><td class="cell-y[Uz">N1: altera textura, dureza ou forma de matéria simples; N5: converte pequenas partes do corpo em elemento já dominado para ganhar resistência temática; N10: transmuta armas ou terreno em elemento do catálogo; N15: converte dano recebido em resistência parcial se o elemento for conhecido; N20: reconfigura membros, armaduras e barreiras em composições elementais complexas; N25: executa transmutação maior em área ou em todo o próprio corpo por curto período.</td><td class="cell-Mx}=">Pode alterar o próprio corpo ou objetos externos em elementos já presentes no repertório dominado.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="e2e14de0-a40e-434e-9218-ac1ed7c108c5"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Manipula%C3%A7%C3%A3o%20e2e14de0a40e434e9218ac1ed7c108c5.html">Manipulação</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-yellow">Controle</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência, precisão de controle e massa manipulada</td><td class="cell-b_S@">Controle físico externo, telecinese e manipulação precisa de objetos, projéteis ou criaturas.</td><td class="cell-y[Uz">N1: move objetos leves e recebe +1 precisão em magias de controle; N5: pode desarmar, empurrar ou puxar com maior estabilidade; N10: manipula múltiplos alvos leves ou um alvo médio sem perder precisão; N15: converte manipulação em esmagamento, suspensão ou redirecionamento de ataques; N20: manipula terreno e projéteis em área; N25: controle fino total, permitindo travar, lançar e reposicionar múltiplos alvos no mesmo turno.</td><td class="cell-Mx}=">Subclasse ideal para aumentar precisão de magias e controle do campo.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="238e6859-4b7e-48d5-9e38-72f810f76e59"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Proje%C3%A7%C3%A3o%20238e68594b7e48d59e3872f810f76e59.html">Projeção</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-yellow">Controle</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência, pressão mental e estabilidade ilusória</td><td class="cell-b_S@">Ilusão, duplicação sensorial e distorção perceptiva com foco em engano e desorientação.</td><td class="cell-y[Uz">N1: cria imagem ou som ilusório simples; N5: impõe penalidade leve de percepção ao alvo enganado; N10: sustenta múltiplas camadas de ilusão e falsos posicionamentos; N15: converte ilusão em dano psíquico leve ou cegueira momentânea; N20: afeta área ampla ou vários sentidos ao mesmo tempo; N25: cria cenário ilusório avançado com leitura emocional e ocultação tática massiva.</td><td class="cell-Mx}=">Subclasse de controle mental indireto, infiltração e distorção sensorial.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="412f3326-a65d-4985-933a-7104d479e1d9"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Invoca%C3%A7%C3%A3o%20412f3326a65d4985933a7104d479e1d9.html">Invocação</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-yellow">Controle</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência, estabilidade invocatória e custo de Mana</td><td class="cell-b_S@">Especialização em trazer entidades, armas, focos ou estruturas mágicas temporárias.</td><td class="cell-y[Uz">N1: invoca construto simples ou arma arcana temporária; N5: invocações ganham +1 ação simples por rodada; N10: pode manter 2 invocações leves ou 1 média; N15: transfere AM ou encantamentos para a invocação; N20: invocação resiste melhor e compartilha sentidos com o conjurador; N25: manifesta entidade maior ou arsenal invocado com múltiplas funções.</td><td class="cell-Mx}=">Invocações escalam em durabilidade, ações e utilidade ao longo dos marcos.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="5d0c060b-1ea9-4449-a5a4-8e8644489a3f"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Cl%C3%A9rigo%205d0c060b1ea94449a5a48e8644489a3f.html">Clérigo</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-green">Suporte</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência, pureza ritual e estabilidade espiritual</td><td class="cell-b_S@">Magia sagrada, proteção, purificação e sustentação ritual com base em Mana refinada.</td><td class="cell-y[Uz">N1: cura leve, purificação simples e selo protetivo; N5: bênçãos recebem duração ampliada; N10: cura e dano sagrado recebem dado extra; N15: pode converter parte do dano causado em cura ou escudo; N20: proteção em área contra estados negativos; N25: liturgia maior com purificação massiva, resistência mágica e explosão sagrada.</td><td class="cell-Mx}=">Quando o efeito usa Mana, o cálculo base continua ligado à Inteligência.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="66fc65b2-ef70-4008-9db5-9379a87eda37"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Encantador%2066fc65b2ef7040089db59379a87eda37.html">Encantador</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-green">Suporte</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência e densidade de encantamentos ativos</td><td class="cell-b_S@">Especialista em inscrições, objetos encantados, runas e amplificação de efeitos presentes no repertório elemental.</td><td class="cell-y[Uz">N1: aplica 1 encantamento simples em arma, armadura ou foco; N5: encantamentos duram +2 turnos ou recebem +1 carga; N10: amplifica encantamentos ligados a elementos conhecidos, elevando bônus numéricos em 50%; N15: pode manter 2 encantamentos simultâneos no mesmo alvo ou item; N20: ativa encantamento reativo ao sofrer ataque ou lançar magia; N25: cria encantamento magistral com custo reduzido e efeito dobrado em um item-chave.</td><td class="cell-Mx}=">Encantador é a subclasse central para sinergia entre elementos, equipamentos e efeitos persistentes.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="0f12c73a-8204-44b3-98a1-171af07bc556"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Bardo%200f12c73a820444b398a1171af07bc556.html">Bardo</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-green">Suporte</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-blue">Mana</span></td><td class="cell-SmYN">Inteligência, ritmo de conjuração e manutenção de efeitos</td><td class="cell-b_S@">Magia sonora e rítmica com foco em buffs, debuffs, comando de ritmo e suporte arcano.</td><td class="cell-y[Uz">N1: aplica música de guerra ou calma com bônus leve; N5: pode sustentar 2 alvos aliados com o mesmo canto; N10: canções causam debuffs em inimigos além do suporte; N15: ecos musicais repetem metade do efeito no turno seguinte; N20: performance em área com múltiplos buff/debuff; N25: sinfonia magistral que altera iniciativa, dano e resistência de todo o campo próximo.</td><td class="cell-Mx}=">Apesar do estilo carismático, o eixo de Mana permanece ligado à Inteligência.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Mago%20f761bd678e484cd0993fda875188004f.html">Mago</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="433c5158-0f2a-468c-b90d-a2fe79aca051"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Mestre%20das%20Armas%20433c51580f2a468cb90da2fe79aca051.html">Mestre das Armas</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-red">Dano</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-SmYN">Sabedoria, atributo principal da arma e refinamento de Ki</td><td class="cell-b_S@">Especialista em armas energizadas com Ki, alcance ampliado e impacto expandido.</td><td class="cell-y[Uz">N1: imbuí arma com Ki e soma dano energético leve; N5: aumenta alcance ou precisão da arma imbuída; N10: ataques armados gastam menos Ki; N15: pode projetar corte ou impacto à distância; N20: arma imbuída rompe guarda ou escudo; N25: manifestação armada suprema com múltiplos golpes energizados no mesmo turno.</td><td class="cell-Mx}=">É a ponte ideal entre arsenal físico e técnicas de Ki.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Ki%20ec27f579c6cb4ff8b30faa1a340adab0.html">Ki</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"><a href="Magias/T%C3%A9cnicas%20de%20Ki/Golpe%20Imbu%C3%ADdo%20c9fd9df452df4d5682e46d1c85e5d0d6.html">Golpe Imbuído</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Corte%20Vibrante%20260a587f512a433f8215308c81d883a6.html">Corte Vibrante</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Infus%C3%A3o%20Ecoante%2050b0909a3f00458e93dc7cee7440cc05.html">Infusão Ecoante</a></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z">N1 ativa infusão básica; N5 reduz custo ou amplia alcance; N10 eleva dado de dano; N15 projeta cortes; N20 rompe guarda; N25 manifesta arsenal supremo.</td><td class="cell-VhN[">Infunde Ki em armas e objetos para intensificar efeito, alcance, corte e dano de cada golpe.</td></tr><tr id="f22504cb-e8e6-4c23-9989-510a0be1abfe"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Lutador%20Marcial%20f22504cbe8e64c239989510a0be1abfe.html">Lutador Marcial</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-red">Dano</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-SmYN">Sabedoria, Destreza ou Força, mais consumo de Ki</td><td class="cell-b_S@">Combate técnico direto com combos, contra-ataques e quebra de defesa por pressão marcial.</td><td class="cell-y[Uz">N1: desbloqueia combo de 2 golpes; N5: recebe +1 ataque em sequência com custo reduzido; N10: combos aplicam quebra de guarda ou empurrão; N15: contra-ataques causam dano ampliado; N20: pode converter deslocamento em golpe bônus; N25: sequência perfeita com múltiplos impactos e controle de ritmo.</td><td class="cell-Mx}=">A cada nível pode adquirir um poder de Ki, com exceção das transformações.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Ki%20ec27f579c6cb4ff8b30faa1a340adab0.html">Ki</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"><a href="Magias/T%C3%A9cnicas%20de%20Ki/Impacto%20Interno%20193b69d3f62746f9b6a658791dd0477a.html">Impacto Interno</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Golpe%20Imbu%C3%ADdo%20c9fd9df452df4d5682e46d1c85e5d0d6.html">Golpe Imbuído</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Sequ%C3%AAncia%20Devastadora%20eac8f7d3345f426399ea1f7d00a3cff8.html">Sequência Devastadora</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Impacto%20Explosivo%20c687b8422bc64335999cc9ecc104f2bb.html">Impacto Explosivo</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Agressiva%20da132de80c654f2b972c65d6c9400cf2.html">Forma Agressiva</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Suprema%20c1110ad53f234213ab77b4fdd7405db1.html">Forma Suprema</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Musculatura%20Explosiva%20c4d79919e2d0432d8a6d686b5b8262bf.html">Musculatura Explosiva</a></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z">N1 ganha pressão corporal; N5 reduz custo de combo; N10 soma quebra de guarda; N15 amplia contra-ataque; N20 acelera sequência; N25 executa cadeia marcial suprema.</td><td class="cell-VhN[">Infunde Ki nos músculos para fortalecer golpes, combos, impacto e pressão física contínua.</td></tr><tr id="4861740c-9152-43a5-ac80-1f4752cc9fe7"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Guerreiro%20Espiritual%204861740c915243a5ac801f4752cc9fe7.html">Guerreiro Espiritual</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-green">Suporte</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-SmYN">Sabedoria, intensidade de Ki e alcance espiritual</td><td class="cell-b_S@">Projeção externa de Ki com rajadas, ondas de choque e resistência espiritual ofensiva.</td><td class="cell-y[Uz">N1: libera rajada simples de Ki; N5: rajadas empurram ou desequilibram; N10: aprende onda de choque em área curta; N15: projeções recebem efeito espiritual secundário; N20: forma muralha ou esfera de Ki defensiva; N25: tempestade espiritual com múltiplos disparos e pressão em área.</td><td class="cell-Mx}=">Subclasse ideal para quem quer alcance sem abandonar Ki.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Ki%20ec27f579c6cb4ff8b30faa1a340adab0.html">Ki</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"><a href="Magias/T%C3%A9cnicas%20de%20Ki/Passo%20Rel%C3%A2mpago%206e18371e35c5458ab6235d1f1b932a89.html">Passo Relâmpago</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Defesa%20Interior%2050c942cc68df465f88095afb328bfe31.html">Defesa Interior</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Golpe%20Imbu%C3%ADdo%20c9fd9df452df4d5682e46d1c85e5d0d6.html">Golpe Imbuído</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Salto%20Celestial%20fdc46cea76994df9975a4092205e9992.html">Salto Celestial</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Corpo%20de%20A%C3%A7o%20f761ea5c59554afeb4801b32cece0722.html">Corpo de Aço</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Explos%C3%A3o%20Espiritual%208e2a1cfbfa7345b094ac48653bc1cbb6.html">Explosão Espiritual</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Onda%20de%20Ki%20dec88666704b485294ffa38ecf5e0e34.html">Onda de Ki</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Barreira%20Interna%20b8089ef33dad48cb951e2f7bd5b9f201.html">Barreira Interna</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Defensiva%20e5b8c1732ca84c3cb7964291f7236e9b.html">Forma Defensiva</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Espiritual%20f3ee169afaef4d2b84112aad032c1f1a.html">Forma Espiritual</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Agressiva%20da132de80c654f2b972c65d6c9400cf2.html">Forma Agressiva</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Suprema%20c1110ad53f234213ab77b4fdd7405db1.html">Forma Suprema</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Detec%C3%A7%C3%A3o%20Avan%C3%A7ada%20d814fac8da7f4a5e94c1455e02f249e7.html">Detecção Avançada</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Detec%C3%A7%C3%A3o%20Intermedi%C3%A1ria%2072f4f5189b724cc0b05477057801d455.html">Detecção Intermediária</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Detec%C3%A7%C3%A3o%20B%C3%A1sica%2022450d5fe70445f79491eac165559074.html">Detecção Básica</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Detec%C3%A7%C3%A3o%20Suprema%20aa02d30faf2f4967a21faaa65e1fc1a9.html">Detecção Suprema</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Lan%C3%A7a%20Astral%200c4e461907e54657a9a938c18335e154.html">Lança Astral</a></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z">N1 libera disparo simples; N5 empurra ou desequilibra; N10 abre área curta; N15 soma efeito espiritual; N20 cria defesa externa; N25 entra em tempestade espiritual.</td><td class="cell-VhN[">Lança Ki para fora do corpo em rajadas, muralhas, ondas de choque e armas espirituais.</td></tr><tr id="4c76234a-1e5e-44ff-bee2-6ab9567a261b"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Monge%204c76234a1e5e44ffbee26ab9567a261b.html">Monge</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-blue">Defesa</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-green">Ki</span></td><td class="cell-SmYN">Sabedoria, fluxo de Ki e disciplina corporal</td><td class="cell-b_S@">Controle corporal absoluto com defesa, mobilidade, regeneração e golpes internos de Ki.</td><td class="cell-y[Uz">N1: ganha postura de foco e defesa reativa; N5: regenera Ki ao esquivar ou aparar; N10: golpes internos ignoram parte da armadura; N15: reduz custo de técnicas sustentadas; N20: pode agir mesmo sob parte de condições físicas; N25: corpo perfeito, grande resistência e contra-ataque automático uma vez por rodada.</td><td class="cell-Mx}=">Recebe novas transformações e se torna a principal linha de evolução corporal do Ki.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Ki%20ec27f579c6cb4ff8b30faa1a340adab0.html">Ki</a>, <a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"><a href="Magias/T%C3%A9cnicas%20de%20Ki/Passo%20Rel%C3%A2mpago%206e18371e35c5458ab6235d1f1b932a89.html">Passo Relâmpago</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Defesa%20Interior%2050c942cc68df465f88095afb328bfe31.html">Defesa Interior</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Palma%20Vibrante%2026d12501f3424a6f8cd78e69b59b574e.html">Palma Vibrante</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Impacto%20Interno%20193b69d3f62746f9b6a658791dd0477a.html">Impacto Interno</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Golpe%20Imbu%C3%ADdo%20c9fd9df452df4d5682e46d1c85e5d0d6.html">Golpe Imbuído</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Salto%20Celestial%20fdc46cea76994df9975a4092205e9992.html">Salto Celestial</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Corpo%20de%20A%C3%A7o%20f761ea5c59554afeb4801b32cece0722.html">Corpo de Aço</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Palma%20Silenciosa%20f45984dbc21149fe915535560ab49c39.html">Palma Silenciosa</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Desvio%20Circular%208f60c292c27941c89b0b5fd8b1acdf2f.html">Desvio Circular</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Defensiva%20e5b8c1732ca84c3cb7964291f7236e9b.html">Forma Defensiva</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20Suprema%20c1110ad53f234213ab77b4fdd7405db1.html">Forma Suprema</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Detec%C3%A7%C3%A3o%20Intermedi%C3%A1ria%2072f4f5189b724cc0b05477057801d455.html">Detecção Intermediária</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Detec%C3%A7%C3%A3o%20B%C3%A1sica%2022450d5fe70445f79491eac165559074.html">Detecção Básica</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20do%20Drag%C3%A3o%20Sereno%207df7ba45760e4261bcc2c30aa3544320.html">Forma do Dragão Sereno</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20do%20Vazio%20Andante%20003e97f50fef48268b734b5e9abea47a.html">Forma do Vazio Andante</a>, <a href="Magias/T%C3%A9cnicas%20de%20Ki/Forma%20do%20Colosso%20Fluido%20f17c2c95042846178ab0381416744557.html">Forma do Colosso Fluido</a></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z">N1 foco e defesa reativa; N5 regenera fluxo em resposta; N10 ignora parte da armadura; N15 reduz custo sustentado; N20 resiste a condições; N25 corpo perfeito com transformação avançada.</td><td class="cell-VhN[">Usa técnicas de Ki para transformação, disciplina corporal, defesa ativa, evasão e estados elevados.</td></tr><tr id="b8215cf0-224a-49f1-9e53-0b6fc894bfe4"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Canalizador%20Dual%20b8215cf0224a49f19e530b6fc894bfe4.html">Canalizador Dual</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-purple">Híbrido</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-purple">Híbrido</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-purple">Mana + Ki</span></td><td class="cell-SmYN">Inteligência, Sabedoria e sincronização de Mana e Ki</td><td class="cell-b_S@">Especialização em usar Mana e Ki ao mesmo tempo em técnicas convergentes.</td><td class="cell-y[Uz">N1: converte pequena parte de Mana em Ki ou o inverso; N5: usa técnica híbrida com custo misto reduzido; N10: soma efeitos de um elemento e uma técnica de Ki; N15: estabiliza colapso ao alternar recursos; N20: lança habilidade híbrida com dupla escala de efeito; N25: convergência perfeita, executando manifestação de Mana e Ki em um mesmo turno com penalidade reduzida.</td><td class="cell-Mx}=">Subclasse de alta complexidade e teto de poder elevado.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/H%C3%ADbrido%20cd1a673735eb4b42b02898eb22d01d5f.html">Híbrido</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="03e643e1-9961-4092-af6d-5b15647e9ccb"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Mestre%20de%20Armas%2003e643e199614092af6d5b15647e9ccb.html">Mestre de Armas</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-red">Restrição</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-red">Dano</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-orange">Energia Física</span></td><td class="cell-SmYN">Força ou Destreza, técnica armada e leitura de combate</td><td class="cell-b_S@">Especialista em qualquer arma física, com maestria universal e combos avançados.</td><td class="cell-y[Uz">N1: escolhe especialidade armada e recebe bônus de precisão; N5: críticos ou manobras ficam mais consistentes; N10: troca de arma em combate sem custo relevante; N15: adapta estilo para ignorar cobertura, escudo ou guarda; N20: combo marcial com duas propriedades de arma no mesmo turno; N25: maestria suprema, extraindo o máximo de qualquer arma equipada.</td><td class="cell-Mx}=">Subclasse flexível para builds físicas que alternam arsenal.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Restri%C3%A7%C3%A3o%20Celestial%20280949ab67c74aceba16774b4427722d.html">Restrição Celestial</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="222198c2-f158-4d4f-b034-3e800f6677e9"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Tit%C3%A3%20Corporal%20222198c2f1584d4fb0343e800f6677e9.html">Titã Corporal</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-red">Restrição</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-red">Dano</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-orange">Energia Física</span></td><td class="cell-SmYN">Força, Constituição e adaptação corporal extrema</td><td class="cell-b_S@">Combate bruto desarmado com resistência física, impacto crescente e domínio do próprio corpo.</td><td class="cell-y[Uz">N1: recebe bônus de impacto desarmado e resistência leve; N5: aumenta tamanho funcional de membros ou alcance corporal; N10: golpes derrubam ou esmagam; N15: reduz penalidades de armadura natural ou peso; N20: ignora parte do dano recebido por puro condicionamento; N25: forma titânica parcial com dano massivo e grande presença de campo.</td><td class="cell-Mx}=">Subclasse brutal para builds de linha de frente e escalonamento físico.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Restri%C3%A7%C3%A3o%20Celestial%20280949ab67c74aceba16774b4427722d.html">Restrição Celestial</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr><tr id="44ad6a53-f7da-468e-81fc-60f0cf75573b"><td class="cell-title"><a href="Criar%20Personagem/Subclasses/Inimigo%20Energ%C3%A9tico%2044ad6a53f7da468e81fc60f0cf75573b.html">Inimigo Energético</a></td><td class="cell-U_Wk"><span class="selected-value select-value-color-red">Restrição</span></td><td class="cell-F@{w"><span class="selected-value select-value-color-blue">Defesa</span></td><td class="cell-TFs;"><span class="selected-value select-value-color-orange">Energia Física</span></td><td class="cell-SmYN">Constituição, nível da subclasse e resiliência física</td><td class="cell-b_S@">Resistência natural contra energias, negação de magia e proteção contra efeitos energéticos.</td><td class="cell-y[Uz">N1: reduz dano energético leve; N5: recebe bônus contra controle arcano; N10: pode dissipar efeito energético ao sofrer ataque; N15: converte parte do dano energético em Energia Física; N20: cria janela curta de negação mágica; N25: torna-se quase imune a explosões energéticas de baixo e médio tier.</td><td class="cell-Mx}=">Subclasse defensiva de restrição celestial contra conjuradores e usuários de Ki.</td><td class="cell-zeeN"><a href="Criar%20Personagem/Classes/Restri%C3%A7%C3%A3o%20Celestial%20280949ab67c74aceba16774b4427722d.html">Restrição Celestial</a></td><td class="cell-CDN{"></td><td class="cell-kMD&gt;"></td><td class="cell-TDnl"></td><td class="cell-p`]z"></td><td class="cell-VhN["></td></tr></tbody></table></div><br/><br/></div></div></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
