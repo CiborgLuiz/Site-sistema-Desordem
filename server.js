@@ -52,12 +52,13 @@ async function listSheets() {
 
   const { data, error } = await supabase
     .from("sheets")
-    .select("id,data,created_at,updated_at")
-    .order("updated_at", { ascending: false });
+    .select("id,data");
 
   if (error) throw new Error(error.message);
 
-  return data || [];
+  return (data || []).sort((left, right) => {
+    return timestampValue(serializeSheetRow(right).updatedAt) - timestampValue(serializeSheetRow(left).updatedAt);
+  });
 }
 
 async function getSheet(id) {
@@ -65,7 +66,7 @@ async function getSheet(id) {
 
   const { data, error } = await supabase
     .from("sheets")
-    .select("id,data,created_at,updated_at")
+    .select("id,data")
     .eq("id", id)
     .single();
 
@@ -86,7 +87,6 @@ async function writeSheet(id, sheet) {
     .upsert({
       id,
       data: sheet,
-      updated_at: new Date().toISOString(),
     }, { onConflict: "id" });
 
   if (error) throw new Error(error.message);
@@ -113,6 +113,11 @@ function serializeSheetRow(row) {
     createdAt: sheet.createdAt || row.created_at || "",
     updatedAt: sheet.updatedAt || row.updated_at || "",
   };
+}
+
+function timestampValue(value) {
+  const parsed = Date.parse(value || "");
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 app.use(express.json({ limit: "2mb" }));
