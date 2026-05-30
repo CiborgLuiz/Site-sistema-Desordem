@@ -1632,18 +1632,16 @@ function timestampValue(value) {
 async function refreshSheetsFromServer() {
   try {
     setSaveStatus("Atualizando...");
-    if (serverOnline) {
-      const sheet = getActiveSheet();
-      if (sheet) await saveSheetOnServer(sheet);
-    }
-
+    const localSheets = state.sheets;
     const serverSheets = await loadServerSheets();
+    const sheets = mergeSheetLists(localSheets, serverSheets);
     serverOnline = true;
-    state.sheets = serverSheets;
+    state.sheets = sheets;
     if (!state.sheets.some((sheet) => sheet.id === state.activeId)) {
       state.activeId = state.sheets[0]?.id || null;
       if (!state.activeId) state.view = "home";
     }
+    await uploadLocalSheetsNewerThanServer(localSheets, serverSheets);
     persistLocalOnly();
     renderApp();
     setSaveStatus("Banco atualizado");
@@ -1668,6 +1666,17 @@ async function saveSheetOnServer(sheet) {
     serverOnline = false;
     throw error;
   }
+}
+
+function syncSheetOnServer(sheet) {
+  if (!sheet?.id) return;
+  setSaveStatus("Salvando no banco...");
+  saveSheetOnServer(sheet)
+    .then(() => setSaveStatus("Banco salvo"))
+    .catch((error) => {
+      console.warn("Não foi possível salvar ficha no banco.", error);
+      setSaveStatus("Salvo localmente");
+    });
 }
 
 async function deleteSheetOnServer(id) {
@@ -1732,7 +1741,7 @@ function createSheetFromForm() {
   state.view = "editor";
   state.activeTab = "ficha";
   persistNow();
-  if (serverOnline) saveSheetOnServer(sheet).catch(() => { serverOnline = false; });
+  syncSheetOnServer(sheet);
   renderApp();
 }
 
@@ -1744,7 +1753,7 @@ function deleteSheet(id) {
   if (state.activeId === id) state.activeId = state.sheets[0]?.id || null;
   state.view = state.activeId ? state.view : "home";
   persistNow();
-  if (serverOnline) deleteSheetOnServer(id).catch(() => { serverOnline = false; });
+  deleteSheetOnServer(id).catch(() => { serverOnline = false; });
   renderApp();
 }
 
@@ -1760,7 +1769,7 @@ function duplicateSheet(id) {
   state.activeId = copy.id;
   state.view = "editor";
   persistNow();
-  if (serverOnline) saveSheetOnServer(copy).catch(() => { serverOnline = false; });
+  syncSheetOnServer(copy);
   renderApp();
 }
 
