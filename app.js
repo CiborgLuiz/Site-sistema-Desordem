@@ -575,6 +575,13 @@ document.addEventListener("input", (event) => {
 
   if (!sheet) return;
 
+  if (target.matches("[data-local-only]")) {
+    sheet.localOnly = target.checked;
+    touchSheet(sheet);
+    renderApp();
+    return;
+  }
+
   if (target.matches("[data-bind]")) {
     setByPath(sheet, target.dataset.bind, target.value);
     if (target.dataset.bind === "name") updateActiveTitle(sheet);
@@ -806,6 +813,10 @@ function renderHome() {
           <span>Descrição</span>
           <textarea data-home-field="description" placeholder="Conceito, origem, campanha"></textarea>
         </label>
+        <label class="inline-field">
+          <input type="checkbox" data-home-field="localOnly" />
+          <span>Ficha invisível (somente local)</span>
+        </label>
         <button type="button" class="primary-button" data-action="new-sheet">Criar ficha</button>
         <button type="button" class="ghost-button" data-action="open-wiki">Abrir wiki do sistema</button>
       </form>
@@ -977,6 +988,7 @@ function renderSheetCard(sheet) {
         <span class="badge hot">${escapeHtml(sheet.className)}</span>
         <span class="badge">Nível ${formatNumber(sheet.level || 1)}</span>
         <span class="badge">PV base ${formatNumber(rules.lifeBase)}</span>
+        ${sheet.localOnly ? `<span class="badge">Invisível</span>` : ``}
       </div>
       <span class="tiny">Atualizada: ${escapeHtml(updated)}</span>
       <div class="card-actions">
@@ -998,6 +1010,7 @@ function renderEditor(sheet) {
           <div class="sheet-meta">
             <span class="badge hot">${escapeHtml(sheet.className)}</span>
             <span class="badge">Nível ${formatNumber(sheet.level || 1)}</span>
+            ${sheet.localOnly ? `<span class="badge">Invisível</span>` : ``}
             <span class="badge" data-calc="trained-summary">Treinadas 0/0</span>
           </div>
         </div>
@@ -1007,6 +1020,10 @@ function renderEditor(sheet) {
             <select data-posture-select>
               ${postureOptions(posture)}
             </select>
+          </label>
+          <label class="inline-field">
+            <input type="checkbox" data-local-only ${sheet.localOnly ? "checked" : ""} />
+            <span>Ficha invisível (somente local)</span>
           </label>
           <span class="tiny" data-calc="posture-summary">Sem alteração de postura.</span>
         </div>
@@ -1774,6 +1791,7 @@ function normalizeSheet(raw) {
   sheet.level = clamp(parseNumber(sheet.level, 1), 1, MAX_LEVEL);
   sheet.className = CLASS_RULES[sheet.className] ? sheet.className : "Mago";
   sheet.posture = sheet.posture || "Neutra";
+  sheet.localOnly = Boolean(sheet.localOnly);
   sheet.subclasses = Array.isArray(sheet.subclasses) ? sheet.subclasses : [];
   sheet.attributes = sheet.attributes || {};
   for (const attr of ATTRIBUTES) {
@@ -2125,7 +2143,7 @@ function mergeSheetLists(localSheets, serverSheets) {
 
   for (const sheet of localSheets) {
     const serverSheet = merged.get(sheet.id);
-    if (!serverSheet || isNewerSheet(sheet, serverSheet)) {
+    if (sheet.localOnly || !serverSheet || isNewerSheet(sheet, serverSheet)) {
       merged.set(sheet.id, sheet);
     }
   }
@@ -2136,6 +2154,7 @@ function mergeSheetLists(localSheets, serverSheets) {
 async function uploadLocalSheetsNewerThanServer(localSheets, serverSheets) {
   const serverById = new Map(serverSheets.map((sheet) => [sheet.id, sheet]));
   const pending = localSheets.filter((sheet) => {
+    if (sheet.localOnly) return false;
     const serverSheet = serverById.get(sheet.id);
     return !serverSheet || isNewerSheet(sheet, serverSheet);
   });
@@ -2188,7 +2207,7 @@ async function refreshSheetsFromServer() {
 }
 
 async function saveSheetOnServer(sheet) {
-  if (!sheet?.id) return;
+  if (!sheet?.id || sheet.localOnly) return;
   try {
     const path = `/sheets/${encodeURIComponent(sheet.id)}`;
     const options = {
@@ -2212,7 +2231,10 @@ async function saveSheetOnServer(sheet) {
 }
 
 function syncSheetOnServer(sheet) {
-  if (!sheet?.id) return;
+  if (!sheet?.id || sheet.localOnly) {
+    setSaveStatus("Salvo localmente");
+    return;
+  }
   setSaveStatus("Salvando no banco...");
   saveSheetOnServer(sheet)
     .then(() => setSaveStatus("Banco salvo"))
@@ -2243,7 +2265,7 @@ function persistNow() {
   persistLocalOnly();
   setSaveStatus("Auto salvo");
   const sheet = getActiveSheet();
-  if (serverOnline && sheet) {
+  if (serverOnline && sheet && !sheet.localOnly) {
     saveSheetOnServer(sheet).catch(() => {
       serverOnline = false;
     });
@@ -2279,7 +2301,8 @@ function createSheetFromForm() {
   const name = document.querySelector('[data-home-field="name"]')?.value.trim() || "Novo Personagem";
   const className = document.querySelector('[data-home-field="className"]')?.value || "Mago";
   const description = document.querySelector('[data-home-field="description"]')?.value.trim() || "";
-  const sheet = createDefaultSheet({ name, className, description });
+  const localOnly = document.querySelector('[data-home-field="localOnly"]')?.checked || false;
+  const sheet = createDefaultSheet({ name, className, description, localOnly });
   state.sheets.unshift(sheet);
   state.activeId = sheet.id;
   state.view = "editor";
