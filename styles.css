@@ -1101,24 +1101,38 @@ input[type="checkbox"] {
 }
 
 .wiki-table {
-  width: 100%;
-  min-width: 44rem;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: auto;
+}
+
+.wiki-table.wide {
+  min-width: max(100%, calc(var(--wiki-columns, 8) * 12rem));
 }
 
 .wiki-table.compact,
 .wiki-table.properties {
+  width: 100%;
   min-width: 34rem;
+  table-layout: fixed;
 }
 
 .wiki-table th,
 .wiki-table td {
+  min-width: 9rem;
   padding: 0.65rem 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.11);
   vertical-align: top;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
   white-space: normal;
+}
+
+.wiki-table.wide th,
+.wiki-table.wide td {
+  min-width: 11rem;
+  max-width: 28rem;
 }
 
 .wiki-table th {
@@ -1156,6 +1170,77 @@ input[type="checkbox"] {
 .wiki-article img {
   max-width: 100%;
   height: auto;
+}
+
+.wiki-records {
+  margin-top: 1rem;
+}
+
+.wiki-records summary {
+  display: flex;
+  align-items: center;
+  min-height: 2.4rem;
+  padding: 0 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.045);
+  cursor: pointer;
+}
+
+.wiki-record-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.wiki-record-card {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.wiki-record-card h3 {
+  margin: 0 0 0.65rem;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.wiki-record-fields {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.wiki-record-field {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wiki-record-field:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.wiki-record-field span {
+  color: var(--faint);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.wiki-record-field strong {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.4;
+  overflow-wrap: break-word;
 }
 
 .formula-list {

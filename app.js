@@ -123,8 +123,8 @@ const WIKI_NAV_SECTIONS = [
     links: [
       { label: "Começar", path: "Sistema/DESORDEM/Começar fc6cc0c0e2b547ab802d44dce7870a88.html" },
       { label: "Criar Personagem", path: "Sistema/DESORDEM/Criar Personagem 361ca02c8953494c8b86c001cc507fca.html" },
-      { label: "Classes", path: "Sistema/DESORDEM/Classes 23e4e788e48041e6be8524abbb45c54f.html" },
-      { label: "Subclasses", path: "Sistema/DESORDEM/Subclasses fa23d144257d4e36a3e22bb34cd621e0.html" },
+      { label: "Classes", path: "Sistema/DESORDEM/Criar Personagem/Classes 70ddc26d3bde4f13b03e2f01bd35e450.csv" },
+      { label: "Subclasses", path: "Sistema/DESORDEM/Criar Personagem/Subclasses 4ff6f2db938a46e09513497027fc1d23.csv" },
       { label: "Progressão", path: "Sistema/DESORDEM/Progressão do Personagem f15ebd73b0e84ab680003ca5cbaee0f6.html" },
       { label: "Perícias", path: "Sistema/DESORDEM/Conceitos Fundamentais/Perícias 5dde8807080143fd8073b4e798207558.csv" },
     ],
@@ -162,6 +162,81 @@ const WIKI_NAV_SECTIONS = [
   },
 ];
 const EMOJI_PATTERN = /[\u00A9\u00AE\u203C\u2049\u2122\u2139\u2194-\u21AA\u231A-\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA-\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u27BF\u2934-\u2935\u2B05-\u2B55\u3030\u303D\u3297\u3299]|\p{Extended_Pictographic}/gu;
+const CONDITION_BALANCE_REFERENCES = {
+  Leve: "Leve: -1/-2 ou 1d4 por turno; alinhado a efeitos básicos de 5-8 Mana e bônus comuns de item (+1).",
+  Média: "Média: -2/-3, reação perdida ou 1d6 por turno; alinhado a controle básico forte e efeitos intermediários leves.",
+  Pesada: "Pesada: -4, perda de Ação Principal, 1d8 por turno ou controle duro; manter curta ou com remoção clara.",
+  Extrema: "Extrema: remove autonomia, turno ou ameaça morte; usar como estado raro, com cura, ritual ou estabilização.",
+  Mista: "Mista: concede pressão ofensiva em troca de risco defensivo; valor líquido próximo de uma postura forte.",
+  Especial: "Especial: vantagem situacional alta; balancear por duração curta, teste de resistência e contra-jogo explícito.",
+};
+const CONDITION_BALANCE = {
+  "Cego (Visão Turva)": ["Média", "Nenhum.", "-3 em Pontaria e Percepção visual; inimigos recebem +2 para flanquear.", "1 a 2 turnos; se bloquear reação visual, trate como Pesada."],
+  Atordoado: ["Pesada", "Nenhum.", "Perde a Ação Principal e sofre -2 de Defesa.", "Até o próximo turno; equivalente a controle duro de magia intermediária."],
+  Flanqueado: ["Média", "Atacantes posicionados recebem +2 no ataque.", "O alvo recebe +1d6 de dano de quem estiver flanqueando.", "Dura enquanto o posicionamento existir; não acumula com outro Flanqueado."],
+  "Guarda Quebrada": ["Pesada", "Quem atacar o alvo recebe janela clara de execução.", "-4 Defesa.", "Até o próximo turno; referência direta de quebra defensiva pesada."],
+  Instável: ["Mista", "+1d6 dano ou +1 AM ao aceitar risco antes do teste.", "Teste CD 15 ao usar habilidade forte; falha causa 1d6 de dano/recurso e uma condição leve.", "Bom para poder alto com chance real de colateral."],
+  Caído: ["Média", "Atacantes corpo a corpo recebem +2 contra o alvo.", "-2 Defesa contra corpo a corpo; levantar consome Movimento ou Ação Secundária.", "Não deve travar turno inteiro sozinho."],
+  Imobilizado: ["Pesada", "Nenhum.", "Deslocamento 0; -2 em Reflexos e Acrobacia.", "Permite ações ofensivas simples para não virar paralisia total."],
+  "Possuído (Parcial)": ["Pesada", "A entidade pode forçar 1 impulso simples por turno.", "-3 em Vontade e Intuição; pode perder uma escolha tática.", "Exige teste mental ou purificação para manter agência."],
+  Esgotado: ["Média", "Nenhum.", "-2 em testes físicos e -2 m de deslocamento.", "Penalidade ampla, mas moderada, para cenas longas."],
+  Silenciado: ["Pesada", "Nenhum.", "Não usa magia verbal, canto ou técnica baseada em voz; -2 em conjuração adaptada.", "Pesada para conjuradores, leve para combatentes sem voz."],
+  Confuso: ["Média", "Nenhum.", "Teste mental CD 13 no começo do turno; falha troca alvo, perde foco ou perde Ação Secundária.", "Controle médio com aleatoriedade, sem tirar sempre a Ação Principal."],
+  Sangramento: ["Média", "Nenhum.", "Sofre 1d6 de dano físico no fim do turno.", "Referência: maior que queimadura básica (1d4), menor que dano direto 1d8."],
+  Fome: ["Leve", "Nenhum.", "-1 em testes prolongados; recuperação de Vida, Mana, Ki e Energia reduzida em 25%.", "Condição de exploração, não punição forte de combate imediato."],
+  Sono: ["Pesada", "Atacantes contra alvo dormindo têm +2 no primeiro ataque.", "-4 Iniciativa e Percepção; se dormir, perde turno até dano/estímulo.", "Controle forte compensado por remoções simples."],
+  Envenenado: ["Média", "Nenhum.", "1d6 veneno por turno e -2 em testes físicos.", "Dano contínuo médio com penalidade clara."],
+  Exausto: ["Pesada", "Nenhum.", "-3 m deslocamento, -2 em testes físicos e dano causado -2.", "Acumular com Esgotado só aumenta duração, não dobra penalidade."],
+  Queimando: ["Leve", "Nenhum.", "1d4 fogo por turno; se durar 3+ turnos, teste mental CD 12 contra pânico leve.", "Referência direta de Fogo básico: 1d4 por 1 turno."],
+  "Fome de Mana": ["Média", "Nenhum.", "Custo de Mana +2, mínimo +25%; AM -1 enquanto durar.", "Afeta economia de conjurador sem bloquear magia."],
+  Congelado: ["Pesada", "Atacantes recebem +2 contra alvo travado.", "Deslocamento -4 m; falha em resistência perde Movimento e sofre -2 Defesa.", "Controle pesado de mobilidade, menor que Imobilizado total."],
+  Desesperado: ["Mista", "+2 em ataque agressivo ou +1d6 dano uma vez por turno.", "-3 Defesa e não pode escolher ação defensiva enquanto atacar.", "Explosão ofensiva com preço defensivo claro."],
+  Paranoico: ["Média", "Nenhum.", "-2 em ações cooperativas; não recebe Ajuda/Suporte sem teste mental CD 13.", "Quebra sinergia sem impedir ações próprias."],
+  Dominado: ["Extrema", "Controlador escolhe as ações do alvo.", "Perde autonomia e usa turno contra os próprios interesses.", "Só use com duração curta, manutenção ou resistência recorrente."],
+  Hipnotizado: ["Pesada", "Controlador impõe comando simples.", "-4 Iniciativa/Percepção; não escolhe objetivo livremente.", "Controle direto menor que Dominado."],
+  Pânico: ["Pesada", "Nenhum.", "Deve se afastar da ameaça; -2 em ataques e testes enquanto foge.", "Tira posicionamento, mas não deve impedir toda ação útil sempre."],
+  Apático: ["Média", "Nenhum.", "-4 Iniciativa, perde Reação e sofre -2 em decisões rápidas.", "Forte contra controle e suporte, moderada contra ações simples."],
+  Frenesi: ["Mista", "+2 ataque corpo a corpo e +1d6 dano.", "-2 Defesa; deve focar alvo mais próximo e não usa ações complexas.", "Burst equivalente a postura ofensiva com perda de controle."],
+  "Quebrado Mentalmente": ["Extrema", "Nenhum.", "Só executa ação básica se passar em teste mental CD 15; -4 em testes mentais.", "Estado de cena inteira, não deve ser aplicado por golpe comum."],
+  Fraturado: ["Pesada", "Nenhum.", "Membro afetado sofre -4 em testes; perna reduz deslocamento em -3 m, braço reduz dano em -1d6.", "Lesão objetiva com impacto por membro."],
+  Mutilado: ["Extrema", "Nenhum.", "Perde uso de membro/função; -6 em ações relacionadas.", "Persistente; exige cura superior, prótese ou reconstrução."],
+  "Sangramento Interno": ["Pesada", "Nenhum.", "1d8 dano oculto por turno de esforço; cura recebida reduzida em 50%.", "Mais letal que Sangramento por ser difícil de detectar."],
+  Asfixiado: ["Extrema", "Nenhum.", "1d8 dano por turno sem ar; após 2 turnos, perde Ação Principal até respirar.", "Letal rápido, precisa contra-jogo imediato."],
+  Enraizado: ["Pesada", "Nenhum.", "Deslocamento 0; -2 Reflexos; não pode usar investida ou esquiva longa.", "Controle de chão sem impedir ataques."],
+  Desidratado: ["Média", "Nenhum.", "Perde 10 Energia Física por cena ou 1d6 por turno de esforço; -2 foco.", "Drena exploração e combate longo sem matar rápido."],
+  Sobrecarregado: ["Média", "Nenhum.", "-2 Reflexos e Iniciativa; deslocamento -2 m.", "Penalidade de carga comparável a armadura pesada ruim."],
+  Infectado: ["Média", "Nenhum.", "-1 Vida máxima por descanso sem tratamento; em combate, -2 Fortitude.", "Pressão de campanha progressiva, não dano explosivo."],
+  "Fome de Ki": ["Média", "Nenhum.", "Técnicas de Ki causam -1d6 dano e custam +2 PK.", "Equivalente marcial de Fome de Mana."],
+  "Excesso de Ki": ["Mista", "+1d6 dano de Ki uma vez por turno se descarregar fluxo.", "Ao usar técnica, sofre 1d6 dano próprio ou perde 2 PK adicionais.", "Transforma recurso alto em risco controlado."],
+  "Mana Corrompida": ["Pesada", "Nenhum.", "Magias custam +2 Mana; teste CD 14 ou geram efeito colateral.", "Instabilidade arcana mais forte que Fome de Mana."],
+  "Sobrecarga Mágica": ["Pesada", "Nenhum.", "Perde Reação e Ação Secundária; se conjurar pesado de novo, fica Atordoado.", "Freio para explosão arcana repetida."],
+  "Vazio Arcano": ["Pesada", "Nenhum.", "AM vira 0 e não conjura magia enquanto durar.", "Extrema para magos se passar de 2 turnos."],
+  "Canalização Quebrada": ["Pesada", "Interrompe efeito inimigo sustentado.", "Perde magia/técnica em canalização; próxima tentativa custa +2 recurso.", "Resposta forte contra habilidades longas."],
+  Drenado: ["Pesada", "Fonte da drenagem recupera metade do recurso drenado, se aplicável.", "Perde 3 Mana/Ki ou 1d6 Energia/Vida por turno.", "Dano de recurso sustentado exige vínculo quebrável."],
+  "Eco Arcano": ["Especial", "Em sucesso, repete efeito arcano leve sem custo adicional.", "Em falha, repete em alvo errado ou causa 1d6 retorno arcano.", "50% benefício/risco, bom para caos controlado."],
+  Exposto: ["Média", "Próximo atacante recebe +2 no ataque.", "-2 Defesa; próximo acerto contra o alvo causa +1d6.", "Janela curta de burst tático."],
+  Desestabilizado: ["Média", "Nenhum.", "Ações complexas exigem teste CD 13; falha perde Ação Secundária ou paga +1 recurso.", "Reduz confiabilidade sem cancelar tudo."],
+  Provocado: ["Média", "Provocador recebe controle de foco do alvo.", "-2 em ataques que não sejam contra o provocador.", "Controle de alvo com contra-jogo mental/linha de visão."],
+  Desarmado: ["Média", "Quem desarmou ganha janela de pressão.", "Não usa arma equipada; dano desarmado vira 1d4 até recuperar/sacar.", "Impacto alto para arma, baixo para conjurador."],
+  Marcado: ["Média", "Aliados que reconhecem a marca causam +1d6 no primeiro acerto por turno.", "Alvo não se beneficia de ocultação leve contra marcadores.", "Foco coletivo limitado por turno."],
+  "Contra-Atacado": ["Média", "O contra-atacante recebe +2 e +1d6 no próximo golpe de reação.", "Alvo fica punido após erro previsível.", "Não acumula com Exposto no mesmo ataque."],
+  "Sob Pressão": ["Média", "Nenhum.", "-2 em testes mentais e Reação; múltiplas ações exigem teste CD 13.", "Pressão tática para líderes e controladores."],
+  Surdo: ["Leve", "Nenhum.", "-2 Percepção auditiva; não recebe comandos verbais nem gatilhos sonoros.", "Leve em duelo, média em equipe/furtividade."],
+  Desorientado: ["Média", "Nenhum.", "-2 ataques, Reflexos e navegação; deslocamento tático reduzido pela metade.", "Controle sensorial moderado."],
+  "Visão Dupla": ["Média", "Nenhum.", "-3 Pontaria/Percepção visual; 25% de chance de errar alvo em distância.", "Versão menos total que Cego."],
+  Alucinado: ["Pesada", "Nenhum.", "-3 testes mentais/percepção; 50% de chance de gastar Reação com ameaça falsa.", "Controle sensorial forte, mas probabilístico."],
+  Rastreado: ["Leve", "Rastreador recebe +2 para perseguir e achar o alvo.", "Alvo não pode se ocultar da fonte sem limpeza do rastro.", "Leve porque não reduz ação diretamente."],
+  "À Beira da Morte": ["Extrema", "Nenhum.", "-4 em todos os testes; qualquer dano 1d6+ força estabilização imediata.", "Estado terminal, não condição comum de dano."],
+  Colapsado: ["Extrema", "Atacantes têm abertura total se o alvo estiver indefeso.", "Não age, não sustenta habilidade e sofre -4 Defesa.", "Remove do ritmo de combate até recurso/cura."],
+  "Alma Fragmentada": ["Extrema", "Nenhum.", "AM -2, recuperação de Sanidade pela metade e -3 testes espirituais/mentais.", "Dano espiritual persistente, exige ritual."],
+  Corrompido: ["Extrema", "Pode liberar +1d6 sombrio se aceitar avançar corrupção.", "Cura recebida -50%; a cada cena teste CD 15 ou ganha condição adicional.", "Poder tentador com custo de longo prazo."],
+  "Instinto de Sobrevivência": ["Mista", "+4 Defesa/Reflexos e +2 ataque ou +2d6 dano por 1 turno.", "Ao acabar, fica Exausto; se já estava Exausto, fica Colapsado.", "Último recurso explosivo com queda forte."],
+  Ancorado: ["Especial", "Imune a empurrão, puxão e teleporte forçado.", "Não pode teleportar, avançar com investida ou ser reposicionado por aliado.", "Defensivo forte contra controle espacial."],
+  Deslocado: ["Especial", "Primeiro ataque contra o alvo tem 50% de chance de falhar.", "-2 precisão; 25% de chance de ação complexa sair atrasada.", "Defesa caótica com perda de controle."],
+  "Eco Temporal": ["Especial", "Pode repetir uma Ação Secundária simples do turno anterior.", "Se falhar teste CD 14, repete movimento/ação ruim involuntariamente.", "Valor alto limitado a 1-2 turnos."],
+  "Gravidade Alterada": ["Especial", "Quem controlar a gravidade recebe +2 contra movimento inimigo.", "Movimento pela metade; saltos impossíveis; -2 corpo a corpo e Reflexos.", "Controle espacial pesado com adaptação possível."],
+  "Marca do Caos": ["Especial", "Resultado favorável: +2 em teste ou +1d6 dano no turno.", "Resultado ruim: 1d6 dano, -2 em teste ou condição leve aleatória.", "Alto caos; resolver com rolagem por turno."],
+};
 
 const EDITOR_TABS = [
   { key: "ficha", label: "Ficha" },
@@ -1880,7 +1955,10 @@ function sanitizeWikiArticle(article) {
     if (!image.getAttribute("alt")) image.setAttribute("alt", "");
   });
   article.querySelectorAll("table").forEach((table) => {
+    const columns = Math.max(...Array.from(table.rows).map((row) => row.cells.length), 1);
     table.classList.add("wiki-table");
+    table.style.setProperty("--wiki-columns", String(columns));
+    if (columns > 6) table.classList.add("wide");
     if (table.closest(".wiki-table-wrap")) return;
     const wrapper = article.ownerDocument.createElement("div");
     wrapper.className = "table-wrap wiki-table-wrap";
@@ -1897,17 +1975,18 @@ function sanitizeWikiArticle(article) {
 }
 
 function renderWikiCsv(text, path) {
-  const rows = parseCsv(text);
+  const rows = prepareWikiRows(parseCsv(text), path);
   if (!rows.length) return `<div class="empty-state">Tabela vazia.</div>`;
 
   const headers = Object.keys(rows[0]);
+  const tableClass = headers.length > 6 ? "wiki-table wide" : "wiki-table";
   return `
     <div class="wiki-csv-heading">
       <h1>${escapeHtml(wikiTitleFromPath(path))}</h1>
       <span class="badge">${rows.length} registros</span>
     </div>
     <div class="table-wrap wiki-table-wrap">
-      <table class="wiki-table">
+      <table class="${tableClass}" style="--wiki-columns: ${headers.length}">
         <thead>
           <tr>${headers.map((header) => `<th>${escapeHtml(cleanWikiText(header))}</th>`).join("")}</tr>
         </thead>
@@ -1920,6 +1999,54 @@ function renderWikiCsv(text, path) {
         </tbody>
       </table>
     </div>
+    ${renderWikiRecordCards(rows, headers)}
+  `;
+}
+
+function prepareWikiRows(rows, path) {
+  if (!isConditionsPath(path)) return rows;
+
+  return rows.map((row) => {
+    const balance = CONDITION_BALANCE[cleanWikiText(row.Nome)] || ["Média", "Nenhum.", "Aplicar penalidade conforme descrição.", "Usar por 1-3 turnos com teste de resistência apropriado."];
+    const [severity, buff, debuff, value] = balance;
+    return {
+      ...row,
+      Severidade: severity,
+      Buff: buff,
+      Debuff: debuff,
+      "Valor em jogo": value,
+      "Referência de balanceamento": CONDITION_BALANCE_REFERENCES[severity] || CONDITION_BALANCE_REFERENCES.Média,
+    };
+  });
+}
+
+function isConditionsPath(path) {
+  return normalizeText(path).includes("condicoes") || normalizeText(wikiTitleFromPath(path)) === "condicoes";
+}
+
+function renderWikiRecordCards(rows, headers) {
+  return `
+    <details class="wiki-records" open>
+      <summary>Registros legíveis</summary>
+      <div class="wiki-record-grid">
+        ${rows.map((row) => {
+          const title = cleanWikiText(row[headers[0]] || "Registro");
+          const fields = headers.slice(1).filter((header) => cleanWikiText(row[header] || "")).map((header) => `
+            <div class="wiki-record-field">
+              <span>${escapeHtml(cleanWikiText(header))}</span>
+              <strong>${escapeHtml(cleanWikiText(row[header] || ""))}</strong>
+            </div>
+          `).join("");
+
+          return `
+            <article class="wiki-record-card">
+              <h3>${escapeHtml(title)}</h3>
+              <div class="wiki-record-fields">${fields || `<p class="tiny">Sem detalhes.</p>`}</div>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </details>
   `;
 }
 
@@ -1952,9 +2079,10 @@ async function loadState() {
   const local = loadLocalState();
   try {
     const serverSheets = await loadServerSheets();
-    serverOnline = true;
     const sheets = mergeSheetLists(local.sheets, serverSheets);
-    await uploadLocalSheetsNewerThanServer(local.sheets, serverSheets);
+    const uploadResult = await uploadLocalSheetsNewerThanServer(local.sheets, serverSheets);
+    serverOnline = true;
+    lastSyncError = uploadResult.failed.length ? `${uploadResult.failed.length} ficha(s) pendente(s) de envio` : "";
     return {
       ...local,
       sheets,
@@ -1963,6 +2091,7 @@ async function loadState() {
   } catch (error) {
     console.warn("Servidor de fichas indisponível, usando armazenamento local.", error);
     serverOnline = false;
+    lastSyncError = "";
     return local;
   }
 }
@@ -2011,9 +2140,16 @@ async function uploadLocalSheetsNewerThanServer(localSheets, serverSheets) {
     return !serverSheet || isNewerSheet(sheet, serverSheet);
   });
 
+  const result = { attempted: pending.length, uploaded: 0, failed: [] };
   for (const sheet of pending) {
-    await saveSheetOnServer(sheet);
+    try {
+      await saveSheetOnServer(sheet);
+      result.uploaded += 1;
+    } catch (error) {
+      result.failed.push({ sheet, error });
+    }
   }
+  return result;
 }
 
 function isNewerSheet(left, right) {
@@ -2037,13 +2173,15 @@ async function refreshSheetsFromServer() {
       state.activeId = state.sheets[0]?.id || null;
       if (!state.activeId) state.view = "home";
     }
-    await uploadLocalSheetsNewerThanServer(localSheets, serverSheets);
+    const uploadResult = await uploadLocalSheetsNewerThanServer(localSheets, serverSheets);
+    lastSyncError = uploadResult.failed.length ? `${uploadResult.failed.length} ficha(s) pendente(s) de envio` : "";
     persistLocalOnly();
     renderApp();
-    setSaveStatus("Banco atualizado");
+    setSaveStatus(uploadResult.failed.length ? "Banco online; envio pendente" : "Banco atualizado");
   } catch (error) {
     console.warn("Não foi possível atualizar fichas do servidor.", error);
     serverOnline = false;
+    lastSyncError = "";
     renderApp();
     setSaveStatus("Usando local");
   }
@@ -2065,8 +2203,10 @@ async function saveSheetOnServer(sheet) {
       await apiRequest(path, { ...options, method: "POST" });
     }
     serverOnline = true;
+    lastSyncError = "";
   } catch (error) {
-    serverOnline = false;
+    serverOnline = Boolean(error.status && error.status < 500 && error.status !== 503);
+    lastSyncError = "Envio pendente";
     throw error;
   }
 }
@@ -2120,6 +2260,7 @@ function persistLocalOnly() {
 }
 
 function databaseStatusText() {
+  if (serverOnline && lastSyncError) return "Banco conectado; envio pendente";
   return serverOnline ? "Banco compartilhado" : "Armazenamento local";
 }
 
