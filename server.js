@@ -10,7 +10,7 @@ loadLocalEnv();
 const app = express();
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 let supabase = null;
 
@@ -39,7 +39,7 @@ function loadLocalEnv() {
 function initSupabase() {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.warn(
-      "Variáveis SUPABASE_URL ou SUPABASE_ANON_KEY não configuradas. Fichas não serão persistidas."
+      "Variáveis SUPABASE_URL e SUPABASE_ANON_KEY/SUPABASE_SERVICE_ROLE_KEY não configuradas. Fichas não serão persistidas."
     );
     return null;
   }

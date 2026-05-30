@@ -116,6 +116,24 @@ const DATA_SOURCES = {
   },
 };
 
+const WIKI_ROOT_PATH = "Sistema/DESORDEM fd4ed0eed7ae4bc689533916b2dfa43a.html";
+const WIKI_QUICK_LINKS = [
+  { label: "Hub", path: WIKI_ROOT_PATH },
+  { label: "Começar", path: "Sistema/DESORDEM/Começar fc6cc0c0e2b547ab802d44dce7870a88.html" },
+  { label: "Criar Personagem", path: "Sistema/DESORDEM/Criar Personagem 361ca02c8953494c8b86c001cc507fca.html" },
+  { label: "Classes", path: "Sistema/DESORDEM/Classes 23e4e788e48041e6be8524abbb45c54f.html" },
+  { label: "Subclasses", path: "Sistema/DESORDEM/Subclasses fa23d144257d4e36a3e22bb34cd621e0.html" },
+  { label: "Conceitos", path: "Sistema/DESORDEM/Conceitos Fundamentais f2b590ffb37b4ab2b1abd437018029f3.html" },
+  { label: "Mecânicas", path: "Sistema/DESORDEM/Mecânicas eb90fea1e320443ca853723f58156cea.html" },
+  { label: "Condições", path: "Sistema/DESORDEM/Mecânicas/Condições dcae7e0593924273908258460c655bef.csv" },
+  { label: "Itens", path: "Sistema/DESORDEM/Itens 5fe4a784ad90408a9827f8decc6b0763.html" },
+  { label: "Magias", path: "Sistema/DESORDEM/Magias 8f527363583d4c40bd712b49b4f86f2c.html" },
+  { label: "Magias Arcanas", path: "Sistema/DESORDEM/Magias/Magias Arcanas af6b2c2026e34411a9c658fcb07d0e52.csv" },
+  { label: "Técnicas de Ki", path: "Sistema/DESORDEM/Magias/Técnicas de Ki 697b3b0ced9944c5ac27df54e855b67e.csv" },
+  { label: "Poderes Especiais", path: "Sistema/DESORDEM/Magias/Poderes Especiais 26d6446d688f44e7af5c7669b7b93d6a.csv" },
+  { label: "Mundo / Lore", path: "Sistema/DESORDEM/Mundo Lore 99e0dc6437e545d7bfed5a78cc9b6bcb.html" },
+];
+
 const EDITOR_TABS = [
   { key: "ficha", label: "Ficha" },
   { key: "pericias", label: "Perícias" },
@@ -193,10 +211,18 @@ const library = {
   error: "",
   data: { items: [], arcane: [], ki: [], powers: [], subclasses: [], postures: [], enchantments: [] },
 };
+const wiki = {
+  status: "idle",
+  error: "",
+  path: "",
+  title: "",
+  html: "",
+};
 
 let state = getInitialState();
 let saveTimer = 0;
 let serverOnline = false;
+let lastSyncError = "";
 
 initializeApp();
 
@@ -222,6 +248,8 @@ function getInitialState() {
     librarySearch: "",
     libraryCategory: "",
     onlyCompatible: true,
+    wikiPath: WIKI_ROOT_PATH,
+    wikiHistory: [],
   };
 }
 
@@ -236,6 +264,27 @@ document.addEventListener("click", (event) => {
     state.view = "home";
     persistNow();
     renderApp();
+    return;
+  }
+
+  if (action === "open-wiki") {
+    openWikiPage(state.wikiPath || WIKI_ROOT_PATH, false);
+    return;
+  }
+
+  if (action === "wiki-home") {
+    openWikiPage(WIKI_ROOT_PATH, true);
+    return;
+  }
+
+  if (action === "wiki-back") {
+    const previous = state.wikiHistory.pop() || WIKI_ROOT_PATH;
+    openWikiPage(previous, false);
+    return;
+  }
+
+  if (action === "wiki-open") {
+    openWikiPage(button.dataset.path || WIKI_ROOT_PATH, true);
     return;
   }
 
@@ -379,6 +428,18 @@ document.addEventListener("click", (event) => {
   if (action === "export-pdf") {
     window.print();
   }
+});
+
+document.addEventListener("click", (event) => {
+  if (state.view !== "wiki") return;
+  const link = event.target.closest(".wiki-article a");
+  if (!link) return;
+
+  const nextPath = resolveWikiPath(link.getAttribute("href"), state.wikiPath || WIKI_ROOT_PATH);
+  if (!nextPath) return;
+
+  event.preventDefault();
+  openWikiPage(nextPath, true);
 });
 
 document.addEventListener("input", (event) => {
@@ -568,19 +629,26 @@ function renderApp() {
     <div class="app-frame">
       ${renderHeader()}
       <main class="shell">
-        ${state.view === "editor" && getActiveSheet() ? renderEditor(getActiveSheet()) : renderHome()}
+        ${renderMainContent()}
       </main>
     </div>
   `;
 
   refreshCalculations();
   renderLibraryListOnly();
+  if (state.view === "wiki") ensureWikiPage(state.wikiPath || WIKI_ROOT_PATH);
+}
+
+function renderMainContent() {
+  if (state.view === "wiki") return renderWiki();
+  if (state.view === "editor" && getActiveSheet()) return renderEditor(getActiveSheet());
+  return renderHome();
 }
 
 function renderHeader() {
   const sheet = getActiveSheet();
   const isEditing = state.view === "editor" && sheet;
-  const title = isEditing ? escapeHtml(sheet.name || "Ficha sem nome") : "Fichas";
+  const title = state.view === "wiki" ? "Wiki" : isEditing ? escapeHtml(sheet.name || "Ficha sem nome") : "Fichas";
   return `
     <header class="topbar">
       <div class="brand">
@@ -593,6 +661,7 @@ function renderHeader() {
       <div class="topbar-actions">
         <span class="save-status" data-save-status>Auto salvo</span>
         <button type="button" class="ghost-button" data-action="go-home">Fichas</button>
+        <button type="button" class="ghost-button" data-action="open-wiki">Wiki</button>
         ${
           isEditing
             ? `<button type="button" class="primary-button" data-action="export-pdf">Exportar PDF</button>`
@@ -626,6 +695,7 @@ function renderHome() {
           <textarea data-home-field="description" placeholder="Conceito, origem, campanha"></textarea>
         </label>
         <button type="button" class="primary-button" data-action="new-sheet">Criar ficha</button>
+        <button type="button" class="ghost-button" data-action="open-wiki">Abrir wiki do sistema</button>
       </form>
       <section class="panel">
         <div class="panel-title">
@@ -642,6 +712,59 @@ function renderHome() {
       </section>
     </section>
   `;
+}
+
+function renderWiki() {
+  const currentPath = state.wikiPath || WIKI_ROOT_PATH;
+  const quickLinks = WIKI_QUICK_LINKS.map(
+    (link) => `
+      <button type="button" class="wiki-nav-button ${link.path === currentPath ? "active" : ""}" data-action="wiki-open" data-path="${escapeAttr(link.path)}">
+        ${escapeHtml(link.label)}
+      </button>
+    `,
+  ).join("");
+
+  return `
+    <section class="wiki-layout">
+      <aside class="panel wiki-sidebar">
+        <div class="panel-title">
+          <h2>Wiki</h2>
+        </div>
+        <div class="wiki-sidebar-actions">
+          <button type="button" class="primary-button" data-action="wiki-home">Hub</button>
+          <button type="button" class="ghost-button" data-action="wiki-back" ${state.wikiHistory.length ? "" : "disabled"}>Voltar</button>
+        </div>
+        <nav class="wiki-nav" aria-label="Seções da wiki">
+          ${quickLinks}
+        </nav>
+      </aside>
+      <section class="panel wiki-panel">
+        <div class="panel-title">
+          <h2>${escapeHtml(wiki.path === currentPath ? wiki.title || "Wiki" : "Wiki")}</h2>
+          <span class="badge">${escapeHtml(wikiStatusText(currentPath))}</span>
+        </div>
+        <article class="wiki-article">
+          ${renderWikiArticle(currentPath)}
+        </article>
+      </section>
+    </section>
+  `;
+}
+
+function renderWikiArticle(currentPath) {
+  if (wiki.path !== currentPath || wiki.status === "loading" || wiki.status === "idle") {
+    return `<div class="empty-state">Carregando wiki.</div>`;
+  }
+  if (wiki.status === "error") {
+    return `<div class="empty-state">${escapeHtml(wiki.error || "Não foi possível carregar esta página da wiki.")}</div>`;
+  }
+  return wiki.html || `<div class="empty-state">Página vazia.</div>`;
+}
+
+function wikiStatusText(currentPath) {
+  if (wiki.path !== currentPath || wiki.status === "loading") return "Carregando";
+  if (wiki.status === "error") return "Erro";
+  return currentPath.endsWith(".csv") ? "Tabela" : "Página";
 }
 
 function renderSheetCard(sheet) {
@@ -1559,6 +1682,120 @@ function loadLocalState() {
       onlyCompatible: true,
     };
   }
+}
+
+function openWikiPage(path, addHistory) {
+  const nextPath = path || WIKI_ROOT_PATH;
+  if (addHistory && state.wikiPath && state.wikiPath !== nextPath) {
+    state.wikiHistory = [...(state.wikiHistory || []), state.wikiPath].slice(-20);
+  }
+  state.view = "wiki";
+  state.wikiPath = nextPath;
+  persistLocalOnly();
+  renderApp();
+}
+
+function ensureWikiPage(path) {
+  if (wiki.path === path && (wiki.status === "loading" || wiki.status === "ready")) return;
+  loadWikiPage(path);
+}
+
+async function loadWikiPage(path) {
+  wiki.status = "loading";
+  wiki.error = "";
+  wiki.path = path;
+  wiki.title = wikiTitleFromPath(path);
+  wiki.html = "";
+
+  try {
+    const response = await fetch(encodeURI(path));
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    const text = await response.text();
+
+    if (path.toLocaleLowerCase("pt-BR").endsWith(".csv")) {
+      wiki.html = renderWikiCsv(text, path);
+      wiki.title = wikiTitleFromPath(path);
+    } else {
+      const parsed = parseWikiHtml(text, path);
+      wiki.html = parsed.html;
+      wiki.title = parsed.title || wikiTitleFromPath(path);
+    }
+
+    wiki.status = "ready";
+  } catch (error) {
+    console.error(error);
+    wiki.status = "error";
+    wiki.error = `Falha ao carregar ${wikiTitleFromPath(path)}.`;
+  }
+
+  if (state.view === "wiki" && state.wikiPath === path) renderApp();
+}
+
+function parseWikiHtml(text, path) {
+  const doc = new DOMParser().parseFromString(text, "text/html");
+  const article = doc.querySelector("article") || doc.body;
+  article.querySelectorAll("script, style").forEach((node) => node.remove());
+  article.querySelectorAll("a").forEach((link) => {
+    const nextPath = resolveWikiPath(link.getAttribute("href"), path);
+    if (nextPath) link.setAttribute("title", "Abrir dentro da wiki");
+  });
+
+  return {
+    title: doc.querySelector(".page-title")?.textContent?.trim() || doc.title || "",
+    html: article.innerHTML,
+  };
+}
+
+function renderWikiCsv(text, path) {
+  const rows = parseCsv(text);
+  if (!rows.length) return `<div class="empty-state">Tabela vazia.</div>`;
+
+  const headers = Object.keys(rows[0]);
+  return `
+    <div class="wiki-csv-heading">
+      <h1>${escapeHtml(wikiTitleFromPath(path))}</h1>
+      <span class="badge">${rows.length} registros</span>
+    </div>
+    <div class="table-wrap wiki-table-wrap">
+      <table class="wiki-table">
+        <thead>
+          <tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          ${rows.map((row) => `
+            <tr>
+              ${headers.map((header) => `<td>${escapeHtml(row[header] || "")}</td>`).join("")}
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function resolveWikiPath(href, currentPath) {
+  if (!href || href.startsWith("#")) return "";
+
+  try {
+    const baseUrl = new URL(encodeURI(currentPath || WIKI_ROOT_PATH), window.location.href);
+    const nextUrl = new URL(href, baseUrl);
+    if (nextUrl.origin !== window.location.origin) return "";
+
+    const nextPath = decodeURIComponent(nextUrl.pathname.replace(/^\/+/, ""));
+    if (!nextPath.startsWith("Sistema/")) return "";
+    return nextPath;
+  } catch (error) {
+    return "";
+  }
+}
+
+function wikiTitleFromPath(path) {
+  const file = decodeURIComponent(String(path || WIKI_ROOT_PATH).split("/").pop() || "Wiki");
+  return file
+    .replace(/\.(html|csv)$/i, "")
+    .replace(/\s+[a-f0-9]{32}$/i, "")
+    .replace(/\s+[a-f0-9-]{36}$/i, "")
+    .trim() || "Wiki";
 }
 
 async function loadState() {
