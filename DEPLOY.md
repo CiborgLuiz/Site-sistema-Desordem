@@ -29,8 +29,9 @@ Este guia passo-a-passo irá ajudá-lo a fazer deploy da aplicação Desordem Fi
 1. Após a criação, vá para **Project Settings** (ícone de engrenagem)
 2. Clique em **API** no menu esquerdo
 3. Copie os seguintes valores:
-   - **Project URL** → `SUPABASE_URL`
-   - **anon public** → `SUPABASE_ANON_KEY`
+   - **Project URL** → `DESORDEM_SUPABASE_URL`
+   - **service_role** → `DESORDEM_SUPABASE_SERVICE_ROLE_KEY`
+   - **anon public** → `DESORDEM_SUPABASE_ANON_KEY` (fallback)
 
 Guarde esses valores com segurança!
 
@@ -86,13 +87,16 @@ Se você prefere fazer fork primeiro:
 
 Na página de configuração do Vercel:
 
-1. Procure por **Environment Variables**
-2. Adicione as seguintes variáveis:
+1. Se estiver usando a integração Supabase do Vercel, confirme que ela criou as variáveis com prefixo `DESORDEM_`.
+2. Se for configurar manualmente, adicione as seguintes variáveis:
 
 | Nome | Valor |
 |------|-------|
-| `SUPABASE_URL` | Cole a URL que copiou de Supabase |
-| `SUPABASE_ANON_KEY` | Cole a chave anon que copiou de Supabase |
+| `DESORDEM_SUPABASE_URL` | URL do Supabase |
+| `DESORDEM_SUPABASE_SERVICE_ROLE_KEY` | Chave service role do Supabase |
+| `DESORDEM_SUPABASE_ANON_KEY` | Chave anon, se não usar service role |
+
+O projeto também aceita os nomes antigos `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ANON_KEY`, mas os nomes `DESORDEM_` são os esperados pela integração atual.
 
 3. Clique em **Deploy**
 
@@ -118,7 +122,7 @@ O Vercel começará o build automaticamente. Você verá:
 
 **Solução**:
 1. Vá para Vercel Settings → Environment Variables
-2. Verifique se `SUPABASE_URL` e `SUPABASE_ANON_KEY` estão corretas
+2. Verifique se `DESORDEM_SUPABASE_URL` e `DESORDEM_SUPABASE_SERVICE_ROLE_KEY` ou `DESORDEM_SUPABASE_ANON_KEY` estão corretas
 3. Clique em **Redeploy** na página do projeto
 
 ### Erro: "Table 'sheets' doesn't exist"

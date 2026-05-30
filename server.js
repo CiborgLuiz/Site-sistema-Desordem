@@ -9,8 +9,16 @@ loadLocalEnv();
 
 const app = express();
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = firstEnv("DESORDEM_SUPABASE_URL", "SUPABASE_URL");
+const SUPABASE_KEY = firstEnv(
+  "DESORDEM_SUPABASE_SERVICE_ROLE_KEY",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "DESORDEM_SUPABASE_SECRET_KEY",
+  "DESORDEM_SUPABASE_ANON_KEY",
+  "DESORDEM_SUPABASE_PUBLISHABLE_KEY",
+  "NEXT_PUBLIC_DESORDEM_SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_ANON_KEY",
+);
 
 let supabase = null;
 
@@ -36,10 +44,18 @@ function loadLocalEnv() {
   }
 }
 
+function firstEnv(...keys) {
+  for (const key of keys) {
+    const value = process.env[key]?.trim();
+    if (value) return value;
+  }
+  return "";
+}
+
 function initSupabase() {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.warn(
-      "Variáveis SUPABASE_URL e SUPABASE_ANON_KEY/SUPABASE_SERVICE_ROLE_KEY não configuradas. Fichas não serão persistidas."
+      "Variáveis DESORDEM_SUPABASE_URL e DESORDEM_SUPABASE_SERVICE_ROLE_KEY/DESORDEM_SUPABASE_ANON_KEY não configuradas. Fichas não serão persistidas."
     );
     return null;
   }

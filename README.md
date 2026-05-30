@@ -34,8 +34,9 @@ Sistema de gerenciamento de fichas de personagem para o RPG Desordem, com armaze
 1. Acesse sua conta Supabase
 2. Vá em **Project Settings** → **API**
 3. Copie:
-   - `Project URL` → `SUPABASE_URL`
-   - `anon public` → `SUPABASE_ANON_KEY`
+   - `Project URL` → `DESORDEM_SUPABASE_URL`
+   - `service_role` → `DESORDEM_SUPABASE_SERVICE_ROLE_KEY` (preferencial no backend)
+   - `anon public` → `DESORDEM_SUPABASE_ANON_KEY` (fallback)
 
 4. Crie a tabela de fichas no SQL Editor executando o arquivo `setup-supabase.sql`.
 
@@ -55,9 +56,10 @@ CREATE INDEX idx_sheets_updated_at ON sheets(updated_at DESC);
 1. Acesse [vercel.com](https://vercel.com)
 2. Clique em **Add New** → **Project**
 3. Selecione seu repositório GitHub
-4. Configure as variáveis de ambiente:
-   - `SUPABASE_URL` = sua URL do Supabase
-   - `SUPABASE_ANON_KEY` = sua chave anon
+4. Configure a integração Supabase do Vercel ou adicione as variáveis de ambiente:
+   - `DESORDEM_SUPABASE_URL` = URL do Supabase
+   - `DESORDEM_SUPABASE_SERVICE_ROLE_KEY` = chave service role do Supabase
+   - `DESORDEM_SUPABASE_ANON_KEY` = chave anon, se não usar service role
 5. Clique em **Deploy**
 
 Pronto! Seu site estará disponível em `https://seu-projeto.vercel.app`
@@ -89,11 +91,15 @@ cp .env.example .env.local
 Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
-SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_ANON_KEY=sua-chave-anonima
+DESORDEM_SUPABASE_URL=https://seu-projeto.supabase.co
+DESORDEM_SUPABASE_SERVICE_ROLE_KEY=sua-chave-service-role
+DESORDEM_SUPABASE_ANON_KEY=sua-chave-anonima
 PORT=3000
 NODE_ENV=development
 ```
+
+Os nomes antigos `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ANON_KEY` ainda funcionam para compatibilidade, mas o deploy integrado do Vercel deve usar os nomes com prefixo `DESORDEM_`.
+Se a integração fornecer `DESORDEM_SUPABASE_SECRET_KEY` em vez de `DESORDEM_SUPABASE_SERVICE_ROLE_KEY`, o backend também aceita esse nome.
 
 ### Executar Localmente
 
@@ -190,11 +196,11 @@ Deleta uma ficha
 ### "Banco de dados não disponível"
 - Verifique as variáveis de ambiente no Vercel
 - Teste a conexão com Supabase localmente
-- Verifique se a chave anon está correta
+- Verifique se `DESORDEM_SUPABASE_URL` e uma chave (`DESORDEM_SUPABASE_SERVICE_ROLE_KEY` ou `DESORDEM_SUPABASE_ANON_KEY`) estão corretas
 
 ### Mudanças não são salvas
 - Verifique a aba Network no DevTools
-- Confirme que `SUPABASE_ANON_KEY` está configurada
+- Confirme que as variáveis `DESORDEM_SUPABASE_*` estão configuradas no Vercel
 - Verifique o console do browser para erros
 
 ### Vercel retorna 502
