@@ -227,7 +227,6 @@ apiRouter.delete("/sheets/:id", async (req, res) => {
 });
 
 app.use("/api", apiRouter);
-app.use(apiRouter);
 
 app.use(express.static(path.join(__dirname)));
 
