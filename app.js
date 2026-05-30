@@ -117,22 +117,51 @@ const DATA_SOURCES = {
 };
 
 const WIKI_ROOT_PATH = "Sistema/DESORDEM fd4ed0eed7ae4bc689533916b2dfa43a.html";
-const WIKI_QUICK_LINKS = [
-  { label: "Hub", path: WIKI_ROOT_PATH },
-  { label: "Começar", path: "Sistema/DESORDEM/Começar fc6cc0c0e2b547ab802d44dce7870a88.html" },
-  { label: "Criar Personagem", path: "Sistema/DESORDEM/Criar Personagem 361ca02c8953494c8b86c001cc507fca.html" },
-  { label: "Classes", path: "Sistema/DESORDEM/Classes 23e4e788e48041e6be8524abbb45c54f.html" },
-  { label: "Subclasses", path: "Sistema/DESORDEM/Subclasses fa23d144257d4e36a3e22bb34cd621e0.html" },
-  { label: "Conceitos", path: "Sistema/DESORDEM/Conceitos Fundamentais f2b590ffb37b4ab2b1abd437018029f3.html" },
-  { label: "Mecânicas", path: "Sistema/DESORDEM/Mecânicas eb90fea1e320443ca853723f58156cea.html" },
-  { label: "Condições", path: "Sistema/DESORDEM/Mecânicas/Condições dcae7e0593924273908258460c655bef.csv" },
-  { label: "Itens", path: "Sistema/DESORDEM/Itens 5fe4a784ad90408a9827f8decc6b0763.html" },
-  { label: "Magias", path: "Sistema/DESORDEM/Magias 8f527363583d4c40bd712b49b4f86f2c.html" },
-  { label: "Magias Arcanas", path: "Sistema/DESORDEM/Magias/Magias Arcanas af6b2c2026e34411a9c658fcb07d0e52.csv" },
-  { label: "Técnicas de Ki", path: "Sistema/DESORDEM/Magias/Técnicas de Ki 697b3b0ced9944c5ac27df54e855b67e.csv" },
-  { label: "Poderes Especiais", path: "Sistema/DESORDEM/Magias/Poderes Especiais 26d6446d688f44e7af5c7669b7b93d6a.csv" },
-  { label: "Mundo / Lore", path: "Sistema/DESORDEM/Mundo Lore 99e0dc6437e545d7bfed5a78cc9b6bcb.html" },
+const WIKI_NAV_SECTIONS = [
+  {
+    title: "Criar ficha",
+    links: [
+      { label: "Começar", path: "Sistema/DESORDEM/Começar fc6cc0c0e2b547ab802d44dce7870a88.html" },
+      { label: "Criar Personagem", path: "Sistema/DESORDEM/Criar Personagem 361ca02c8953494c8b86c001cc507fca.html" },
+      { label: "Classes", path: "Sistema/DESORDEM/Classes 23e4e788e48041e6be8524abbb45c54f.html" },
+      { label: "Subclasses", path: "Sistema/DESORDEM/Subclasses fa23d144257d4e36a3e22bb34cd621e0.html" },
+      { label: "Progressão", path: "Sistema/DESORDEM/Progressão do Personagem f15ebd73b0e84ab680003ca5cbaee0f6.html" },
+      { label: "Perícias", path: "Sistema/DESORDEM/Conceitos Fundamentais/Perícias 5dde8807080143fd8073b4e798207558.csv" },
+    ],
+  },
+  {
+    title: "Regras de mesa",
+    links: [
+      { label: "Hub", path: WIKI_ROOT_PATH },
+      { label: "Conceitos", path: "Sistema/DESORDEM/Conceitos Fundamentais f2b590ffb37b4ab2b1abd437018029f3.html" },
+      { label: "Mecânicas", path: "Sistema/DESORDEM/Mecânicas eb90fea1e320443ca853723f58156cea.html" },
+      { label: "Combate", path: "Sistema/DESORDEM/Mecânicas/Sistema de Combate 710cf59944ff429cab30ed577ad9f649.html" },
+      { label: "Recursos", path: "Sistema/DESORDEM/Mecânicas/Sistema de Energia e Recursos 1d2e0ad26aba49ba957c08533e2e5f1b.html" },
+      { label: "Condições", path: "Sistema/DESORDEM/Mecânicas/Condições dcae7e0593924273908258460c655bef.csv" },
+      { label: "Posturas", path: "Sistema/DESORDEM/Mecânicas/Posturas 0f28ef55604447adbda13a03dee93d95.csv" },
+    ],
+  },
+  {
+    title: "Listas de escolha",
+    links: [
+      { label: "Itens", path: "Sistema/DESORDEM/Itens 5fe4a784ad90408a9827f8decc6b0763.html" },
+      { label: "Equipamentos", path: "Sistema/DESORDEM/Itens/Equipamentos d7ca8178912546b9a539ec5e7682bae5.csv" },
+      { label: "Magias", path: "Sistema/DESORDEM/Magias 8f527363583d4c40bd712b49b4f86f2c.html" },
+      { label: "Magias Arcanas", path: "Sistema/DESORDEM/Magias/Magias Arcanas af6b2c2026e34411a9c658fcb07d0e52.csv" },
+      { label: "Técnicas de Ki", path: "Sistema/DESORDEM/Magias/Técnicas de Ki 697b3b0ced9944c5ac27df54e855b67e.csv" },
+      { label: "Poderes Especiais", path: "Sistema/DESORDEM/Magias/Poderes Especiais 26d6446d688f44e7af5c7669b7b93d6a.csv" },
+    ],
+  },
+  {
+    title: "Campanha",
+    links: [
+      { label: "Filosofia do Combate", path: "Sistema/DESORDEM/Filosofia do Combate 6317dfe19862449bac72d8462c0e5c83.html" },
+      { label: "Mundo e Lore", path: "Sistema/DESORDEM/Mundo Lore 99e0dc6437e545d7bfed5a78cc9b6bcb.html" },
+      { label: "Referência Rápida", path: "Sistema/DESORDEM/Referência Rápida 8f2547cd1e894adf9ed9fac6557a16e2.html" },
+    ],
+  },
 ];
+const EMOJI_PATTERN = /[\u00A9\u00AE\u203C\u2049\u2122\u2139\u2194-\u21AA\u231A-\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA-\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u27BF\u2934-\u2935\u2B05-\u2B55\u3030\u303D\u3297\u3299]|\p{Extended_Pictographic}/gu;
 
 const EDITOR_TABS = [
   { key: "ficha", label: "Ficha" },
@@ -250,6 +279,7 @@ function getInitialState() {
     onlyCompatible: true,
     wikiPath: WIKI_ROOT_PATH,
     wikiHistory: [],
+    wikiSearch: "",
   };
 }
 
@@ -458,6 +488,13 @@ document.addEventListener("input", (event) => {
     state.libraryCategory = target.value;
     renderLibraryListOnly();
     persistSoon();
+    return;
+  }
+
+  if (target.matches("[data-wiki-search]")) {
+    state.wikiSearch = target.value;
+    persistLocalOnly();
+    renderApp();
     return;
   }
 
@@ -716,13 +753,6 @@ function renderHome() {
 
 function renderWiki() {
   const currentPath = state.wikiPath || WIKI_ROOT_PATH;
-  const quickLinks = WIKI_QUICK_LINKS.map(
-    (link) => `
-      <button type="button" class="wiki-nav-button ${link.path === currentPath ? "active" : ""}" data-action="wiki-open" data-path="${escapeAttr(link.path)}">
-        ${escapeHtml(link.label)}
-      </button>
-    `,
-  ).join("");
 
   return `
     <section class="wiki-layout">
@@ -734,8 +764,13 @@ function renderWiki() {
           <button type="button" class="primary-button" data-action="wiki-home">Hub</button>
           <button type="button" class="ghost-button" data-action="wiki-back" ${state.wikiHistory.length ? "" : "disabled"}>Voltar</button>
         </div>
+        <label class="field wiki-search">
+          <span>Buscar seção</span>
+          <input data-wiki-search value="${escapeAttr(state.wikiSearch || "")}" placeholder="Classe, magia, condição" />
+        </label>
+        ${renderWikiCreationSummary()}
         <nav class="wiki-nav" aria-label="Seções da wiki">
-          ${quickLinks}
+          ${renderWikiNav(currentPath)}
         </nav>
       </aside>
       <section class="panel wiki-panel">
@@ -743,10 +778,97 @@ function renderWiki() {
           <h2>${escapeHtml(wiki.path === currentPath ? wiki.title || "Wiki" : "Wiki")}</h2>
           <span class="badge">${escapeHtml(wikiStatusText(currentPath))}</span>
         </div>
+        ${renderWikiCreationGuide(currentPath)}
         <article class="wiki-article">
           ${renderWikiArticle(currentPath)}
         </article>
       </section>
+    </section>
+  `;
+}
+
+function renderWikiNav(currentPath) {
+  const search = normalizeText(state.wikiSearch || "");
+  const sections = WIKI_NAV_SECTIONS.map((section) => {
+    const links = section.links.filter((link) => {
+      if (!search) return true;
+      return normalizeText(`${section.title} ${link.label} ${wikiTitleFromPath(link.path)}`).includes(search);
+    });
+    return { ...section, links };
+  }).filter((section) => section.links.length);
+
+  if (!sections.length) return `<div class="empty-state">Nenhuma seção encontrada.</div>`;
+
+  return sections.map((section) => `
+    <div class="wiki-nav-section">
+      <h3>${escapeHtml(section.title)}</h3>
+      <div class="wiki-nav-links">
+        ${section.links.map((link) => `
+          <button type="button" class="wiki-nav-button ${link.path === currentPath ? "active" : ""}" data-action="wiki-open" data-path="${escapeAttr(link.path)}">
+            ${escapeHtml(link.label)}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderWikiCreationSummary() {
+  return `
+    <section class="wiki-summary">
+      <h3>Criação rápida</h3>
+      <dl>
+        <div><dt>Nível</dt><dd>1 a ${MAX_LEVEL}</dd></div>
+        <div><dt>Atributos</dt><dd>${INITIAL_ATTRIBUTE_POINTS} pontos base</dd></div>
+        <div><dt>Subclasse</dt><dd>até ${MAX_SUBCLASS_LEVEL} níveis</dd></div>
+        <div><dt>Perícia treinada</dt><dd>+5</dd></div>
+      </dl>
+    </section>
+  `;
+}
+
+function renderWikiCreationGuide(currentPath) {
+  const title = wikiTitleFromPath(currentPath);
+  const shouldShow = currentPath === WIKI_ROOT_PATH || ["Começar", "Criar Personagem"].includes(title);
+  if (!shouldShow) return "";
+
+  const classRows = Object.entries(CLASS_RULES).map(([className, rules]) => `
+    <tr>
+      <th>${escapeHtml(className)}</th>
+      <td>PV ${formatNumber(rules.lifeBase)} + ${formatNumber(rules.lifePerLevel)} por nível</td>
+      <td>${rules.usesMana ? "Mana" : ""}${rules.usesMana && rules.usesKi ? " e " : ""}${rules.usesKi ? "Ki" : ""}${!rules.usesMana && !rules.usesKi ? "sem Mana/Ki" : ""}</td>
+    </tr>
+  `).join("");
+
+  return `
+    <section class="wiki-guide" aria-label="Guia rápido de criação">
+      <div class="wiki-guide-head">
+        <h3>Guia rápido para criar ficha</h3>
+        <p>Use esta ordem para montar personagem sem procurar regra em várias páginas.</p>
+      </div>
+      <ol class="wiki-steps">
+        <li><strong>Dados básicos:</strong> nome, classe, conceito e nível entre 1 e ${MAX_LEVEL}.</li>
+        <li><strong>Atributos:</strong> distribua ${INITIAL_ATTRIBUTE_POINTS} pontos base. O modificador é piso((atributo total - 10) / 2).</li>
+        <li><strong>Classe:</strong> define PV base, recurso principal e perfil inicial de jogo.</li>
+        <li><strong>Subclasses:</strong> escolha opções compatíveis e limite cada uma a ${MAX_SUBCLASS_LEVEL} níveis.</li>
+        <li><strong>Poderes e itens:</strong> use Biblioteca para adicionar equipamentos, magias, técnicas e poderes à ficha.</li>
+      </ol>
+      <div class="table-wrap wiki-table-wrap">
+        <table class="wiki-table compact">
+          <thead>
+            <tr><th>Classe</th><th>Vida</th><th>Recurso</th></tr>
+          </thead>
+          <tbody>${classRows}</tbody>
+        </table>
+      </div>
+      <div class="wiki-formula-grid">
+        ${RESOURCES.map((resource) => `
+          <div class="wiki-formula">
+            <span>${escapeHtml(resource.label)}</span>
+            <strong>${escapeHtml(resource.formula)}</strong>
+          </div>
+        `).join("")}
+      </div>
     </section>
   `;
 }
@@ -1668,6 +1790,9 @@ function loadLocalState() {
       librarySearch: raw.librarySearch || "",
       libraryCategory: raw.libraryCategory || "",
       onlyCompatible: raw.onlyCompatible !== false,
+      wikiPath: raw.wikiPath || WIKI_ROOT_PATH,
+      wikiHistory: Array.isArray(raw.wikiHistory) ? raw.wikiHistory : [],
+      wikiSearch: raw.wikiSearch || "",
     };
   } catch (error) {
     console.error(error);
@@ -1680,6 +1805,9 @@ function loadLocalState() {
       librarySearch: "",
       libraryCategory: "",
       onlyCompatible: true,
+      wikiPath: WIKI_ROOT_PATH,
+      wikiHistory: [],
+      wikiSearch: "",
     };
   }
 }
@@ -1734,16 +1862,38 @@ async function loadWikiPage(path) {
 function parseWikiHtml(text, path) {
   const doc = new DOMParser().parseFromString(text, "text/html");
   const article = doc.querySelector("article") || doc.body;
-  article.querySelectorAll("script, style").forEach((node) => node.remove());
+  sanitizeWikiArticle(article);
   article.querySelectorAll("a").forEach((link) => {
     const nextPath = resolveWikiPath(link.getAttribute("href"), path);
     if (nextPath) link.setAttribute("title", "Abrir dentro da wiki");
   });
 
   return {
-    title: doc.querySelector(".page-title")?.textContent?.trim() || doc.title || "",
+    title: stripEmoji(doc.querySelector(".page-title")?.textContent?.trim() || doc.title || "").trim(),
     html: article.innerHTML,
   };
+}
+
+function sanitizeWikiArticle(article) {
+  article.querySelectorAll("script, style, .page-header-icon, .icon, .property-icon").forEach((node) => node.remove());
+  article.querySelectorAll("img").forEach((image) => {
+    if (!image.getAttribute("alt")) image.setAttribute("alt", "");
+  });
+  article.querySelectorAll("table").forEach((table) => {
+    table.classList.add("wiki-table");
+    if (table.closest(".wiki-table-wrap")) return;
+    const wrapper = article.ownerDocument.createElement("div");
+    wrapper.className = "table-wrap wiki-table-wrap";
+    table.parentNode.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+
+  const walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+  textNodes.forEach((node) => {
+    node.nodeValue = stripEmoji(node.nodeValue);
+  });
 }
 
 function renderWikiCsv(text, path) {
@@ -1759,12 +1909,12 @@ function renderWikiCsv(text, path) {
     <div class="table-wrap wiki-table-wrap">
       <table class="wiki-table">
         <thead>
-          <tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr>
+          <tr>${headers.map((header) => `<th>${escapeHtml(cleanWikiText(header))}</th>`).join("")}</tr>
         </thead>
         <tbody>
           ${rows.map((row) => `
             <tr>
-              ${headers.map((header) => `<td>${escapeHtml(row[header] || "")}</td>`).join("")}
+              ${headers.map((header) => `<td>${escapeHtml(cleanWikiText(row[header] || ""))}</td>`).join("")}
             </tr>
           `).join("")}
         </tbody>
@@ -1820,9 +1970,18 @@ async function loadState() {
 async function apiRequest(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, options);
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    throw new ApiRequestError(response);
   }
   return response;
+}
+
+class ApiRequestError extends Error {
+  constructor(response) {
+    super(`API request failed: ${response.status} ${response.statusText}`);
+    this.name = "ApiRequestError";
+    this.status = response.status;
+    this.statusText = response.statusText;
+  }
 }
 
 async function loadServerSheets() {
@@ -1893,11 +2052,18 @@ async function refreshSheetsFromServer() {
 async function saveSheetOnServer(sheet) {
   if (!sheet?.id) return;
   try {
-    await apiRequest(`/sheets/${encodeURIComponent(sheet.id)}`, {
+    const path = `/sheets/${encodeURIComponent(sheet.id)}`;
+    const options = {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(sheet),
-    });
+    };
+    try {
+      await apiRequest(path, options);
+    } catch (error) {
+      if (![404, 405].includes(error.status)) throw error;
+      await apiRequest(path, { ...options, method: "POST" });
+    }
     serverOnline = true;
   } catch (error) {
     serverOnline = false;
@@ -2825,10 +2991,18 @@ function libraryStatusText() {
 }
 
 function cleanWikiText(value) {
-  return String(value || "")
+  return stripEmoji(value)
     .replace(/\s*\([^)]*\.html\)/g, "")
     .replace(/\s*Sem título\s*\([^)]*\)/g, "")
+    .replace(/\s{2,}/g, " ")
     .trim();
+}
+
+function stripEmoji(value) {
+  return String(value || "")
+    .replace(EMOJI_PATTERN, "")
+    .replace(/[\uFE0E\uFE0F\u200D]/g, "")
+    .replace(/\s{2,}/g, " ");
 }
 
 function setByPath(target, path, value) {

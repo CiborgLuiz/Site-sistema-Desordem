@@ -122,13 +122,13 @@ function timestampValue(value) {
 
 app.use(express.json({ limit: "2mb" }));
 
-app.use(express.static(path.join(__dirname)));
+const apiRouter = express.Router();
 
-app.get("/api/health", (req, res) => {
+apiRouter.get("/health", (req, res) => {
   res.json({ database: supabase ? "connected" : "unconfigured" });
 });
 
-app.get("/api/sheets", async (req, res) => {
+apiRouter.get("/sheets", async (req, res) => {
   try {
     if (!supabase) {
       return res
@@ -144,7 +144,7 @@ app.get("/api/sheets", async (req, res) => {
   }
 });
 
-app.get("/api/sheets/:id", async (req, res) => {
+apiRouter.get("/sheets/:id", async (req, res) => {
   try {
     if (!supabase) {
       return res
@@ -159,7 +159,7 @@ app.get("/api/sheets/:id", async (req, res) => {
   }
 });
 
-app.post("/api/sheets/:id", async (req, res) => {
+apiRouter.post("/sheets/:id", async (req, res) => {
   try {
     if (!supabase) {
       return res
@@ -176,7 +176,7 @@ app.post("/api/sheets/:id", async (req, res) => {
   }
 });
 
-app.put("/api/sheets/:id", async (req, res) => {
+apiRouter.put("/sheets/:id", async (req, res) => {
   try {
     if (!supabase) {
       return res
@@ -193,7 +193,7 @@ app.put("/api/sheets/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/sheets/:id", async (req, res) => {
+apiRouter.delete("/sheets/:id", async (req, res) => {
   try {
     if (!supabase) {
       return res
@@ -209,6 +209,11 @@ app.delete("/api/sheets/:id", async (req, res) => {
     res.status(404).json({ error: "Ficha não encontrada." });
   }
 });
+
+app.use("/api", apiRouter);
+app.use(apiRouter);
+
+app.use(express.static(path.join(__dirname)));
 
 app.use((req, res) => {
   res.status(404).send("Not Found");

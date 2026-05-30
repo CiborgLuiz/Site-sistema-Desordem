@@ -36,3 +36,6 @@ dist/
 
 # Sheets directory (local development only)
 sheets/
+
+# Env
+.env
