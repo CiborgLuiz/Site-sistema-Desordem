@@ -1,6 +1,7 @@
 "use strict";
 
-const app = require("../server");
+const path = require("path");
+const app = require(path.join(__dirname, "..", "server"));
 
 module.exports = (req, res) => {
   // Vercel pode repassar o caminho com ou sem o prefixo /api.
