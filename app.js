@@ -80,7 +80,7 @@ const SKILLS = [
 ];
 
 const RESOURCES = [
-  { key: "hp", label: "Vida", formula: "Base da classe + (CON mod + vida por nível) x nível" },
+  { key: "hp", label: "Vida", formula: "Base da classe + max(1, CON mod + vida por nível) x nível" },
   { key: "sanity", label: "Sanidade", formula: "20 + CAR mod + metade do nível" },
   { key: "mana", label: "Mana", formula: "10 + nível x (3 + INT mod)" },
   { key: "ki", label: "Ki", formula: "10 + nível x (3 + SAB mod)" },
@@ -102,10 +102,6 @@ const DATA_SOURCES = {
   ki: {
     label: "Técnicas de Ki",
     path: "Sistema/DESORDEM/Magias/Técnicas de Ki 697b3b0ced9944c5ac27df54e855b67e.csv",
-  },
-  powers: {
-    label: "Poderes Especiais",
-    path: "Sistema/DESORDEM/Magias/Poderes Especiais 26d6446d688f44e7af5c7669b7b93d6a.csv",
   },
   subclasses: {
     label: "Subclasses",
@@ -314,7 +310,7 @@ const app = document.getElementById("app");
 const library = {
   status: "loading",
   error: "",
-  data: { items: [], arcane: [], ki: [], powers: [], subclasses: [], postures: [], enchantments: [] },
+  data: { items: [], arcane: [], ki: [], subclasses: [], postures: [], enchantments: [] },
 };
 const wiki = {
   status: "idle",
@@ -1786,7 +1782,7 @@ function normalizeSheet(raw) {
   for (const resource of RESOURCES) sheet.current[resource.key] = sheet.current[resource.key] ?? "";
   sheet.equipmentDefense = parseNumber(sheet.equipmentDefense, 0);
   sheet.inventory = Array.isArray(sheet.inventory) ? sheet.inventory.map(normalizeInventoryItem) : [];
-  sheet.abilities = Array.isArray(sheet.abilities) ? sheet.abilities.map(normalizeAbility) : [];
+  sheet.abilities = Array.isArray(sheet.abilities) ? sheet.abilities.map(normalizeAbility).filter(shouldKeepAbility) : [];
   sheet.modifiers = Array.isArray(sheet.modifiers) ? sheet.modifiers.map(normalizeModifier) : [];
   sheet.createdAt = sheet.createdAt || new Date().toISOString();
   sheet.updatedAt = sheet.updatedAt || new Date().toISOString();
@@ -1827,6 +1823,13 @@ function normalizeAbility(ability) {
     normalized.damage = "1d6";
   }
   return normalized;
+}
+
+function shouldKeepAbility(ability) {
+  const type = normalizeText(ability.type);
+  const source = normalizeText(ability.source);
+  if (type !== "poder") return true;
+  return !["wiki", "poderes especiais"].includes(source);
 }
 
 function normalizeEnchantment(enchantment) {
@@ -2632,6 +2635,7 @@ function getAbilityRequirement(sheet, row, sourceKey) {
   if (!sheet) return { ok: true, reason: "" };
   if (sourceKey === "arcane") {
     if (!["Mago", "Híbrido"].includes(sheet.className)) return { ok: false, reason: "Apenas Mago ou Híbrido podem aprender magias arcanas." };
+    if (isFreeDefaultMagicName(row.Nome)) return { ok: true, reason: "" };
     const arcanism = getSubclassLevel(sheet, "Arcanismo");
     if (arcanism < 1) return { ok: false, reason: "Requer pelo menos 1 nível em Arcanismo." };
     const used = countArcanismMagicAbilities(sheet);
@@ -2645,6 +2649,7 @@ function getAbilityRequirement(sheet, row, sourceKey) {
 
 function getLibraryRequirementText(row, key) {
   const requirements = cleanWikiText(row.Requisitos || "");
+  if (key === "arcane" && isFreeDefaultMagicName(row.Nome)) return "Magia padrão de Mago e Híbrido";
   if (key === "arcane") {
     return ["Requer 1 nível livre de Arcanismo", requirements].filter(Boolean).join("; ");
   }
@@ -2652,7 +2657,15 @@ function getLibraryRequirementText(row, key) {
 }
 
 function countArcanismMagicAbilities(sheet) {
-  return sheet.abilities.filter((ability) => ability.type === "Magia" && normalizeText(ability.source) !== "padrao").length;
+  return sheet.abilities.filter((ability) => normalizeText(ability.type) === "magia" && !isFreeDefaultMagicAbility(ability)).length;
+}
+
+function isFreeDefaultMagicAbility(ability) {
+  return normalizeText(ability.source) === "padrao" || isFreeDefaultMagicName(ability.name);
+}
+
+function isFreeDefaultMagicName(name) {
+  return normalizeText(name) === "raio de mana";
 }
 
 function normalizeText(value) {
@@ -2752,8 +2765,7 @@ function calculateCore(sheet, includePosture) {
 }
 
 function getLifeGrowthPerLevel(rules, constitutionMod) {
-  if (constitutionMod < 0) return 1;
-  return constitutionMod + rules.lifePerLevel;
+  return Math.max(1, constitutionMod + rules.lifePerLevel);
 }
 
 function sumExternalModifiers(sheet, target) {

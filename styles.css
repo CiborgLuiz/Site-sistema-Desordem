@@ -591,6 +591,19 @@ input[type="checkbox"] {
   gap: 0.55rem;
 }
 
+.level-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.level-up-button {
+  min-height: 2.45rem;
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+}
+
 .stat-box {
   min-height: 4.2rem;
   padding: 0.65rem;
