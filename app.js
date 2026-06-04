@@ -87,6 +87,7 @@ const RESOURCES = [
   { key: "energy", label: "Energia física", formula: "Constituição total x nível" },
   { key: "defense", label: "Defesa", formula: "10 + metade do nível + DES mod + equipamento" },
   { key: "magicAmp", label: "Ampliação Mágica", formula: "INT mod + piso(nível / 10)" },
+  { key: "kiRefine", label: "Refino de Ki", formula: "SAB mod + piso(nível / 10)" },
 ];
 
 const DATA_SOURCES = {
@@ -431,6 +432,13 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (action === "level-up") {
+    sheet.level = clamp(parseNumber(sheet.level, 1) + 1, 1, MAX_LEVEL);
+    clampSubclasses(sheet);
+    touchAndRender(sheet);
+    return;
+  }
+
   if (action === "switch-library-tab") {
     state.libraryTab = button.dataset.libraryTab;
     state.libraryCategory = "";
@@ -499,7 +507,7 @@ document.addEventListener("click", (event) => {
   }
 
   if (action === "add-custom-ability") {
-    sheet.abilities.push({ id: uid(), name: "", type: "Poder", cost: "", damage: "", note: "", source: "Manual" });
+    sheet.abilities.push({ id: uid(), name: "", type: "Poder", cost: "", range: "", damage: "", note: "", source: "Manual" });
     touchAndRender(sheet);
     return;
   }
@@ -1075,7 +1083,10 @@ function renderSheetTab(sheet) {
             </label>
             <label class="field">
               <span>Level</span>
-              <input type="number" min="1" max="${MAX_LEVEL}" step="1" data-number-bind="level" value="${escapeAttr(sheet.level)}" />
+              <div class="level-control">
+                <input type="number" min="1" max="${MAX_LEVEL}" step="1" data-number-bind="level" value="${escapeAttr(sheet.level)}" />
+                <button type="button" class="ghost-button level-up-button" data-action="level-up" title="Subir 1 nível" aria-label="Subir 1 nível">+1</button>
+              </div>
             </label>
             <label class="field">
               <span>Classe</span>
@@ -1185,6 +1196,7 @@ function renderResourceCard(sheet, resource) {
   const currentDisabled = uses ? "" : "disabled";
   const extra = sheet.resourceMods[resource.key] ?? 0;
   const current = sheet.current[resource.key] ?? "";
+  const tracksCurrent = !["defense", "magicAmp", "kiRefine"].includes(resource.key);
   const defenseEquip = resource.key === "defense"
     ? `
       <label class="field">
@@ -1200,14 +1212,14 @@ function renderResourceCard(sheet, resource) {
         <span class="metric-name">${resource.label}</span>
         <strong class="metric-value" data-calc="resource-${resource.key}">0</strong>
         <div class="metric-formula">${resource.formula}</div>
-        ${uses && resource.key !== "defense" && resource.key !== "magicAmp" ? `
+        ${uses && tracksCurrent ? `
         <div class="resource-bar" data-resource-bar="${resource.key}">
           <div class="resource-bar-fill"></div>
           <div class="resource-bar-text"><span class="bar-current">${escapeHtml(String(current || "0"))}</span>/<span class="bar-max">0</span></div>
         </div>
         ` : ""}
       </div>
-      ${resource.key !== "defense" && resource.key !== "magicAmp" ? `
+      ${tracksCurrent ? `
       <label class="field">
         <span>Atual</span>
         <input type="number" step="0.5" data-current="${resource.key}" value="${escapeAttr(current)}" ${currentDisabled} />
@@ -1452,50 +1464,8 @@ function renderAbilitiesTab(sheet) {
           }
         </div>
       </div>
-      <div class="panel">
-        <div class="panel-title">
-          <h3>Poderes básicos da wiki</h3>
-          <span class="badge">${library.data.powers.length} poderes</span>
-        </div>
-        <div class="library-list">
-          ${
-            library.data.powers.length
-              ? library.data.powers.slice(0, 24).map((row, index) => renderPowerPickCard(row, index)).join("")
-              : `<div class="empty-state">Carregando poderes básicos.</div>`
-          }
-        </div>
-      </div>
     </section>
   `;
-}
-
-function renderPowerPickCard(row, sourceIndex) {
-  const requirement = getPowerRequirement(row);
-  return `
-    <article class="library-card">
-      <div>
-        <h3>${escapeHtml(row.Nome)}</h3>
-      </div>
-      <p>${escapeHtml(row.Descrição || row["Efeito mecânico"] || row.Observações || "Poder sem descrição.")}</p>
-      <div class="library-fields">
-        ${libraryField("Dano", row.Dano)}
-        ${libraryField("Custo", row.Custo)}
-        ${libraryField("Duração", row.Duração)}
-        ${libraryField("Requisitos", requirement)}
-      </div>
-      <button type="button" class="primary-button" data-action="add-ability" data-source-key="powers" data-source-index="${sourceIndex}">Adicionar à ficha</button>
-    </article>
-  `;
-}
-
-function getPowerRequirement(row) {
-  const resource = normalizeText(row.Recurso || "");
-  const category = normalizeText(row.Categoria || row.Sistema || "");
-  const requiresArcane = resource.includes("magia") || category.includes("magia") || category.includes("arcana") || resource.includes("arcan") || category.includes("arcan");
-  if (requiresArcane) {
-    return "Requer 1 nível livre de Arcanismo";
-  }
-  return row.Requisitos || "-";
 }
 
 function renderAbilityRow(ability, index) {
@@ -1512,6 +1482,10 @@ function renderAbilityRow(ability, index) {
       <label class="field">
         <span>Custo</span>
         <input data-ability-field="cost" data-index="${index}" value="${escapeAttr(ability.cost)}" />
+      </label>
+      <label class="field">
+        <span>Alcance</span>
+        <input data-ability-field="range" data-index="${index}" value="${escapeAttr(ability.range)}" />
       </label>
       <label class="field">
         <span>Dano</span>
@@ -1693,7 +1667,8 @@ function renderLibraryCard(row, key, sourceIndex) {
         ${libraryField("Alcance", row.Alcance)}
         ${libraryField("Dano", damage)}
         ${libraryField("Duração", row.Duração)}
-        ${libraryField("Requisitos", key === "arcane" || key === "ki" ? "Requer 1 nível livre de Arcanismo" : (row.Requisitos || "-"))}
+        ${libraryField("Base", row["Base Elemental"])}
+        ${libraryField("Requisitos", getLibraryRequirementText(row, key))}
       </div>
       ${requirement.ok ? "" : `<p class="requirement-warning">${escapeHtml(requirement.reason)}</p>`}
       <button type="button" class="primary-button" data-action="add-ability" data-source-key="${key}" data-source-index="${sourceIndex}" ${requirement.ok ? "" : "disabled"}>Adicionar à ficha</button>
@@ -1770,8 +1745,9 @@ function createDefaultAbilities(className) {
         id: uid(),
         name: "Raio de Mana",
         type: "Magia",
-        cost: "0",
-        damage: "",
+        cost: "4 Mana",
+        range: "18 m",
+        damage: "1d6",
         note: "Equipado por padrão, sem custo de Arcanismo.",
         source: "Padrão",
       },
@@ -1835,15 +1811,22 @@ function normalizeInventoryItem(item) {
 }
 
 function normalizeAbility(ability) {
-  return {
+  const normalized = {
     id: ability.id || uid(),
     name: ability.name || "",
     type: ability.type || "",
     cost: ability.cost || "",
+    range: ability.range || "",
     damage: ability.damage || "",
     note: ability.note || "",
     source: ability.source || "",
   };
+  if (normalizeText(normalized.source) === "padrao" && normalizeText(normalized.name) === "raio de mana") {
+    normalized.cost = "4 Mana";
+    normalized.range = "18 m";
+    normalized.damage = "1d6";
+  }
+  return normalized;
 }
 
 function normalizeEnchantment(enchantment) {
@@ -2651,13 +2634,25 @@ function getAbilityRequirement(sheet, row, sourceKey) {
     if (!["Mago", "Híbrido"].includes(sheet.className)) return { ok: false, reason: "Apenas Mago ou Híbrido podem aprender magias arcanas." };
     const arcanism = getSubclassLevel(sheet, "Arcanismo");
     if (arcanism < 1) return { ok: false, reason: "Requer pelo menos 1 nível em Arcanismo." };
-    const used = sheet.abilities.filter((ability) => ability.type === "Magia").length;
+    const used = countArcanismMagicAbilities(sheet);
     if (used >= arcanism) return { ok: false, reason: `Limite de magias por Arcanismo atingido: ${used}/${arcanism}.` };
   }
   if (sourceKey === "ki" && !["Ki", "Híbrido"].includes(sheet.className)) {
     return { ok: false, reason: "Apenas Ki ou Híbrido podem aprender técnicas de Ki." };
   }
   return { ok: true, reason: "" };
+}
+
+function getLibraryRequirementText(row, key) {
+  const requirements = cleanWikiText(row.Requisitos || "");
+  if (key === "arcane") {
+    return ["Requer 1 nível livre de Arcanismo", requirements].filter(Boolean).join("; ");
+  }
+  return requirements || "-";
+}
+
+function countArcanismMagicAbilities(sheet) {
+  return sheet.abilities.filter((ability) => ability.type === "Magia" && normalizeText(ability.source) !== "padrao").length;
 }
 
 function normalizeText(value) {
@@ -2695,14 +2690,16 @@ function calculateCore(sheet, includePosture) {
   }
 
   const resourceExternal = (key) => parseNumber(sheet.resourceMods[key], 0) + sumExternalModifiers(sheet, `res:${key}`);
+  const lifeGrowth = getLifeGrowthPerLevel(rules, attrMods.constitution);
   const resources = {
-    hp: Math.floor(rules.lifeBase + (attrMods.constitution + rules.lifePerLevel) * level + resourceExternal("hp")),
+    hp: Math.floor(rules.lifeBase + lifeGrowth * level + resourceExternal("hp")),
     sanity: Math.floor(20 + attrMods.charisma + halfLevel + resourceExternal("sanity")),
     mana: rules.usesMana ? Math.floor(10 + level * (3 + attrMods.intelligence) + resourceExternal("mana")) : 0,
     ki: rules.usesKi ? Math.floor(10 + level * (3 + attrMods.wisdom) + resourceExternal("ki")) : 0,
     energy: Math.floor(attributes.constitution * level + resourceExternal("energy")),
     defense: Math.floor(10 + halfLevel + attrMods.dexterity + parseNumber(sheet.equipmentDefense, 0) + resourceExternal("defense")),
     magicAmp: Math.floor(attrMods.intelligence + Math.floor(level / 10) + resourceExternal("magicAmp")),
+    kiRefine: Math.floor(attrMods.wisdom + Math.floor(level / 10) + resourceExternal("kiRefine")),
   };
 
   if (posture.defenseAttr && posture.defenseAttrPct) {
@@ -2752,6 +2749,11 @@ function calculateCore(sheet, includePosture) {
     inventoryDamage,
     equippedDefense,
   };
+}
+
+function getLifeGrowthPerLevel(rules, constitutionMod) {
+  if (constitutionMod < 0) return 1;
+  return constitutionMod + rules.lifePerLevel;
 }
 
 function sumExternalModifiers(sheet, target) {
@@ -3110,6 +3112,7 @@ function addAbilityFromLibrary(sheet, sourceKey, sourceIndex) {
     name: cleanWikiText(row.Nome || type),
     type,
     cost: row["Custo base"] || row.Custo || "",
+    range: row.Alcance || "",
     damage: row["Dano base"] || row.Dano || "",
     note: cleanWikiText(row.Descrição || row.Efeito || row["Efeito secundário"] || row.Observações || ""),
     source: DATA_SOURCES[sourceKey]?.label || "Wiki",
