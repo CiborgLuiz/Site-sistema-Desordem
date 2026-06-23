@@ -1,0 +1,91 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Cálculos</title><style>
+body{font-family:Arial,Helvetica,sans-serif;margin:2em;max-width:900px;color:#333}
+h1{font-size:1.8rem}
+table{border-collapse:collapse;width:100%;margin:1em 0}
+th,td{border:1px solid #ccc;padding:0.5em;text-align:left}
+th{background:#f5f5f5}
+.mono{font-family:monospace;background:#fafafa;padding:.25em .5em;border-radius:4px}
+</style></head><body>
+<h1>Cálculos úteis do sistema</h1>
+<p>Resumo de fórmulas e tabelas de referência para uso rápido na wiki.</p>
+
+<h2>Fórmulas</h2>
+<ul>
+  <li><strong>Carga máxima</strong>: <span class="mono">25 + (mod Força + 5) × (level / 2)</span></li>
+  <li><strong>Dano por peso</strong>: <span class="mono">(Peso / 50) d6</span> — use quando um objeto não tem dano definido; arredonde para baixo o número de d6 (ex.: 120 kg → 2d6).</li>
+  <li><strong>Deslocamento</strong>: <span class="mono">10 + mod Destreza</span> (metros por turno)</li>
+  <li><strong>Velocidade máxima</strong>: <span class="mono">20 + 3 × mod Destreza</span> (m/s ou metros por turno conforme tabela do grupo)</li>
+  <li><strong>Distância de arremesso</strong>: <span class="mono">Carga máxima / √(peso)</span> (metros; calcular com raiz quadrada do peso em mesma unidade)</li>
+</ul>
+
+<h2>Tabelas de referência (valores arredondados)</h2>
+
+<h3>Modificadores típicos (Força / Destreza)</h3>
+<table>
+<thead><tr><th>Valor de Atributo</th><th>Modificador</th></tr></thead>
+<tbody>
+<tr><td>8</td><td>-1</td></tr>
+<tr><td>10</td><td>0</td></tr>
+<tr><td>12</td><td>+1</td></tr>
+<tr><td>14</td><td>+2</td></tr>
+<tr><td>16</td><td>+3</td></tr>
+<tr><td>18</td><td>+4</td></tr>
+<tr><td>20</td><td>+5</td></tr>
+</tbody>
+</table>
+
+<h3>Carga máxima — exemplos rápidos</h3>
+<table>
+<thead><tr><th>Level</th><th>mod Força</th><th>Carga máxima (ex.)</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>0</td><td>25 + (0+5)×(1/2) = 27.5 → 27</td></tr>
+<tr><td>5</td><td>+2</td><td>25 + (2+5)×(5/2) = 25 + 7×2.5 = 42.5 → 42</td></tr>
+<tr><td>10</td><td>+3</td><td>25 + (3+5)×(10/2) = 25 + 8×5 = 65</td></tr>
+<tr><td>20</td><td>+5</td><td>25 + (5+5)×(20/2) = 25 + 10×10 = 125</td></tr>
+</tbody>
+</table>
+
+<h3>Dano por peso — exemplos</h3>
+<table>
+<thead><tr><th>Peso (kg)</th><th>Dados</th></tr></thead>
+<tbody>
+<tr><td>25</td><td>0 d6 (sem dano)</td></tr>
+<tr><td>50</td><td>1 d6</td></tr>
+<tr><td>100</td><td>2 d6</td></tr>
+<tr><td>250</td><td>5 d6</td></tr>
+<tr><td>500</td><td>10 d6</td></tr>
+</tbody>
+</table>
+
+<h3>Deslocamento e velocidade — exemplos</h3>
+<table>
+<thead><tr><th>mod Destreza</th><th>Deslocamento</th><th>Velocidade máxima</th></tr></thead>
+<tbody>
+<tr><td>-1</td><td>9</td><td>17</td></tr>
+<tr><td>0</td><td>10</td><td>20</td></tr>
+<tr><td>+1</td><td>11</td><td>23</td></tr>
+<tr><td>+2</td><td>12</td><td>26</td></tr>
+<tr><td>+3</td><td>13</td><td>29</td></tr>
+<tr><td>+4</td><td>14</td><td>32</td></tr>
+<tr><td>+5</td><td>15</td><td>35</td></tr>
+</tbody>
+</table>
+
+<h3>Distância de arremesso — exemplos (peso em kg)</h3>
+<table>
+<thead><tr><th>Carga máxima</th><th>Peso</th><th>Distância ≈</th></tr></thead>
+<tbody>
+<tr><td>50</td><td>5</td><td>50 / √5 ≈ 22.4 m</td></tr>
+<tr><td>100</td><td>10</td><td>100 / √10 ≈ 31.6 m</td></tr>
+<tr><td>125</td><td>25</td><td>125 / √25 = 125 / 5 = 25 m</td></tr>
+<tr><td>200</td><td>50</td><td>200 / √50 ≈ 28.3 m</td></tr>
+</tbody>
+</table>
+
+<p>Posso ajustar unidades (metros vs. passos), arredondamentos, ou gerar uma versão em Markdown/JSON para uso em ferramentas. Deseja que eu:</p>
+<ul>
+  <li>Adicione essa página na navegação da wiki (link no índice)?</li>
+  <li>Inclua uma tabela completa de mod/atributo até 30 em vez dos poucos exemplos?</li>
+</ul>
+
+</body></html>
