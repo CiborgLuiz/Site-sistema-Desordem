@@ -154,6 +154,8 @@ const WIKI_NAV_SECTIONS = [
     links: [
       { label: "Filosofia do Combate", path: "Sistema/DESORDEM/Filosofia do Combate 6317dfe19862449bac72d8462c0e5c83.html" },
       { label: "Mundo e Lore", path: "Sistema/DESORDEM/Mundo Lore 99e0dc6437e545d7bfed5a78cc9b6bcb.html" },
+      { label: "Cálculos de Jogo", path: "Sistema/DESORDEM/Guias/Calculos de Jogo 1a2b3c4d5e.html" },
+      { label: "Sanidade", path: "Sistema/DESORDEM/Guias/Sanidade 9f3b2c1d4e5f6a7b8c9d0e1f2a3b4c5d.html" },
       { label: "Referência Rápida", path: "Sistema/DESORDEM/Referência Rápida 8f2547cd1e894adf9ed9fac6557a16e2.html" },
     ],
   },
