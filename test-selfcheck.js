@@ -8,9 +8,25 @@ const lines = src.split("\n");
 function extract(name) {
   const start = lines.findIndex((line) => line.startsWith(`function ${name}(`));
   if (start === -1) throw new Error(`função ${name} não encontrada`);
-  let end = start + 1;
-  while (end < lines.length && lines[end] !== "}") end += 1;
-  return lines.slice(start, end + 1).join("\n");
+  let depth = 0;
+  let quote = null;
+  for (let i = start; i < lines.length; i++) {
+    const line = lines[i];
+    for (const ch of line) {
+      if (quote) {
+        if (quote === "`" && ch === "$" && line[line.indexOf(ch) + 1] === "{") continue;
+        if (ch === quote) quote = null;
+      } else if (ch === '"' || ch === "'" || ch === "`") {
+        quote = ch;
+      } else if (ch === "{") {
+        depth += 1;
+      } else if (ch === "}") {
+        depth -= 1;
+        if (depth === 0) return lines.slice(start, i + 1).join("\n");
+      }
+    }
+  }
+  throw new Error(`função ${name} sem fechamento`);
 }
 
 const FUNCS = [
@@ -25,6 +41,8 @@ const FUNCS = [
   "option",
   "optionWithLabel",
   "renderModifierRow",
+  "detectBonusModifier",
+  "normalizeText",
 ];
 
 const sandbox = {};
@@ -97,5 +115,14 @@ for (const needle of [
 ]) {
   assert.ok(html.includes(needle), `renderModifierRow sem "${needle}"`);
 }
+
+// detectBonusModifier: só dá alvo quando há número real perto da palavra-chave
+assert.deepStrictEqual(detectBonusModifier("Reduz dano físico por 2 turnos (+4 Defesa)."), { target: "res:defense", value: 4 });
+assert.deepStrictEqual(detectBonusModifier("Detecta presenças hostis (+2 Percepção)."), { target: "skill:percepcao", value: 2 });
+assert.deepStrictEqual(detectBonusModifier("Poção: +3 Força temporária."), { target: "attr:strength", value: 3 });
+assert.deepStrictEqual(detectBonusModifier("Aumenta velocidade (+2 m deslocamento)."), { target: "misc:displacement", value: 2 });
+assert.deepStrictEqual(detectBonusModifier("Reduz o deslocamento do alvo pela metade."), { target: "", value: 0 });
+assert.deepStrictEqual(detectBonusModifier("Reflete parte do dano recebido ao atacante."), { target: "", value: 0 });
+assert.deepStrictEqual(detectBonusModifier(""), { target: "", value: 0 });
 
 console.log("OK: todos os asserts passaram");

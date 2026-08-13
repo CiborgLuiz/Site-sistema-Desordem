@@ -687,6 +687,7 @@ document.addEventListener("input", (event) => {
   if (target.matches("[data-ability-field]")) {
     updateCollectionField(sheet.abilities, target);
     touchSheet(sheet);
+    refreshCalculations();
     return;
   }
 
@@ -1520,6 +1521,22 @@ function renderAbilityRow(ability, index) {
         <input data-ability-field="damage" data-index="${index}" value="${escapeAttr(ability.damage)}" />
       </label>
       <label class="field">
+        <span>Bônus</span>
+        <input data-ability-field="bonus" data-index="${index}" value="${escapeAttr(ability.bonus)}" />
+      </label>
+      <label class="inline-field">
+        <input type="checkbox" data-ability-field="active" data-index="${index}" ${ability.active !== false ? "checked" : ""} />
+        Ativo
+      </label>
+      <label class="field">
+        <span>Alvo</span>
+        <input data-ability-field="target" data-index="${index}" value="${escapeAttr(ability.target)}" placeholder="res:defense" />
+      </label>
+      <label class="field">
+        <span>Valor</span>
+        <input type="number" step="0.5" data-ability-field="value" data-index="${index}" value="${escapeAttr(ability.value)}" />
+      </label>
+      <label class="field">
         <span>Nota</span>
         <input data-ability-field="note" data-index="${index}" value="${escapeAttr(ability.note)}" />
       </label>
@@ -1887,7 +1904,11 @@ function normalizeAbility(ability) {
     cost: ability.cost || "",
     range: ability.range || "",
     damage: ability.damage || "",
+    bonus: ability.bonus || "",
     note: ability.note || "",
+    target: ability.target || "",
+    value: parseNumber(ability.value, 0),
+    active: ability.active !== false,
     source: ability.source || "",
   };
   if (normalizeText(normalized.source) === "padrao" && normalizeText(normalized.name) === "raio de mana") {
@@ -2821,17 +2842,21 @@ function calculateCore(sheet, includePosture) {
   }
 
   const resourceExternal = (key) => sumExternalModifiers(sheet, `res:${key}`);
-  const resourceTotal = (key, base) => applyModifierTo(base + parseNumber(sheet.resourceMods[key], 0), resourceExternal(key));
+  const resourceFlat = (key, base) => base + parseNumber(sheet.resourceMods[key], 0) + resourceExternal(key).flat;
+  const resourcePct = (key, value) => {
+    const pct = resourceExternal(key).pct;
+    return pct ? Math.floor(value + (value * pct) / 100) : value;
+  };
   const lifeGrowth = getLifeGrowthPerLevel(rules, attrMods.constitution);
   const resources = {
-    hp: Math.floor(rules.lifeBase + lifeGrowth * level + resourceTotal("hp", 0)),
-    sanity: Math.floor(20 + attrMods.charisma + halfLevel + resourceTotal("sanity", 0)),
-    mana: rules.usesMana ? Math.floor(10 + level * (3 + attrMods.intelligence) + resourceTotal("mana", 0)) : 0,
-    ki: rules.usesKi ? Math.floor(10 + level * (3 + attrMods.wisdom) + resourceTotal("ki", 0)) : 0,
-    energy: Math.floor(attributes.constitution * level + resourceTotal("energy", 0)),
-    defense: Math.floor(10 + halfLevel + attrMods.dexterity + parseNumber(sheet.equipmentDefense, 0) + resourceTotal("defense", 0)),
-    magicAmp: Math.floor(attrMods.intelligence + Math.floor(level / 10) + resourceTotal("magicAmp", 0)),
-    kiRefine: Math.floor(attrMods.wisdom + Math.floor(level / 10) + resourceTotal("kiRefine", 0)),
+    hp: resourcePct("hp", Math.floor(rules.lifeBase + lifeGrowth * level + resourceFlat("hp", 0))),
+    sanity: resourcePct("sanity", Math.floor(20 + attrMods.charisma + halfLevel + resourceFlat("sanity", 0))),
+    mana: rules.usesMana ? resourcePct("mana", Math.floor(10 + level * (3 + attrMods.intelligence) + resourceFlat("mana", 0))) : 0,
+    ki: rules.usesKi ? resourcePct("ki", Math.floor(10 + level * (3 + attrMods.wisdom) + resourceFlat("ki", 0))) : 0,
+    energy: resourcePct("energy", Math.floor(attributes.constitution * level + resourceFlat("energy", 0))),
+    defense: resourcePct("defense", Math.floor(10 + halfLevel + attrMods.dexterity + parseNumber(sheet.equipmentDefense, 0) + resourceFlat("defense", 0))),
+    magicAmp: resourcePct("magicAmp", Math.floor(attrMods.intelligence + Math.floor(level / 10) + resourceFlat("magicAmp", 0))),
+    kiRefine: resourcePct("kiRefine", Math.floor(attrMods.wisdom + Math.floor(level / 10) + resourceFlat("kiRefine", 0))),
   };
 
   if (posture.defenseAttr && posture.defenseAttrPct) {
@@ -2865,7 +2890,7 @@ function calculateCore(sheet, includePosture) {
 
   const totalWeight = sheet.inventory.reduce((sum, item) => sum + parseNumber(item.weight, 0) * parseNumber(item.quantity, 1), 0);
   const cargoMax = 25 + (attrMods.strength + 5) * (level / 2);
-  const displacement = 10 + attrMods.dexterity;
+  const displacement = 10 + attrMods.dexterity + sumExternalModifiers(sheet, "misc:displacement").flat;
   const maxSpeed = 20 + 3 * attrMods.dexterity;
 
   return {
@@ -2905,13 +2930,18 @@ function getLifeGrowthPerLevel(rules, constitutionMod) {
 }
 
 function sumExternalModifiers(sheet, target) {
-  const flat = getInventoryTargetTotal(sheet, target);
+  let flat = getInventoryTargetTotal(sheet, target);
   if (!target) return { flat, pct: 0 };
   let pct = 0;
   for (const modifier of sheet.modifiers) {
     if (!modifier.active || !modifierAppliesTo(modifier, target)) continue;
     if (modifier.unit === "pct") pct += parseNumber(modifier.value, 0);
     else flat += parseNumber(modifier.value, 0);
+  }
+  for (const ability of sheet.abilities || []) {
+    if (ability.active !== false && ability.target && modifierAppliesTo(ability, target)) {
+      flat += parseNumber(ability.value, 0);
+    }
   }
   return { flat, pct };
 }
@@ -2997,7 +3027,7 @@ function refreshCalculations() {
   setCalc("displacement", `${formatNumber(calc.displacement)} m/turno`);
   setCalc("max-speed", `${formatNumber(calc.maxSpeed)} m/s`);
   const objectWeight = parseNumber(state.statObjectWeight, 0);
-  setCalc("weight-damage", objectWeight > 0 ? `${weightDamageDice(objectWeight)}d6` : "—");
+  setCalc("weight-damage", objectWeight > 0 ? `${weightDamageDice(objectWeight)}d6 + ${signed(calc.attrMods.strength)}` : "—");
   setCalc("throw-distance", objectWeight > 0 ? `${formatNumber(throwDistance(objectWeight, calc.cargoMax))} m` : "—");
   setCalc("posture-summary", getPostureSummary(calc));
   document.querySelectorAll("[data-skill-summary]").forEach((node) => {
@@ -3288,6 +3318,8 @@ function addAbilityFromLibrary(sheet, sourceKey, sourceIndex) {
     return;
   }
   const type = sourceKey === "arcane" ? "Magia" : sourceKey === "ki" ? "Técnica de Ki" : "Poder";
+  const bonus = cleanWikiText(row.Bônus || "");
+  const detected = detectAbilityModifier(row);
   sheet.abilities.push({
     id: uid(),
     name: cleanWikiText(row.Nome || type),
@@ -3295,10 +3327,55 @@ function addAbilityFromLibrary(sheet, sourceKey, sourceIndex) {
     cost: row["Custo base"] || row.Custo || "",
     range: row.Alcance || "",
     damage: extractDamageFromRow(row),
+    bonus,
     note: cleanWikiText(row.Descrição || row.Efeito || row["Efeito secundário"] || row.Observações || ""),
+    target: detected.target,
+    value: detected.value,
+    active: Boolean(detected.target),
     source: DATA_SOURCES[sourceKey]?.label || "Wiki",
   });
   touchAndRender(sheet);
+}
+
+function detectAbilityModifier(row) {
+  return detectBonusModifier(row.Bônus || "");
+}
+
+function detectBonusModifier(text) {
+  const normalized = normalizeText(text);
+  const valueNear = (keyword) => {
+    const index = normalized.indexOf(keyword);
+    if (index < 0) return null;
+    const window = text.slice(Math.max(0, index - 30), index + 30);
+    const numbers = window.match(/[+-]?\d+(?:[.,]\d+)?/g) || [];
+    if (!numbers.length) return null;
+    const signed = numbers.find((value) => /^[+-]/.test(value)) || numbers[0];
+    return parseNumber(signed);
+  };
+  const attrMatch = String(text).match(/[+-]?\d+(?:[.,]\d+)?\s*(?:de\s*)?(força|destreza|constituição|inteligência|sabedoria|carisma)/i);
+  if (attrMatch) {
+    const key = { forca: "strength", destreza: "dexterity", constituicao: "constitution", inteligencia: "intelligence", sabedoria: "wisdom", carisma: "charisma" }[normalizeText(attrMatch[1])];
+    return { target: `attr:${key}`, value: parseNumber(attrMatch[0]) };
+  }
+  const match = (keyword, target) => {
+    const value = valueNear(keyword);
+    return value === null ? null : { target, value };
+  };
+  return (
+    match("percepcao", "skill:percepcao") ||
+    match("reflexos", "skill:reflexos") ||
+    match("esquiva", "skill:reflexos") ||
+    match("iniciativa", "skill:iniciativa") ||
+    match("vontade", "skill:vontade") ||
+    match("atletismo", "skill:atletismo") ||
+    match("escalada", "skill:atletismo") ||
+    match("furtividade", "skill:furtividade") ||
+    match("defesa", "res:defense") ||
+    match("deslocamento", "misc:displacement") ||
+    match("pv", "res:hp") ||
+    match("vida", "res:hp") ||
+    { target: "", value: 0 }
+  );
 }
 
 function detectItemModifier(row) {
@@ -3323,7 +3400,7 @@ function detectItemModifier(row) {
     return { target: `attr:${attr.key}`, value: modifierValue || firstNumber || 0 };
   }
 
-  return { target: "", value: 0 };
+  return detectBonusModifier(`${row.Bônus || ""}`);
 }
 
 function extractFirstSignedNumber(text) {
