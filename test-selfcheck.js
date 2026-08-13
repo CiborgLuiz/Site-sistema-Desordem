@@ -43,6 +43,7 @@ const FUNCS = [
   "renderModifierRow",
   "detectBonusModifier",
   "normalizeText",
+  "calcOverweightPenalty",
 ];
 
 const sandbox = {};
@@ -75,6 +76,13 @@ assert.strictEqual(parseNumber("abc", 7), 7);
 assert.strictEqual(weightDamageDice(50), 1);
 assert.strictEqual(weightDamageDice(120), 2);
 assert.strictEqual(weightDamageDice(30), 0);
+
+// sobrecarga: -1 Destreza a cada 5kg acima da carga máxima
+assert.strictEqual(calcOverweightPenalty(27.5, 27.5), 0);
+assert.strictEqual(calcOverweightPenalty(32.4, 27.5), 0);
+assert.strictEqual(calcOverweightPenalty(32.5, 27.5), 1);
+assert.strictEqual(calcOverweightPenalty(35, 25), 2);
+assert.strictEqual(calcOverweightPenalty(0, 25), 0);
 
 // distância de arremesso: cargaMax / raiz(peso)
 assert.strictEqual(throwDistance(100, 200), 20);

@@ -1656,6 +1656,7 @@ function renderStatsTab(sheet) {
           <div class="stats-grid">
             <div class="stat-box"><span>Carga máxima</span><strong data-calc="cargo-max">-</strong></div>
             <div class="stat-box"><span>Carga atual</span><strong data-calc="cargo-current">-</strong></div>
+            <div class="stat-box"><span>Penalidade de carga</span><strong data-calc="overweight-penalty">-</strong></div>
             <div class="stat-box"><span>Deslocamento</span><strong data-calc="displacement">-</strong></div>
             <div class="stat-box"><span>Velocidade máxima</span><strong data-calc="max-speed">-</strong></div>
           </div>
@@ -1788,6 +1789,7 @@ function targetOptions(selected) {
   for (const attr of ATTRIBUTES) options.push(optionWithLabel(`attr:${attr.key}`, `Atributo: ${attr.label}`, selected));
   for (const resource of RESOURCES) options.push(optionWithLabel(`res:${resource.key}`, `Recurso: ${resource.label}`, selected));
   for (const skill of SKILLS) options.push(optionWithLabel(`skill:${skill.key}`, `Perícia: ${skill.label}`, selected));
+  options.push(optionWithLabel("misc:cargoMax", "Carga máxima", selected));
   return options.join("");
 }
 
@@ -2841,6 +2843,14 @@ function calculateCore(sheet, includePosture) {
     attrMods[attr.key] = Math.floor((attributes[attr.key] - 10) / 2);
   }
 
+  const totalWeight = sheet.inventory.reduce((sum, item) => sum + parseNumber(item.weight, 0) * parseNumber(item.quantity, 1), 0);
+  const cargoMax = 25 + (attrMods.strength + 5) * (level / 2) + sumExternalModifiers(sheet, "misc:cargoMax").flat;
+  const overweightPenalty = calcOverweightPenalty(totalWeight, cargoMax);
+  if (overweightPenalty > 0) {
+    attributes.dexterity = Math.max(0, attributes.dexterity - overweightPenalty);
+    attrMods.dexterity = Math.floor((attributes.dexterity - 10) / 2);
+  }
+
   const resourceExternal = (key) => sumExternalModifiers(sheet, `res:${key}`);
   const resourceFlat = (key, base) => base + parseNumber(sheet.resourceMods[key], 0) + resourceExternal(key).flat;
   const resourcePct = (key, value) => {
@@ -2888,8 +2898,6 @@ function calculateCore(sheet, includePosture) {
   );
   const equippedDefense = getInventoryTargetTotal(sheet, "res:defense");
 
-  const totalWeight = sheet.inventory.reduce((sum, item) => sum + parseNumber(item.weight, 0) * parseNumber(item.quantity, 1), 0);
-  const cargoMax = 25 + (attrMods.strength + 5) * (level / 2);
   const displacement = 10 + attrMods.dexterity + sumExternalModifiers(sheet, "misc:displacement").flat;
   const maxSpeed = 20 + 3 * attrMods.dexterity;
 
@@ -2911,6 +2919,7 @@ function calculateCore(sheet, includePosture) {
     equippedDefense,
     totalWeight,
     cargoMax,
+    overweightPenalty,
     displacement,
     maxSpeed,
   };
@@ -2918,6 +2927,10 @@ function calculateCore(sheet, includePosture) {
 
 function weightDamageDice(peso) {
   return Math.max(0, Math.floor(peso / 50));
+}
+
+function calcOverweightPenalty(totalWeight, cargoMax) {
+  return Math.floor(Math.max(0, totalWeight - cargoMax) / 5);
 }
 
 function throwDistance(peso, cargoMax) {
@@ -3023,6 +3036,10 @@ function refreshCalculations() {
   setCalc("cargo-current", `${formatNumber(calc.totalWeight)} kg`);
   document.querySelectorAll("[data-calc='cargo-current']").forEach((node) => {
     node.classList.toggle("posture-altered", calc.totalWeight > calc.cargoMax);
+  });
+  setCalc("overweight-penalty", calc.overweightPenalty > 0 ? `-${calc.overweightPenalty} DES` : "—");
+  document.querySelectorAll("[data-calc='overweight-penalty']").forEach((node) => {
+    node.classList.toggle("posture-altered", calc.overweightPenalty > 0);
   });
   setCalc("displacement", `${formatNumber(calc.displacement)} m/turno`);
   setCalc("max-speed", `${formatNumber(calc.maxSpeed)} m/s`);
