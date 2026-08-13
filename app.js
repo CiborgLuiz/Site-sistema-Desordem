@@ -1573,6 +1573,7 @@ function renderModifierRow(modifier, index) {
     { title: "Atributos", entries: ATTRIBUTES.map((entry) => [`attr:${entry.key}`, entry.label]) },
     { title: "Recursos", entries: RESOURCES.map((entry) => [`res:${entry.key}`, entry.label]) },
     { title: "Perícias", entries: SKILLS.map((entry) => [`skill:${entry.key}`, entry.label]) },
+    { title: "Carga", entries: [["misc:cargoMax", "Carga máxima"]] },
   ];
   return `
     <div class="modifier-row">
