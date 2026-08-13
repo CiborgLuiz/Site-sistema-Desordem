@@ -72,9 +72,25 @@ async function listSheets() {
 
   if (error) throw new Error(error.message);
 
-  return (data || []).sort((left, right) => {
-    return timestampValue(serializeSheetRow(right).updatedAt) - timestampValue(serializeSheetRow(left).updatedAt);
-  });
+  const tombstoned = new Set(await listDeletedSheets());
+
+  return (data || [])
+    .filter((row) => !tombstoned.has(row.id))
+    .sort((left, right) => {
+      return timestampValue(serializeSheetRow(right).updatedAt) - timestampValue(serializeSheetRow(left).updatedAt);
+    });
+}
+
+async function listDeletedSheets() {
+  if (!supabase) throw new Error("Supabase não configurado");
+
+  const { data, error } = await supabase
+    .from("deleted_sheets")
+    .select("id");
+
+  if (error) throw new Error(error.message);
+
+  return (data || []).map((row) => row.id);
 }
 
 async function getSheet(id) {
@@ -98,6 +114,18 @@ async function writeSheet(id, sheet) {
     throw new Error("ID inválido para gravação de ficha.");
   }
 
+  const { data: tombstone } = await supabase
+    .from("deleted_sheets")
+    .select("id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (tombstone) {
+    const error = new Error("Esta ficha foi excluída e não pode ser recriada.");
+    error.status = 409;
+    throw error;
+  }
+
   const { data, error } = await supabase
     .from("sheets")
     .upsert({
@@ -112,6 +140,12 @@ async function writeSheet(id, sheet) {
 
 async function deleteSheetRecord(id) {
   if (!supabase) throw new Error("Supabase não configurado");
+
+  const { error: tombstoneError } = await supabase
+    .from("deleted_sheets")
+    .upsert({ id }, { onConflict: "id" });
+
+  if (tombstoneError) throw new Error(tombstoneError.message);
 
   const { error } = await supabase
     .from("sheets")
@@ -160,6 +194,21 @@ apiRouter.get("/sheets", async (req, res) => {
   }
 });
 
+apiRouter.get("/deleted-sheets", async (req, res) => {
+  try {
+    if (!supabase) {
+      return res
+        .status(503)
+        .json({ error: "Banco de dados não disponível" });
+    }
+
+    res.json(await listDeletedSheets());
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 apiRouter.get("/sheets/:id", async (req, res) => {
   try {
     if (!supabase) {
@@ -188,6 +237,7 @@ apiRouter.post("/sheets/:id", async (req, res) => {
 
     res.status(201).json(req.body);
   } catch (error) {
+    if (error.status === 409) return res.status(409).json({ error: error.message });
     res.status(400).json({ error: error.message });
   }
 });
@@ -205,6 +255,7 @@ apiRouter.put("/sheets/:id", async (req, res) => {
 
     res.json(req.body);
   } catch (error) {
+    if (error.status === 409) return res.status(409).json({ error: error.message });
     res.status(400).json({ error: error.message });
   }
 });

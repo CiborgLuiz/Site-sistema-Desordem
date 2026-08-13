@@ -501,7 +501,44 @@ input[type="checkbox"] {
 }
 
 .modifier-row {
-  grid-template-columns: minmax(9rem, 1fr) 8rem minmax(12rem, 1fr) 7rem 7rem minmax(10rem, 1fr) auto;
+  grid-template-columns: minmax(9rem, 1fr) 8rem 9rem 7rem auto minmax(10rem, 1fr) auto;
+}
+
+.modifier-row > .modifier-targets {
+  grid-column: 1 / -1;
+}
+
+.modifier-targets {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.modifier-targets summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--muted);
+  user-select: none;
+}
+
+.modifier-target-group {
+  margin-top: 0.6rem;
+}
+
+.modifier-target-title {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.modifier-target-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
 }
 
 .ability-row {
@@ -1295,6 +1332,12 @@ input[type="checkbox"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
   margin-top: 1rem;
+}
+
+.stat-tools-title {
+  margin-top: 1.2rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
 }
 
 #radarCanvas {

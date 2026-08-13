@@ -354,6 +354,8 @@ function getInitialState() {
     wikiPath: WIKI_ROOT_PATH,
     wikiHistory: [],
     wikiSearch: "",
+    statObjectWeight: "",
+    deletedSheets: [],
   };
 }
 
@@ -521,7 +523,8 @@ document.addEventListener("click", (event) => {
       id: uid(),
       name: "",
       kind: "Buff",
-      target: "",
+      unit: "flat",
+      targets: [],
       value: 0,
       active: true,
       note: "",
@@ -580,6 +583,13 @@ document.addEventListener("input", (event) => {
   }
 
   if (!sheet) return;
+
+  if (target.matches("[data-stat-weight]")) {
+    state.statObjectWeight = target.value;
+    persistNow();
+    refreshCalculations();
+    return;
+  }
 
   if (target.matches("[data-local-only]")) {
     sheet.localOnly = target.checked;
@@ -689,6 +699,22 @@ document.addEventListener("input", (event) => {
 
 document.addEventListener("change", (event) => {
   const target = event.target;
+
+  if (target.matches("[data-modifier-target]")) {
+    const sheet = getActiveSheet();
+    if (!sheet) return;
+    const modifier = sheet.modifiers[Number(target.dataset.index)];
+    if (!modifier) return;
+    const value = target.dataset.modifierTarget;
+    const selected = new Set(modifier.targets || []);
+    if (target.checked) selected.add(value);
+    else selected.delete(value);
+    modifier.targets = [...selected];
+    touchSheet(sheet);
+    refreshCalculations();
+    return;
+  }
+
   const sheet = getActiveSheet();
 
   if (target.matches("[data-library-compatible]")) {
@@ -1339,6 +1365,10 @@ function renderInventoryRow(item, index) {
           ${damageAttrOptions(item.damageAttr)}
         </select>
       </label>
+      <label class="field">
+        <span>Peso</span>
+        <input type="number" step="0.5" min="0" data-inventory-field="weight" data-index="${index}" value="${escapeAttr(item.weight)}" />
+      </label>
       <div class="stat-box compact-stat">
         <span>Dano total</span>
         <strong data-calc="inventory-damage-${item.id}">-</strong>
@@ -1521,6 +1551,12 @@ function renderModifiersTab(sheet) {
 }
 
 function renderModifierRow(modifier, index) {
+  const selected = new Set(modifier.targets || []);
+  const targetGroups = [
+    { title: "Atributos", entries: ATTRIBUTES.map((entry) => [`attr:${entry.key}`, entry.label]) },
+    { title: "Recursos", entries: RESOURCES.map((entry) => [`res:${entry.key}`, entry.label]) },
+    { title: "Perícias", entries: SKILLS.map((entry) => [`skill:${entry.key}`, entry.label]) },
+  ];
   return `
     <div class="modifier-row">
       <label class="field">
@@ -1530,13 +1566,14 @@ function renderModifierRow(modifier, index) {
       <label class="field">
         <span>Origem</span>
         <select data-modifier-field="kind" data-index="${index}">
-          ${["Buff", "Equipamento", "Artefato", "Condição", "Outro"].map((kind) => option(kind, modifier.kind)).join("")}
+          ${["Buff", "Debuff", "Equipamento", "Artefato", "Condição", "Outro"].map((kind) => option(kind, modifier.kind)).join("")}
         </select>
       </label>
       <label class="field">
-        <span>Alvo</span>
-        <select data-modifier-field="target" data-index="${index}">
-          ${targetOptions(modifier.target)}
+        <span>Tipo</span>
+        <select data-modifier-field="unit" data-index="${index}">
+          ${optionWithLabel("flat", "Valor fixo", modifier.unit)}
+          ${optionWithLabel("pct", "Porcentagem %", modifier.unit)}
         </select>
       </label>
       <label class="field">
@@ -1547,6 +1584,22 @@ function renderModifierRow(modifier, index) {
         <input type="checkbox" data-modifier-field="active" data-index="${index}" ${modifier.active ? "checked" : ""} />
         Ativo
       </label>
+      <details class="modifier-targets">
+        <summary>Alvos${selected.size ? ` (${selected.size})` : ""}</summary>
+        ${targetGroups.map((group) => `
+          <div class="modifier-target-group">
+            <span class="modifier-target-title">${group.title}</span>
+            <div class="modifier-target-chips">
+              ${group.entries.map(([value, label]) => `
+                <label class="inline-field">
+                  <input type="checkbox" data-modifier-target="${escapeAttr(value)}" data-index="${index}" ${selected.has(value) ? "checked" : ""} />
+                  ${escapeHtml(label)}
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </details>
       <label class="field">
         <span>Nota</span>
         <input data-modifier-field="note" data-index="${index}" value="${escapeAttr(modifier.note)}" />
@@ -1582,6 +1635,23 @@ function renderStatsTab(sheet) {
             <div class="stat-box"><span>Crítico/precisão</span><strong data-calc="crit-bonus">0%</strong></div>
             <div class="stat-box"><span>Mobilidade/esquiva</span><strong data-calc="mobility-bonus">0%</strong></div>
             <div class="stat-box"><span>Custo de Mana</span><strong data-calc="mana-cost">0%</strong></div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box"><span>Carga máxima</span><strong data-calc="cargo-max">-</strong></div>
+            <div class="stat-box"><span>Carga atual</span><strong data-calc="cargo-current">-</strong></div>
+            <div class="stat-box"><span>Deslocamento</span><strong data-calc="displacement">-</strong></div>
+            <div class="stat-box"><span>Velocidade máxima</span><strong data-calc="max-speed">-</strong></div>
+          </div>
+          <div class="panel-title stat-tools-title">
+            <h3>Arremesso e queda</h3>
+          </div>
+          <label class="field">
+            <span>Peso do objeto (kg)</span>
+            <input type="number" step="0.5" min="0" data-stat-weight value="${escapeAttr(state.statObjectWeight)}" placeholder="ex.: 120" />
+          </label>
+          <div class="stats-grid">
+            <div class="stat-box"><span>Dano por peso</span><strong data-calc="weight-damage">-</strong></div>
+            <div class="stat-box"><span>Distância de arremesso</span><strong data-calc="throw-distance">-</strong></div>
           </div>
         </aside>
       </div>
@@ -1646,7 +1716,7 @@ function renderLibraryCard(row, key, sourceIndex) {
 
   const sourceLabel = DATA_SOURCES[key].label;
   const cost = row["Custo base"] || row.Custo || "";
-  const damage = row["Dano base"] || row.Dano || "";
+  const damage = extractDamageFromRow(row);
   const description = row.Descrição || row.Efeito || row["Efeito secundário"] || row.Observações || "Sem descrição.";
   const requirement = getAbilityRequirement(sheet, row, key);
   const tierLabel = normalizeTierCategory(row.Tier || row.Raridade || row.Tipo || row.Categoria || "") || row.Tipo || row.Categoria || "";
@@ -1802,6 +1872,7 @@ function normalizeInventoryItem(item) {
     value: parseNumber(item.value, 0),
     damage: item.damage || "",
     damageAttr: item.damageAttr || detectDamageAttr(item.damage || item.note || ""),
+    weight: parseNumber(item.weight, 0),
     note: item.note || "",
     source: item.source || "",
     enchantments: Array.isArray(item.enchantments) ? item.enchantments.map(normalizeEnchantment) : [],
@@ -1847,11 +1918,15 @@ function normalizeEnchantment(enchantment) {
 }
 
 function normalizeModifier(modifier) {
+  const targets = Array.isArray(modifier.targets) && modifier.targets.length
+    ? modifier.targets.filter(Boolean)
+    : (modifier.target ? [modifier.target] : []);
   return {
     id: modifier.id || uid(),
     name: modifier.name || "",
     kind: modifier.kind || "Buff",
-    target: modifier.target || "",
+    unit: modifier.unit === "pct" ? "pct" : "flat",
+    targets,
     value: parseNumber(modifier.value, 0),
     active: modifier.active !== false,
     note: modifier.note || "",
@@ -1874,6 +1949,8 @@ function loadLocalState() {
       wikiPath: raw.wikiPath || WIKI_ROOT_PATH,
       wikiHistory: Array.isArray(raw.wikiHistory) ? raw.wikiHistory : [],
       wikiSearch: raw.wikiSearch || "",
+      statObjectWeight: raw.statObjectWeight || "",
+      deletedSheets: Array.isArray(raw.deletedSheets) ? raw.deletedSheets : [],
     };
   } catch (error) {
     console.error(error);
@@ -2084,13 +2161,14 @@ function wikiTitleFromPath(path) {
 async function loadState() {
   const local = loadLocalState();
   try {
-    const serverSheets = await loadServerSheets();
-    const sheets = mergeSheetLists(local.sheets, serverSheets);
+    const [serverSheets, deletedIds] = await Promise.all([loadServerSheets(), loadDeletedSheets(local.deletedSheets)]);
+    const sheets = mergeSheetLists(local.sheets, serverSheets, deletedIds);
     const uploadResult = await uploadLocalSheetsNewerThanServer(local.sheets, serverSheets);
     serverOnline = true;
     lastSyncError = uploadResult.failed.length ? `${uploadResult.failed.length} ficha(s) pendente(s) de envio` : "";
     return {
       ...local,
+      deletedSheets: state.deletedSheets,
       sheets,
       activeId: sheets.some((sheet) => sheet.id === local.activeId) ? local.activeId : sheets[0]?.id || null,
     };
@@ -2125,11 +2203,32 @@ async function loadServerSheets() {
   return Array.isArray(sheets) ? sheets.map(normalizeSheet) : [];
 }
 
-function mergeSheetLists(localSheets, serverSheets) {
+function isSheetDeleted(id) {
+  return state.deletedSheets.includes(id);
+}
+
+async function loadDeletedSheets(initial = state.deletedSheets) {
+  try {
+    const response = await apiRequest("/deleted-sheets");
+    const ids = await response.json();
+    if (Array.isArray(ids)) {
+      state.deletedSheets = [...new Set([...initial, ...ids])];
+      persistLocalOnly();
+    }
+  } catch (error) {
+    console.warn("Não foi possível carregar fichas excluídas.", error);
+  }
+  return new Set(state.deletedSheets);
+}
+
+function mergeSheetLists(localSheets, serverSheets, deletedIds = new Set(state.deletedSheets)) {
   const merged = new Map();
-  for (const sheet of serverSheets) merged.set(sheet.id, sheet);
+  for (const sheet of serverSheets) {
+    if (!deletedIds.has(sheet.id)) merged.set(sheet.id, sheet);
+  }
 
   for (const sheet of localSheets) {
+    if (deletedIds.has(sheet.id)) continue;
     const serverSheet = merged.get(sheet.id);
     if (sheet.localOnly || !serverSheet || isNewerSheet(sheet, serverSheet)) {
       merged.set(sheet.id, sheet);
@@ -2142,7 +2241,7 @@ function mergeSheetLists(localSheets, serverSheets) {
 async function uploadLocalSheetsNewerThanServer(localSheets, serverSheets) {
   const serverById = new Map(serverSheets.map((sheet) => [sheet.id, sheet]));
   const pending = localSheets.filter((sheet) => {
-    if (sheet.localOnly) return false;
+    if (sheet.localOnly || isSheetDeleted(sheet.id)) return false;
     const serverSheet = serverById.get(sheet.id);
     return !serverSheet || isNewerSheet(sheet, serverSheet);
   });
@@ -2172,8 +2271,8 @@ async function refreshSheetsFromServer() {
   try {
     setSaveStatus("Atualizando...");
     const localSheets = state.sheets;
-    const serverSheets = await loadServerSheets();
-    const sheets = mergeSheetLists(localSheets, serverSheets);
+    const [serverSheets, deletedIds] = await Promise.all([loadServerSheets(), loadDeletedSheets()]);
+    const sheets = mergeSheetLists(localSheets, serverSheets, deletedIds);
     serverOnline = true;
     state.sheets = sheets;
     if (!state.sheets.some((sheet) => sheet.id === state.activeId)) {
@@ -2212,10 +2311,26 @@ async function saveSheetOnServer(sheet) {
     serverOnline = true;
     lastSyncError = "";
   } catch (error) {
+    if (error.status === 409) {
+      console.warn("Ficha excluída no servidor; removendo localmente.", sheet.id);
+      markSheetDeletedLocally(sheet.id);
+      return;
+    }
     serverOnline = Boolean(error.status && error.status < 500 && error.status !== 503);
     lastSyncError = "Envio pendente";
     throw error;
   }
+}
+
+function markSheetDeletedLocally(id) {
+  if (!state.deletedSheets.includes(id)) state.deletedSheets.push(id);
+  state.sheets = state.sheets.filter((entry) => entry.id !== id);
+  if (state.activeId === id) {
+    state.activeId = state.sheets[0]?.id || null;
+    if (!state.activeId) state.view = "home";
+  }
+  persistLocalOnly();
+  renderApp();
 }
 
 function syncSheetOnServer(sheet) {
@@ -2307,6 +2422,7 @@ function deleteSheet(id) {
   state.sheets = state.sheets.filter((entry) => entry.id !== id);
   if (state.activeId === id) state.activeId = state.sheets[0]?.id || null;
   state.view = state.activeId ? state.view : "home";
+  if (!sheet.localOnly && !state.deletedSheets.includes(id)) state.deletedSheets.push(id);
   persistNow();
   deleteSheetOnServer(id).catch(() => { serverOnline = false; });
   renderApp();
@@ -2347,7 +2463,7 @@ function updateCollectionField(collection, input) {
   const field = input.dataset.inventoryField || input.dataset.abilityField || input.dataset.modifierField;
   if (input.type === "checkbox") {
     item[field] = input.checked;
-  } else if (["quantity", "value"].includes(field)) {
+  } else if (["quantity", "value", "weight"].includes(field)) {
     item[field] = parseNumber(input.value);
   } else {
     item[field] = input.value;
@@ -2698,23 +2814,24 @@ function calculateCore(sheet, includePosture) {
     const base = parseNumber(sheet.attributes[attr.key]?.base, 0);
     const manual = parseNumber(sheet.attributes[attr.key]?.manual, 0);
     const external = sumExternalModifiers(sheet, `attr:${attr.key}`);
-    let total = base + manual + external;
+    let total = applyModifierTo(base + manual, external);
     if (posture.attrPct?.[attr.key]) total += Math.floor((total * posture.attrPct[attr.key]) / 100);
     attributes[attr.key] = Math.floor(total);
     attrMods[attr.key] = Math.floor((attributes[attr.key] - 10) / 2);
   }
 
-  const resourceExternal = (key) => parseNumber(sheet.resourceMods[key], 0) + sumExternalModifiers(sheet, `res:${key}`);
+  const resourceExternal = (key) => sumExternalModifiers(sheet, `res:${key}`);
+  const resourceTotal = (key, base) => applyModifierTo(base + parseNumber(sheet.resourceMods[key], 0), resourceExternal(key));
   const lifeGrowth = getLifeGrowthPerLevel(rules, attrMods.constitution);
   const resources = {
-    hp: Math.floor(rules.lifeBase + lifeGrowth * level + resourceExternal("hp")),
-    sanity: Math.floor(20 + attrMods.charisma + halfLevel + resourceExternal("sanity")),
-    mana: rules.usesMana ? Math.floor(10 + level * (3 + attrMods.intelligence) + resourceExternal("mana")) : 0,
-    ki: rules.usesKi ? Math.floor(10 + level * (3 + attrMods.wisdom) + resourceExternal("ki")) : 0,
-    energy: Math.floor(attributes.constitution * level + resourceExternal("energy")),
-    defense: Math.floor(10 + halfLevel + attrMods.dexterity + parseNumber(sheet.equipmentDefense, 0) + resourceExternal("defense")),
-    magicAmp: Math.floor(attrMods.intelligence + Math.floor(level / 10) + resourceExternal("magicAmp")),
-    kiRefine: Math.floor(attrMods.wisdom + Math.floor(level / 10) + resourceExternal("kiRefine")),
+    hp: Math.floor(rules.lifeBase + lifeGrowth * level + resourceTotal("hp", 0)),
+    sanity: Math.floor(20 + attrMods.charisma + halfLevel + resourceTotal("sanity", 0)),
+    mana: rules.usesMana ? Math.floor(10 + level * (3 + attrMods.intelligence) + resourceTotal("mana", 0)) : 0,
+    ki: rules.usesKi ? Math.floor(10 + level * (3 + attrMods.wisdom) + resourceTotal("ki", 0)) : 0,
+    energy: Math.floor(attributes.constitution * level + resourceTotal("energy", 0)),
+    defense: Math.floor(10 + halfLevel + attrMods.dexterity + parseNumber(sheet.equipmentDefense, 0) + resourceTotal("defense", 0)),
+    magicAmp: Math.floor(attrMods.intelligence + Math.floor(level / 10) + resourceTotal("magicAmp", 0)),
+    kiRefine: Math.floor(attrMods.wisdom + Math.floor(level / 10) + resourceTotal("kiRefine", 0)),
   };
 
   if (posture.defenseAttr && posture.defenseAttrPct) {
@@ -2726,13 +2843,12 @@ function calculateCore(sheet, includePosture) {
 
   const skills = {};
   for (const skill of SKILLS) {
-    skills[skill.key] = Math.floor(
+    const base =
       attrMods[skill.attr] +
-        halfLevel +
-        (sheet.trained[skill.key] ? 5 : 0) +
-        parseNumber(sheet.skillMods[skill.key], 0) +
-        sumExternalModifiers(sheet, `skill:${skill.key}`),
-    );
+      halfLevel +
+      (sheet.trained[skill.key] ? 5 : 0) +
+      parseNumber(sheet.skillMods[skill.key], 0);
+    skills[skill.key] = Math.floor(applyModifierTo(base, sumExternalModifiers(sheet, `skill:${skill.key}`)));
   }
 
   applyPostureSkillBonus(skills, posture);
@@ -2746,6 +2862,11 @@ function calculateCore(sheet, includePosture) {
     sheet.inventory.map((item) => [item.id, getInventoryDamage(item, attrMods, combatStats.damagePct, combatStats.damageAttrBonus)]),
   );
   const equippedDefense = getInventoryTargetTotal(sheet, "res:defense");
+
+  const totalWeight = sheet.inventory.reduce((sum, item) => sum + parseNumber(item.weight, 0) * parseNumber(item.quantity, 1), 0);
+  const cargoMax = 25 + (attrMods.strength + 5) * (level / 2);
+  const displacement = 10 + attrMods.dexterity;
+  const maxSpeed = 20 + 3 * attrMods.dexterity;
 
   return {
     level,
@@ -2763,7 +2884,20 @@ function calculateCore(sheet, includePosture) {
     combatStats,
     inventoryDamage,
     equippedDefense,
+    totalWeight,
+    cargoMax,
+    displacement,
+    maxSpeed,
   };
+}
+
+function weightDamageDice(peso) {
+  return Math.max(0, Math.floor(peso / 50));
+}
+
+function throwDistance(peso, cargoMax) {
+  if (peso <= 0) return 0;
+  return cargoMax / Math.sqrt(peso);
 }
 
 function getLifeGrowthPerLevel(rules, constitutionMod) {
@@ -2771,12 +2905,27 @@ function getLifeGrowthPerLevel(rules, constitutionMod) {
 }
 
 function sumExternalModifiers(sheet, target) {
-  if (!target) return 0;
-  const inventory = getInventoryTargetTotal(sheet, target);
-  const modifiers = sheet.modifiers
-    .filter((modifier) => modifier.active && modifier.target === target)
-    .reduce((total, modifier) => total + parseNumber(modifier.value, 0), 0);
-  return inventory + modifiers;
+  const flat = getInventoryTargetTotal(sheet, target);
+  if (!target) return { flat, pct: 0 };
+  let pct = 0;
+  for (const modifier of sheet.modifiers) {
+    if (!modifier.active || !modifierAppliesTo(modifier, target)) continue;
+    if (modifier.unit === "pct") pct += parseNumber(modifier.value, 0);
+    else flat += parseNumber(modifier.value, 0);
+  }
+  return { flat, pct };
+}
+
+function modifierAppliesTo(modifier, target) {
+  if (!target) return false;
+  if (Array.isArray(modifier.targets)) return modifier.targets.includes(target);
+  return modifier.target === target;
+}
+
+function applyModifierTo(value, external) {
+  let total = value + external.flat;
+  if (external.pct) total += Math.floor((total * external.pct) / 100);
+  return Math.floor(total);
 }
 
 function getInventoryTargetTotal(sheet, target) {
@@ -2840,6 +2989,16 @@ function refreshCalculations() {
   setCalc("crit-bonus", `${signed(calc.combatStats.critPct)}%`);
   setCalc("mobility-bonus", `${signed(calc.combatStats.mobilityPct + calc.combatStats.dodgePct)}%`);
   setCalc("mana-cost", `${signed(calc.combatStats.manaCostPct)}%`);
+  setCalc("cargo-max", `${formatNumber(calc.cargoMax)} kg`);
+  setCalc("cargo-current", `${formatNumber(calc.totalWeight)} kg`);
+  document.querySelectorAll("[data-calc='cargo-current']").forEach((node) => {
+    node.classList.toggle("posture-altered", calc.totalWeight > calc.cargoMax);
+  });
+  setCalc("displacement", `${formatNumber(calc.displacement)} m/turno`);
+  setCalc("max-speed", `${formatNumber(calc.maxSpeed)} m/s`);
+  const objectWeight = parseNumber(state.statObjectWeight, 0);
+  setCalc("weight-damage", objectWeight > 0 ? `${weightDamageDice(objectWeight)}d6` : "—");
+  setCalc("throw-distance", objectWeight > 0 ? `${formatNumber(throwDistance(objectWeight, calc.cargoMax))} m` : "—");
   setCalc("posture-summary", getPostureSummary(calc));
   document.querySelectorAll("[data-skill-summary]").forEach((node) => {
     node.classList.toggle("over-limit", calc.trainedCount > calc.trainedMax);
@@ -3095,7 +3254,7 @@ function addInventoryFromLibrary(sheet, sourceKey, sourceIndex) {
   const row = library.data[sourceKey]?.[sourceIndex];
   if (!row) return;
   const detected = detectItemModifier(row);
-  const damage = cleanWikiText(row.Dano || "");
+  const damage = cleanWikiText(extractDamageFromRow(row));
   sheet.inventory.push({
     id: uid(),
     name: cleanWikiText(row.Nome || "Item"),
@@ -3105,11 +3264,19 @@ function addInventoryFromLibrary(sheet, sourceKey, sourceIndex) {
     value: detected.value,
     damage,
     damageAttr: detectDamageAttr(`${damage} ${row["Escala com"] || ""}`),
+    weight: parseNumber(row.Peso, 0),
     note: cleanWikiText(row.Bônus || row.Efeito || row.Observações || ""),
     source: DATA_SOURCES[sourceKey]?.label || "Wiki",
     enchantments: [],
   });
   touchAndRender(sheet);
+}
+
+function extractDamageFromRow(row) {
+  const direct = row["Dano base"] || row.Dano || "";
+  if (direct) return direct;
+  const bonus = (row.Bônus || "").trim();
+  return /^(?:\d+d\d+|\+?\d+\s*de\s+dano)/i.test(bonus) ? bonus : "";
 }
 
 function addAbilityFromLibrary(sheet, sourceKey, sourceIndex) {
@@ -3127,7 +3294,7 @@ function addAbilityFromLibrary(sheet, sourceKey, sourceIndex) {
     type,
     cost: row["Custo base"] || row.Custo || "",
     range: row.Alcance || "",
-    damage: row["Dano base"] || row.Dano || "",
+    damage: extractDamageFromRow(row),
     note: cleanWikiText(row.Descrição || row.Efeito || row["Efeito secundário"] || row.Observações || ""),
     source: DATA_SOURCES[sourceKey]?.label || "Wiki",
   });

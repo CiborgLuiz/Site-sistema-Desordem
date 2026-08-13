@@ -68,3 +68,24 @@ CREATE POLICY "Sheets can be updated by everyone" ON public.sheets
 DROP POLICY IF EXISTS "Sheets can be deleted by everyone" ON public.sheets;
 CREATE POLICY "Sheets can be deleted by everyone" ON public.sheets
   FOR DELETE USING (true);
+
+-- Tombstones de exclusao: impedem que caches locais de outros usuarios
+-- recriem uma ficha que foi deletada publicamente.
+CREATE TABLE IF NOT EXISTS public.deleted_sheets (
+  id TEXT PRIMARY KEY,
+  deleted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.deleted_sheets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Deleted sheets readable by everyone" ON public.deleted_sheets;
+CREATE POLICY "Deleted sheets readable by everyone" ON public.deleted_sheets
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Deleted sheets insertable by everyone" ON public.deleted_sheets;
+CREATE POLICY "Deleted sheets insertable by everyone" ON public.deleted_sheets
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Deleted sheets deletable by everyone" ON public.deleted_sheets;
+CREATE POLICY "Deleted sheets deletable by everyone" ON public.deleted_sheets
+  FOR DELETE USING (true);
