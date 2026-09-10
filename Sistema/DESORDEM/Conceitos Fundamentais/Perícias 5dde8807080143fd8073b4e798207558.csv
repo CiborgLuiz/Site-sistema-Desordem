@@ -22,7 +22,7 @@ Persuasão,Carisma,,"Convencer, liderar, negociar e mover pessoas sem coerção 
 Jogatina,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Blefar, ler apostas, manipular mesa e ganhar vantagem em jogos de risco.",Social
 Iniciativa,Destreza,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Determina velocidade de resposta, abertura de turno e leitura imediata de combate.",Técnica
 Religião,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Reconhecer crenças, ritos, símbolos, entidades e práticas espirituais.",Mental
-Medicina,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Diagnosticar ferimentos, estabilizar aliados, tratar doenças e conduzir primeiros socorros.",Técnica
+Medicina,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Identificar, diagnosticar e tratar doenças, condições, contaminações e alterações do corpo.",Técnica
 Natureza,Inteligência,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Identificar fauna, flora, fenômenos naturais e riscos ambientais.",Conhecimento
 Navegação,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Orientar-se, traçar rotas, ler mapas, estrelas e condições de viagem.",Técnica
 Intimidação,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Pressionar, ameaçar e impor presença sem depender de violência direta.",Social
