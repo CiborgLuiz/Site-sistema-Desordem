@@ -918,9 +918,11 @@ function renderHeader() {
 }
 
 function renderHome() {
-  const visibleSheets = state.activeCampaignId ? state.sheets.filter((sheet) => sheet.campaignId === state.activeCampaignId) : state.sheets.filter((sheet) => !sheet.campaignId);
+  const activeCampaign = (state.campaigns || []).find((entry) => entry.id === state.activeCampaignId);
+  if (state.activeCampaignId && !activeCampaign) state.activeCampaignId = null;
+  const visibleSheets = activeCampaign ? state.sheets.filter((sheet) => sheet.campaignId === activeCampaign.id) : state.sheets;
   const sheets = visibleSheets.map(renderSheetCard).join("");
-  const campaign = state.campaigns.find((entry) => entry.id === state.activeCampaignId);
+  const campaign = activeCampaign;
   const campaignCards = (state.campaigns || []).map((entry) => renderCampaignCard(entry)).join("");
   return `
     <section class="home-grid">
@@ -955,7 +957,7 @@ function renderHome() {
       </form>
       <section class="panel">
         <div class="panel-title">
-          <h2>${escapeHtml(campaign ? campaign.name : "Fichas sem campanha")}</h2>
+          <h2>${escapeHtml(campaign ? campaign.name : "Todas as fichas")}</h2>
           <div class="card-actions">
             <span class="badge ${serverOnline ? "hot" : ""}">${databaseStatusText()}</span>
             <span class="badge hot">${visibleSheets.length} fichas</span>
