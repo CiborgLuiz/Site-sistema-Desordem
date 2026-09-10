@@ -451,6 +451,9 @@ input[type="checkbox"] {
 
 .simulation-results .stats-grid { margin-top: 1rem; }
 .simulation-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.campaign-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; margin-top: 1rem; }
+.campaign-card { border: 1px solid var(--line); border-radius: var(--radius); padding: .8rem; background: rgba(255,255,255,.025); }
+.campaign-card h3 { margin: 0 0 .35rem; }
 .simulation-chart { display: grid; gap: .55rem; margin: 1rem 0; }
 .simulation-run-actions { display: flex; align-items: center; gap: .8rem; margin: 1rem 0; }
 .simulation-chart-row { display: grid; grid-template-columns: 7rem minmax(8rem, 1fr) auto; gap: .6rem; align-items: center; }

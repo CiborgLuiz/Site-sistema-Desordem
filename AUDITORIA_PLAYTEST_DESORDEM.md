@@ -164,3 +164,80 @@ O próximo salto não é adicionar mais dano: é estruturar poderes não-danosos
 * `Sistema/DESORD.../Magias/Poderes Especiais ...csv` — 55 registros.
 * `Sistema/DESORD.../Mecânicas/Posturas ...csv` e páginas de postura.
 * `Sistema/DESORD.../Mecânicas/Recursos ...csv/html` — recursos e fórmulas.
+
+## 10. Revisão completa de coerência e escopo
+
+Esta revisão considera o sistema como ele funciona hoje: ficha operacional, 4 classes, 16 subclasses, 23 perícias, 17 posturas, 292 equipamentos, 66 condições, 26 magias arcanas, 29 técnicas de Ki e 55 poderes especiais.
+
+### Regras que precisam ser criadas
+
+1. **Ordem de resolução de um turno.** Escrever uma sequência única: início do turno → iniciativa → manutenção → ação principal → ação secundária → movimento → fim do turno. A simulação já usa iniciativa, mas a mesa precisa saber quando postura, condição, AM/Refino e recuperação acontecem.
+2. **Contrato de ataque.** Declarar qual perícia cada ataque usa, como alcance/linha de visão/cobertura funcionam, quando uma Defesa é estática ou uma CD, e como ataques contra múltiplos alvos dividem dano.
+3. **Economia de ação dos poderes.** Toda magia, técnica, postura e poder deve ser Principal, Secundária, Movimento, Reação, Livre ou manutenção. Sem isso, um poder de controle pode ser mais forte que seu dano sem custo comparável.
+4. **Alvos e áreas.** Criar termos padronizados: um alvo, cone, linha, raio, zona, aliado, inimigo, si mesmo. Definir como AM/Refino ampliam cada área e qual é o limite de segurança.
+5. **Resistências e testes.** Cada efeito precisa declarar atributo/perícia de resistência, CD, sucesso, falha, imunidade e repetição de teste. “Falha em resistência” não pode ficar sem tipo de resistência.
+6. **Recuperação e manutenção.** AM/Refino têm consequência narrativa, mas a mesa precisa de uma regra mínima de quando o recurso volta e o que significa “recuperação drasticamente reduzida”.
+7. **Subclasses por marco.** Para cada uma das 16 subclasses, listar poderes nos níveis 1, 5, 10, 15, 20 e 25, dizendo se são passivos, ativáveis ou narrativos. O limite de um nível por nível de personagem já existe e deve ser exposto na ficha.
+8. **Inimigos de referência.** Criar blocos oficiais de minion, padrão, elite e chefe em níveis 1, 10, 25 e 50. Sem alvos padronizados, o balanceamento entre classes e poderes não é comparável.
+9. **Falha e sucesso fora de combate.** Perícias precisam de uma escala de dificuldade e consequências graduais: sucesso, sucesso parcial, falha com custo e falha crítica. Isso dá utilidade a exploração, social e investigação.
+
+### Perícias que devem ser reorganizadas
+
+As 23 perícias são válidas como repertório, mas há sobreposição. Recomendo manter os nomes usados pelos jogadores e reorganizar em seis famílias para evitar que o mestre crie uma CD diferente para cada sinônimo:
+
+| Família | Perícias atuais |
+|---|---|
+| Física | Luta, Atletismo, Vigor, Fortitude |
+| Mobilidade | Reflexos, Furtividade, Acrobacia, Iniciativa, Pontaria, Ladinagem |
+| Intelecto | Misticismo, Investigação, Conhecimento |
+| Instinto | Vontade, Intuição, Percepção, Sobrevivência, Tática de Sobrevivência, Cura |
+| Social | Jogatina, Persuasão, Enganação, Diplomacia |
+| Ofício | espaço reservado para perícias de profissão/campanha, se necessário |
+
+Não recomendo remover perícias imediatamente. Primeiro registrar frequência de uso por sessão. Se duas perícias sempre recebem a mesma ação, atributo e CD, fundi-las ou tornar uma especialização da outra. Iniciativa, Cura e Misticismo devem permanecer separadas porque têm funções mecânicas claras; Conhecimento/Investigação e Persuasão/Enganação são os pares com maior chance de sobreposição narrativa.
+
+### Elementos que devem ser simplificados ou removidos
+
+* **Remover do cálculo automático qualquer efeito textual não estruturado.** O parser deve sinalizar “não resolvido”, não conceder bônus aproximado. Isso evita que palavras como “controle” e “cura” criem poder oculto.
+* **Remover posturas duplicadas da lista padrão.** Neutra, Ofensiva e Defensiva são o núcleo. Guardião, Berserker, Arcana, Vampírica, Dimensional e outras devem ser desbloqueios explícitos de lore/treino, não escolhas disponíveis por acidente na ficha.
+* **Separar origens narrativas de poderes acionáveis.** Demônio Selado, Liberdade de Destino e Poder Anômalo Flagelado não devem ocupar o mesmo seletor de uma magia com custo e dano.
+* **Não transformar Sanidade, Energia ou duração narrativa em uma segunda economia rígida.** Manter os campos na ficha e os modificadores manuais, mas evitar mais fórmulas automáticas.
+* **Remover colunas vazias dos catálogos somente depois da migração.** Antes, preencher o contrato mínimo; depois, esconder campos que não fazem sentido para aquele tipo de poder.
+* **Evitar poder especial “genérico” sem risco mensurável.** Se continuar narrativo, marcar como Origem/Arco e impedir que entre no ranking de combate.
+
+### O que não deve ser removido
+
+* A distinção Mana/Ki/Híbrido/Restrição Celestial, porque cria identidades de jogo diferentes.
+* A Restrição Celestial com pontos extras, desde que o custo seja a ausência de Mana/Ki e isso seja testado contra subclasses equivalentes.
+* Postura livre no início do turno, porque cria decisão tática sem adicionar contabilidade pesada.
+* Equipamentos e peso, porque dão contexto de exploração; apenas itens inválidos devem ser bloqueados.
+* Condições narrativas, desde que cada condição tenha uma frase de efeito, contra-jogo e indicação de quem decide sua duração.
+
+### Ordem recomendada de trabalho
+
+**P0 — coerência:** contrato de turno, ataque, ação, alvo, resistência, CD e inimigos de referência.
+
+**P1 — conteúdo:** preencher os campos dos poderes P0, mapear os marcos das subclasses e testar os 17 arquétipos de postura.
+
+**P2 — redução de complexidade:** medir uso das 23 perícias, fundir sinônimos, separar origens narrativas e esconder campos não aplicáveis.
+
+**P3 — balanceamento:** executar lotes de 1.000 combates por nível, composição e subclasse usando os mesmos inimigos de referência; comparar taxa de vitória, duração, dano, controle, cura, recursos e ações negadas.
+
+### Critério de sistema “coerente”
+
+O sistema estará coerente quando um mestre diferente conseguir responder, sem improvisar uma regra nova: “o que faço neste turno?”, “qual perícia rolo?”, “qual CD uso?”, “quanto custa?”, “quanto dura?”, “qual é o contra-jogo?” e “como comparo este poder com outro do mesmo tier?”. A ficha e a simulação devem então consumir os mesmos campos, enquanto decisões de lore continuam explicitamente narrativas.
+
+## 11. Decisões incorporadas nesta versão
+
+* Toda magia e técnica de Ki adicionada à ficha recebe **Ação Principal** como termo padronizado.
+* O turno passa a ser apresentado na ficha como 1 Ação Principal, 1 Ação Secundária e 1 Ação de Movimento; o jogador pode agir em qualquer ordem, não precisa gastar tudo e pode trocar a Principal por outra ação.
+* A postura é uma **Ação Livre no início do turno** e só pode ser trocada uma vez nesse início. A ficha continua oferecendo apenas Neutra, Ofensiva e Defensiva; as demais permanecem conteúdo do livro/desbloqueios do mestre.
+* Tática de Sobrevivência foi removida da lista de perícias. As outras perícias continuam servindo para qualquer teste que o mestre determinar, sempre usando o atributo associado.
+* Poderes Especiais não entram na ficha dos jogadores, na simulação nem no balanceamento; continuam conteúdo de uso exclusivo do mestre.
+* Campanhas foram adicionadas à área de Fichas. É possível criar uma campanha, abrir sua visão, mover fichas para ela e manter fichas sem campanha separadas.
+
+### Economia de ações vigente
+
+Cada personagem tem uma Ação Principal, uma Ação Secundária e uma Ação de Movimento. A ordem é escolhida pelo jogador; nenhuma ação é obrigatória; a Principal pode ser convertida em outra ação quando a ficção exigir (por exemplo, usar Principal + Movimento para correr). Magias e técnicas de Ki são Principal. Postura é Livre no início do turno e só pode mudar uma vez nesse momento.
+
+As campanhas são organização de dados, não uma nova regra de personagem: uma ficha pode pertencer a uma campanha ou ficar independente, e a mesma ficha continua podendo ser usada na simulação como membro repetido de um time.

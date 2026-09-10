@@ -71,7 +71,6 @@ const SKILLS = [
   { key: "intuicao", label: "Intuição", attr: "wisdom" },
   { key: "percepcao", label: "Percepção", attr: "wisdom" },
   { key: "sobrevivencia", label: "Sobrevivência", attr: "wisdom" },
-  { key: "taticaSobrevivencia", label: "Tática de Sobrevivência", attr: "wisdom" },
   { key: "cura", label: "Cura", attr: "wisdom" },
   { key: "jogatina", label: "Jogatina", attr: "charisma" },
   { key: "persuasao", label: "Persuasão", attr: "charisma" },
@@ -356,6 +355,8 @@ function getInitialState() {
     wikiSearch: "",
     statObjectWeight: "",
     deletedSheets: [],
+    campaigns: [],
+    activeCampaignId: null,
     simulation: { count: 100, side1: [{ mode: "random", sheetId: "", level: 10 }], side2: [{ mode: "random", sheetId: "", level: 10 }] },
     simulationResult: null,
   };
@@ -429,6 +430,26 @@ document.addEventListener("click", (event) => {
 
   if (action === "duplicate-sheet") {
     duplicateSheet(button.dataset.id);
+    return;
+  }
+
+  if (action === "create-campaign") {
+    const name = document.querySelector('[data-campaign-field="name"]')?.value.trim() || "Nova campanha";
+    state.campaigns ||= []; state.campaigns.push({ id: uid(), name, description: "", createdAt: new Date().toISOString() });
+    persistNow(); renderApp(); return;
+  }
+
+  if (action === "open-campaign") {
+    state.activeCampaignId = button.dataset.id; state.view = "home"; persistLocalOnly(); renderApp(); return;
+  }
+
+  if (action === "clear-campaign") {
+    state.activeCampaignId = null; persistLocalOnly(); renderApp(); return;
+  }
+
+  if (action === "move-sheet-campaign") {
+    const targetSheet = state.sheets.find((entry) => entry.id === button.dataset.sheetId);
+    if (targetSheet) { targetSheet.campaignId = button.dataset.campaignId || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
     return;
   }
 
@@ -533,7 +554,7 @@ document.addEventListener("click", (event) => {
   }
 
   if (action === "add-custom-ability") {
-    sheet.abilities.push({ id: uid(), name: "", type: "Poder", cost: "", range: "", damage: "", note: "", source: "Manual" });
+    sheet.abilities.push({ id: uid(), name: "", type: "Poder", cost: "", range: "", damage: "", note: "", action: "Ação Principal", source: "Manual" });
     touchAndRender(sheet);
     return;
   }
@@ -587,6 +608,12 @@ document.addEventListener("input", (event) => {
   const sheet = getActiveSheet();
 
   if (target.matches("[data-home-field]")) return;
+
+  if (target.matches("[data-sheet-campaign]")) {
+    const targetSheet = state.sheets.find((entry) => entry.id === target.dataset.sheetId);
+    if (targetSheet) { targetSheet.campaignId = target.value || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
+    return;
+  }
 
   if (target.matches("[data-library-search]")) {
     state.librarySearch = target.value;
@@ -740,6 +767,23 @@ document.addEventListener("input", (event) => {
 document.addEventListener("change", (event) => {
   const target = event.target;
 
+  if (target.matches("[data-sheet-campaign]")) {
+    const targetSheet = state.sheets.find((entry) => entry.id === target.dataset.sheetId);
+    if (targetSheet) { targetSheet.campaignId = target.value || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
+    return;
+  }
+
+  if (target.matches("[data-sim-config]")) {
+    const side = target.dataset.simSide === "side2" ? "side2" : "side1";
+    const index = Number(target.dataset.simIndex);
+    state.simulation ||= normalizeSimulationConfig();
+    if (target.dataset.simConfig === "mode") state.simulation[side][index].mode = target.value;
+    if (target.dataset.simConfig === "sheetId") state.simulation[side][index].sheetId = target.value;
+    persistLocalOnly();
+    if (target.dataset.simConfig === "mode") renderApp();
+    return;
+  }
+
   if (target.matches("[data-modifier-target]")) {
     const sheet = getActiveSheet();
     if (!sheet) return;
@@ -866,7 +910,10 @@ function renderHeader() {
 }
 
 function renderHome() {
-  const sheets = state.sheets.map(renderSheetCard).join("");
+  const visibleSheets = state.activeCampaignId ? state.sheets.filter((sheet) => sheet.campaignId === state.activeCampaignId) : state.sheets.filter((sheet) => !sheet.campaignId);
+  const sheets = visibleSheets.map(renderSheetCard).join("");
+  const campaign = state.campaigns.find((entry) => entry.id === state.activeCampaignId);
+  const campaignCards = (state.campaigns || []).map((entry) => renderCampaignCard(entry)).join("");
   return `
     <section class="home-grid">
       <form class="panel home-form" onsubmit="return false">
@@ -893,19 +940,25 @@ function renderHome() {
         </label>
         <button type="button" class="primary-button" data-action="new-sheet">Criar ficha</button>
         <button type="button" class="ghost-button" data-action="open-wiki">Abrir wiki do sistema</button>
+        <hr />
+        <div class="panel-title"><h3>Nova campanha</h3></div>
+        <label class="field"><span>Nome da campanha</span><input data-campaign-field="name" placeholder="Ex.: Crônicas do Vazio" /></label>
+        <button type="button" class="ghost-button" data-action="create-campaign">Criar campanha</button>
       </form>
       <section class="panel">
         <div class="panel-title">
-          <h2>Personagens</h2>
+          <h2>${escapeHtml(campaign ? campaign.name : "Fichas sem campanha")}</h2>
           <div class="card-actions">
             <span class="badge ${serverOnline ? "hot" : ""}">${databaseStatusText()}</span>
-            <span class="badge hot">${state.sheets.length} fichas</span>
+            <span class="badge hot">${visibleSheets.length} fichas</span>
+            ${campaign ? `<button type="button" class="ghost-button" data-action="clear-campaign">Todas as fichas</button>` : ""}
             <button type="button" class="ghost-button" data-action="refresh-sheets">Atualizar</button>
           </div>
         </div>
         <div class="sheets-grid">
           ${sheets || `<div class="empty-state">Nenhuma ficha criada.</div>`}
         </div>
+        <div class="campaign-grid">${campaignCards || `<div class="empty-state">Nenhuma campanha criada.</div>`}</div>
       </section>
     </section>
   `;
@@ -1068,10 +1121,16 @@ function renderSheetCard(sheet) {
       <div class="card-actions">
         <button type="button" class="primary-button" data-action="open-sheet" data-id="${sheet.id}">Abrir</button>
         <button type="button" class="ghost-button" data-action="duplicate-sheet" data-id="${sheet.id}">Duplicar</button>
+        ${(state.campaigns || []).length ? `<select class="sheet-campaign-select" data-sheet-campaign data-sheet-id="${sheet.id}"><option value="">Sem campanha</option>${state.campaigns.map((campaign) => `<option value="${escapeAttr(campaign.id)}" ${sheet.campaignId === campaign.id ? "selected" : ""}>${escapeHtml(campaign.name)}</option>`).join("")}</select>` : ""}
         <button type="button" class="danger-button" data-action="delete-sheet" data-id="${sheet.id}">Excluir</button>
       </div>
     </article>
   `;
+}
+
+function renderCampaignCard(campaign) {
+  const count = state.sheets.filter((sheet) => sheet.campaignId === campaign.id).length;
+  return `<article class="campaign-card"><h3>${escapeHtml(campaign.name)}</h3><span class="tiny">${count} ficha(s)</span><div class="card-actions"><button type="button" class="primary-button" data-action="open-campaign" data-id="${escapeAttr(campaign.id)}">Abrir campanha</button></div></article>`;
 }
 
 function renderEditor(sheet) {
@@ -1099,7 +1158,8 @@ function renderEditor(sheet) {
             <input type="checkbox" data-local-only ${sheet.localOnly ? "checked" : ""} />
             <span>Ficha invisível (somente local)</span>
           </label>
-          <span class="tiny" data-calc="posture-summary">Sem alteração de postura.</span>
+          <span class="tiny" data-calc="posture-summary">Sem alteração de postura. A postura é ação Livre no início do turno e só pode mudar uma vez.</span>
+          <span class="tiny">Turno: 1 Principal, 1 Secundária e 1 Movimento; você pode não usar ações e trocar a Principal por outra ação.</span>
         </div>
       </div>
       <nav class="tabbar" aria-label="Abas da ficha">
@@ -1206,6 +1266,8 @@ function renderSheetTab(sheet) {
 }
 
 function renderSubclassRow(row, index) {
+  const source = (library.data.subclasses || []).find((entry) => normalizeText(cleanWikiText(entry.Nome)) === normalizeText(row.name));
+  const classification = classifySubclassPowers(source);
   return `
     <div class="subclass-row">
       <label class="field">
@@ -1221,8 +1283,24 @@ function renderSubclassRow(row, index) {
       <div class="row-actions">
         <button type="button" class="danger-button" data-action="remove-subclass" data-index="${index}">Remover</button>
       </div>
+      <span class="tiny subclass-power-types">Poderes: ${escapeHtml(classification.join(" · "))}</span>
     </div>
   `;
+}
+
+function classifySubclassPowers(row) {
+  if (!row) return ["Não catalogado — carregando progressão"];
+  const progression = cleanWikiText(row.Progressão || "");
+  if (!progression) return ["Narrativo — progressão sem descrição"];
+  const parts = progression.split(/N\d+\s*:/i).map((part) => part.trim()).filter(Boolean);
+  const types = new Set();
+  for (const part of parts) {
+    const text = normalizeText(part);
+    if (/(invoca|aplica|ativa|converte|cria|pode |mantem|manter|libera|transfere)/.test(text)) types.add("Ativável");
+    if (/(ganha|recebe|escala|aumenta|reduz|compartilha|duram|passa a|\+1|\+2)/.test(text)) types.add("Passivo");
+    if (/(lore|ritual|principio|corrup|entidade|narrativ|dominio conceitual|criatividade)/.test(text)) types.add("Narrativo");
+  }
+  return [...types].length ? [...types] : ["Narrativo — requer decisão do mestre"];
 }
 
 function renderAttributeCard(sheet, attr) {
@@ -1552,6 +1630,12 @@ function renderAbilityRow(ability, index) {
       <label class="field">
         <span>Custo</span>
         <input data-ability-field="cost" data-index="${index}" value="${escapeAttr(ability.cost)}" />
+      </label>
+      <label class="field">
+        <span>Ação</span>
+        <select data-ability-field="action" data-index="${index}">
+          ${["Ação Principal", "Ação Secundária", "Ação de Movimento", "Reação", "Livre", "Narrativa"].map((value) => option(value, ability.action || "Ação Principal")).join("")}
+        </select>
       </label>
       <label class="field">
         <span>Alcance</span>
@@ -1959,6 +2043,7 @@ function renderLibraryCard(row, key, sourceIndex) {
           ${badge(sourceLabel)}
           ${badge(tierLabel)}
           ${badge(cost)}
+          ${key === "arcane" || key === "ki" ? badge("Ação Principal") : ""}
         </div>
       </div>
       <p>${escapeHtml(description)}</p>
@@ -1966,6 +2051,7 @@ function renderLibraryCard(row, key, sourceIndex) {
         ${libraryField("Alcance", row.Alcance)}
         ${libraryField("Dano", damage)}
         ${libraryField("Duração", row.Duração)}
+        ${libraryField("Ação", key === "arcane" || key === "ki" ? "Ação Principal" : row.Ação)}
         ${libraryField("Base", row["Base Elemental"])}
         ${libraryField("Requisitos", getLibraryRequirementText(row, key))}
       </div>
@@ -2068,6 +2154,7 @@ function normalizeSheet(raw) {
   sheet.className = CLASS_RULES[sheet.className] ? sheet.className : "Mago";
   sheet.posture = sheet.posture || "Neutra";
   sheet.localOnly = Boolean(sheet.localOnly);
+  sheet.campaignId = sheet.campaignId || "";
   sheet.subclasses = Array.isArray(sheet.subclasses) ? sheet.subclasses : [];
   sheet.attributes = sheet.attributes || {};
   for (const attr of ATTRIBUTES) {
@@ -2125,7 +2212,7 @@ function normalizeAbility(ability) {
     value: parseNumber(ability.value, 0),
     active: ability.active !== false,
     source: ability.source || "",
-    action: ability.action || "",
+    action: ability.action || ((normalizeText(ability.type).includes("magia") || normalizeText(ability.type).includes("tecnica")) ? "Ação Principal" : ""),
     duration: ability.duration || "",
     effect: ability.effect || "",
     scaling: ability.scaling || "",
@@ -2194,6 +2281,8 @@ function loadLocalState() {
       wikiSearch: raw.wikiSearch || "",
       statObjectWeight: raw.statObjectWeight || "",
       deletedSheets: Array.isArray(raw.deletedSheets) ? raw.deletedSheets : [],
+      campaigns: Array.isArray(raw.campaigns) ? raw.campaigns : [],
+      activeCampaignId: raw.activeCampaignId || null,
       simulation: normalizeSimulationConfig(raw.simulation),
       simulationResult: null,
     };
@@ -2211,6 +2300,8 @@ function loadLocalState() {
       wikiPath: WIKI_ROOT_PATH,
       wikiHistory: [],
       wikiSearch: "",
+      campaigns: [],
+      activeCampaignId: null,
     };
   }
 }
@@ -2818,7 +2909,7 @@ function applyPostureSkillBonus(skills, posture) {
     }
   }
   if (posture.survivalSkillPct) {
-    for (const key of ["sobrevivencia", "percepcao", "taticaSobrevivencia"]) addPercentToSkill(skills, key, posture.survivalSkillPct);
+    for (const key of ["sobrevivencia", "percepcao"]) addPercentToSkill(skills, key, posture.survivalSkillPct);
   }
 }
 
@@ -3281,7 +3372,7 @@ function refreshCalculations() {
   const objectWeight = parseNumber(state.statObjectWeight, 0);
   setCalc("weight-damage", objectWeight > 0 ? `${weightDamageDice(objectWeight)}d6 + ${signed(calc.attrMods.strength)}` : "—");
   setCalc("throw-distance", objectWeight > 0 ? `${formatNumber(throwDistance(objectWeight, calc.cargoMax))} m` : "—");
-  setCalc("posture-summary", getPostureSummary(calc));
+  setCalc("posture-summary", `${getPostureSummary(calc)} Ação Livre no início do turno; troca máxima uma vez.`);
   document.querySelectorAll("[data-skill-summary]").forEach((node) => {
     node.classList.toggle("over-limit", calc.trainedCount > calc.trainedMax);
   });
@@ -3549,6 +3640,7 @@ function addInventoryFromLibrary(sheet, sourceKey, sourceIndex) {
     weight: parseNumber(row.Peso, 0),
     note: cleanWikiText(row.Bônus || row.Efeito || row.Observações || ""),
     source: DATA_SOURCES[sourceKey]?.label || "Wiki",
+    action: sourceKey === "arcane" || sourceKey === "ki" ? "Ação Principal" : "",
     enchantments: [],
   });
   touchAndRender(sheet);
