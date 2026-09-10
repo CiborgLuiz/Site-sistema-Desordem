@@ -22,7 +22,7 @@ Foram verificados `app.js`, `styles.css`, `tools/playtest-1000.js`, `test-selfch
 | Recursos | Vida, Mana, Ki, Energia, Sanidade, Defesa, AM e Refino |
 | Biblioteca | Itens, magias, técnicas de Ki, subclasses e encantamentos |
 | Poderes adicionados | Preservam ação, duração, efeito, escalonamento, limite, risco e categoria |
-| Simulação | Acesso superior ao lado de Fichas/Wiki; dois times, múltiplos combatentes, fichas repetidas e aleatórios por nível |
+| Simulação | Acesso superior ao lado de Fichas/Wiki; dois times, múltiplos combatentes, fichas repetidas, aleatórios por nível e relatório detalhado |
 | Teste automatizado | `node test-selfcheck.js` aprovado |
 
 ## 2. Regras normativas usadas

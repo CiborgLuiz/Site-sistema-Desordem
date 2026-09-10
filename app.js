@@ -1751,12 +1751,15 @@ function renderSimulationPage() {
 
 function renderSimulationMembers(side, members) {
   const sheets = state.sheets;
-  return members.map((member, index) => `<div class="simulation-member"><strong>#${index + 1}</strong><select data-sim-config="mode" data-sim-side="${side}" data-sim-index="${index}"><option value="random" ${member.mode === "random" ? "selected" : ""}>Ficha aleatória por nível</option><option value="sheet" ${member.mode === "sheet" ? "selected" : ""}>Ficha existente</option></select>${member.mode === "sheet" ? `<select data-sim-config="sheetId" data-sim-side="${side}" data-sim-index="${index}">${sheets.map((sheet) => `<option value="${escapeAttr(sheet.id)}" ${member.sheetId === sheet.id ? "selected" : ""}>${escapeHtml(sheet.name || sheet.className)}</option>`).join("") || `<option value="">Nenhuma ficha</option>`}</select>` : ""}<label class="inline-field"><span>Nível</span><input type="number" min="1" max="50" data-sim-config="level" data-sim-side="${side}" data-sim-index="${index}" value="${escapeAttr(member.level || 10)}" /></label><button type="button" class="danger-button" data-action="remove-sim-member" data-sim-side="${side}" data-index="${index}">Remover</button></div>`).join("");
+  return members.map((member, index) => `<div class="simulation-member"><strong>#${index + 1}</strong><select data-sim-config="mode" data-sim-side="${side}" data-sim-index="${index}"><option value="random" ${member.mode === "random" ? "selected" : ""}>Ficha aleatória por nível</option><option value="sheet" ${member.mode === "sheet" ? "selected" : ""}>Ficha existente</option></select>${member.mode === "sheet" ? `<select data-sim-config="sheetId" data-sim-side="${side}" data-sim-index="${index}">${sheets.map((sheet) => `<option value="${escapeAttr(sheet.id)}" ${member.sheetId === sheet.id ? "selected" : ""}>${escapeHtml(sheet.name || sheet.className)}</option>`).join("") || `<option value="">Nenhuma ficha</option>`}</select>` : `<label class="inline-field"><span>Nível</span><input type="number" min="1" max="50" data-sim-config="level" data-sim-side="${side}" data-sim-index="${index}" value="${escapeAttr(member.level || 10)}" /></label>`}<button type="button" class="danger-button" data-action="remove-sim-member" data-sim-side="${side}" data-index="${index}">Remover</button></div>`).join("");
 }
 
 function renderTeamSimulationResult(result) {
   const total = Math.max(1, result.total);
-  return `<div class="panel simulation-results"><div class="panel-title"><h3>Resultado agregado</h3><span class="badge">${formatNumber(total)} simulações</span></div><div class="stats-grid"><div class="stat-box"><span>Vitórias Time 1</span><strong>${formatNumber(result.wins.side1)}</strong></div><div class="stat-box"><span>Vitórias Time 2</span><strong>${formatNumber(result.wins.side2)}</strong></div><div class="stat-box"><span>Empates</span><strong>${formatNumber(result.draws)}</strong></div><div class="stat-box"><span>Rodadas médias</span><strong>${formatNumber(result.avgRounds)}</strong></div><div class="stat-box"><span>Acertos</span><strong>${formatNumber(result.hits)}</strong></div><div class="stat-box"><span>Críticos</span><strong>${formatNumber(result.crits)}</strong></div></div><h4>Combinações com maior taxa de vitória</h4><ol>${(result.combinations || []).slice(0, 10).map((row) => `<li><strong>${escapeHtml(row.label)}</strong>: ${formatNumber(row.winRate * 100)}% (${row.wins}/${row.tests})</li>`).join("") || "<li>Sem dados suficientes.</li>"}</ol><p class="tiny">Resistências e imunidades são aplicadas internamente e não são reveladas durante a simulação.</p></div>`;
+  const maxWin = Math.max(1, result.wins.side1, result.wins.side2, result.draws);
+  const memberRows = Object.values(result.memberStats || {}).sort((a, b) => b.damage - a.damage).slice(0, 30);
+  const tests = (result.tests || []).slice(0, 100).map((row) => `<tr><td>${row.index}</td><td>${escapeHtml(row.winner)}</td><td>${escapeHtml(row.label)}</td><td>${row.rounds}</td><td>${row.hits}</td><td>${row.crits}</td><td>${formatNumber(row.damage)}</td><td>${row.survivors1}/${row.survivors2}</td></tr>`).join("");
+  return `<div class="panel simulation-results"><div class="panel-title"><h3>Relatório completo</h3><span class="badge">${formatNumber(total)} simulações</span></div><div class="simulation-chart"><div class="simulation-chart-row"><span>Time 1</span><div class="simulation-bar"><i style="width:${Math.round((result.wins.side1 / maxWin) * 100)}%"></i></div><strong>${formatNumber(result.wins.side1)} (${formatNumber(result.wins.side1 / total * 100)}%)</strong></div><div class="simulation-chart-row"><span>Time 2</span><div class="simulation-bar"><i style="width:${Math.round((result.wins.side2 / maxWin) * 100)}%"></i></div><strong>${formatNumber(result.wins.side2)} (${formatNumber(result.wins.side2 / total * 100)}%)</strong></div><div class="simulation-chart-row"><span>Empates</span><div class="simulation-bar"><i style="width:${Math.round((result.draws / maxWin) * 100)}%"></i></div><strong>${formatNumber(result.draws)} (${formatNumber(result.draws / total * 100)}%)</strong></div></div><div class="stats-grid"><div class="stat-box"><span>Rodadas médias</span><strong>${formatNumber(result.avgRounds)}</strong></div><div class="stat-box"><span>Acertos</span><strong>${formatNumber(result.hits)}</strong></div><div class="stat-box"><span>Críticos</span><strong>${formatNumber(result.crits)}</strong></div><div class="stat-box"><span>Dano registrado</span><strong>${formatNumber(result.tests.reduce((sum, row) => sum + row.damage, 0))}</strong></div></div><h4>Combinações com maior taxa de vitória</h4><ol>${(result.combinations || []).slice(0, 10).map((row) => `<li><strong>${escapeHtml(row.label)}</strong>: ${formatNumber(row.winRate * 100)}% (${row.wins}/${row.tests})</li>`).join("") || "<li>Sem dados suficientes.</li>"}</ol><h4>Desempenho por combatente</h4><div class="table-wrap"><table class="wiki-table compact"><thead><tr><th>Combatente</th><th>Testes</th><th>Sobreviveu</th><th>Acertos</th><th>Críticos</th><th>Dano</th></tr></thead><tbody>${memberRows.map((row) => `<tr><td>${escapeHtml(row.name)}</td><td>${row.tests}</td><td>${row.survived}</td><td>${row.hits}</td><td>${row.crits}</td><td>${formatNumber(row.damage)}</td></tr>`).join("")}</tbody></table></div><h4>Log detalhado das primeiras 100 simulações</h4><div class="table-wrap"><table class="wiki-table compact"><thead><tr><th>#</th><th>Vencedor</th><th>Combinação</th><th>Rodadas</th><th>Acertos</th><th>Críticos</th><th>Dano</th><th>Sobreviventes T1/T2</th></tr></thead><tbody>${tests}</tbody></table></div><details><summary>Eventos de iniciativa e ataques (primeiros 100 eventos)</summary><div class="table-wrap"><table class="wiki-table compact"><thead><tr><th>Teste</th><th>Rodada</th><th>Atacante</th><th>Alvo</th><th>Iniciativa</th><th>Rolagem</th><th>Total</th><th>Defesa</th><th>Acertou</th><th>Dano</th></tr></thead><tbody>${(result.eventLog || []).slice(0, 100).map((event) => `<tr><td>${event.test}</td><td>${event.round}</td><td>${escapeHtml(event.attacker)}</td><td>${escapeHtml(event.target)}</td><td>${event.initiative}</td><td>${event.roll}</td><td>${event.attackTotal}</td><td>${event.defense}</td><td>${event.success ? "sim" : "não"}${event.critical ? " / crítico" : ""}</td><td>${formatNumber(event.damage)}</td></tr>`).join("")}</tbody></table></div></details><p class="tiny">As propriedades ocultas do alvo continuam sem ser reveladas durante os testes. O relatório mostra apenas efeitos observados e estatísticas agregadas.</p></div>`;
 }
 
 function renderSimulationResult(result) {
@@ -1796,7 +1799,7 @@ function abilityEffectScore(ability) {
 function runTeamSimulation() {
   const cfg = normalizeSimulationConfig(state.simulation);
   state.simulation = cfg;
-  const result = { total: cfg.count, wins: { side1: 0, side2: 0 }, draws: 0, rounds: 0, hits: 0, crits: 0, combinations: [] };
+  const result = { total: cfg.count, wins: { side1: 0, side2: 0 }, draws: 0, rounds: 0, hits: 0, crits: 0, combinations: [], tests: [], eventLog: [], memberStats: {} };
   const comboMap = new Map(); let seed = 0x6d657461;
   const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
   const d20 = () => Math.floor(rand() * 20) + 1;
@@ -1809,6 +1812,12 @@ function runTeamSimulation() {
     if (duel.winner === "side1") result.wins.side1++; else if (duel.winner === "side2") result.wins.side2++; else result.draws++;
     const row = comboMap.get(label) || { label, tests: 0, wins: 0 };
     row.tests++; if (duel.winner === "side1") row.wins++; comboMap.set(label, row);
+    result.tests.push({ index: test + 1, label, winner: duel.winner, rounds: duel.rounds, hits: duel.hits, crits: duel.crits, damage: duel.damage, survivors1: duel.survivors1, survivors2: duel.survivors2 });
+    if (result.eventLog.length < 100) result.eventLog.push(...duel.events.map((event) => ({ test: test + 1, ...event })));
+    for (const member of duel.members) {
+      const key = `${member.side}:${member.name}`; const stats = result.memberStats[key] || { side: member.side, name: member.name, tests: 0, survived: 0, hits: 0, crits: 0, damage: 0 };
+      stats.tests++; stats.survived += member.survived ? 1 : 0; stats.hits += member.hits; stats.crits += member.crits; stats.damage += member.damage; result.memberStats[key] = stats;
+    }
   }
   result.avgRounds = result.rounds / Math.max(1, result.total);
   result.combinations = [...comboMap.values()].map((row) => ({ ...row, winRate: row.wins / row.tests })).sort((a, b) => b.winRate - a.winRate || b.tests - a.tests);
@@ -1820,7 +1829,7 @@ function makeTeamCombatant(member, test, index, side, rand) {
   if (member.mode === "sheet") {
     const source = state.sheets.find((entry) => entry.id === member.sheetId) || state.sheets[0];
     sheet = source ? JSON.parse(JSON.stringify(source)) : createDefaultSheet({ className: "Mago" });
-    sheet.level = clamp(parseNumber(member.level, sheet.level || 1), 1, MAX_LEVEL);
+    sheet.level = clamp(parseNumber(sheet.level, 1), 1, MAX_LEVEL);
   } else {
     const names = Object.keys(CLASS_RULES); const className = names[(test + index + (side === "side2" ? 1 : 0)) % names.length];
     sheet = createDefaultSheet({ name: `Aleatório ${className}`, className, level: clamp(parseNumber(member.level, 10), 1, MAX_LEVEL) });
@@ -1837,20 +1846,24 @@ function makeTeamCombatant(member, test, index, side, rand) {
 }
 
 function simulateTeamFight(side1, side2, d20, rand) {
-  const all = [...side1, ...side2].map((fighter) => ({ ...fighter, initiative: d20() + fighter.initiative }));
-  let rounds = 0, hits = 0, crits = 0;
+  const events = []; [...side1, ...side2].forEach((fighter, index) => { fighter.name = `${fighter.className} ${fighter.side === "side1" ? "T1" : "T2"} #${index + 1}`; }); const all = [...side1, ...side2].map((fighter) => ({ ...fighter, initiativeRoll: d20(), hits: 0, crits: 0, damage: 0 }));
+  all.forEach((fighter) => { fighter.initiativeTotal = fighter.initiativeRoll + fighter.initiative; });
+  let rounds = 0, hits = 0, crits = 0, damageTotal = 0;
   while (side1.some((f) => f.hp > 0) && side2.some((f) => f.hp > 0) && rounds < 100) {
     rounds++;
-    for (const attacker of [...all].sort((a, b) => b.initiative - a.initiative)) {
+    for (const attacker of [...all].sort((a, b) => b.initiativeTotal - a.initiativeTotal)) {
       if (attacker.hp <= 0) continue;
       const enemies = attacker.side === "side1" ? side2.filter((f) => f.hp > 0) : side1.filter((f) => f.hp > 0);
       if (!enemies.length) break;
       const target = enemies[Math.floor(rand() * enemies.length)]; const roll = d20();
-      if (roll === 20 || roll + attacker.attack >= target.defense) { hits++; if (roll === 20) crits++; const damage = attacker.damage + 3 + Math.floor(rand() * 6) + (roll === 20 ? 3 + Math.floor(rand() * 6) : 0); target.hp -= damage; }
+      const success = roll === 20 || roll + attacker.attack >= target.defense;
+      const event = { round: rounds, attacker: attacker.name, target: target.name, initiative: attacker.initiativeTotal, roll, attackTotal: roll + attacker.attack, defense: target.defense, success, critical: roll === 20, damage: 0 };
+      if (success) { hits++; attacker.hits++; if (roll === 20) { crits++; attacker.crits++; } const dealt = attacker.damage + 3 + Math.floor(rand() * 6) + (roll === 20 ? 3 + Math.floor(rand() * 6) : 0); target.hp -= dealt; attacker.damage += dealt; damageTotal += dealt; event.damage = dealt; }
+      events.push(event);
     }
   }
   const alive1 = side1.some((f) => f.hp > 0), alive2 = side2.some((f) => f.hp > 0);
-  return { winner: alive1 && !alive2 ? "side1" : alive2 && !alive1 ? "side2" : "draw", rounds, hits, crits };
+  return { winner: alive1 && !alive2 ? "side1" : alive2 && !alive1 ? "side2" : "draw", rounds, hits, crits, damage: damageTotal, survivors1: side1.filter((f) => f.hp > 0).length, survivors2: side2.filter((f) => f.hp > 0).length, events, members: all.map((fighter) => ({ side: fighter.side, name: fighter.name, survived: fighter.hp > 0, hits: fighter.hits, crits: fighter.crits, damage: fighter.damage })) };
 }
 
 function runSheetSimulation(sheet) {
