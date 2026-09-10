@@ -244,6 +244,59 @@ const CONDITION_BALANCE = {
   "Marca do Caos": ["Especial", "Resultado favorável: +2 em teste ou +1d6 dano no turno.", "Resultado ruim: 1d6 dano, -2 em teste ou condição leve aleatória.", "Alto caos; resolver com rolagem por turno."],
 };
 
+// Organização editorial da wiki. A hierarquia não cria uma regra nova nem
+// altera o efeito da condição: ela só ajuda o mestre a encontrar primeiro os
+// estados mais frequentes e a comparar estados equivalentes.
+const CONDITION_COMMON_ORDER = [
+  "Caído", "Atordoado", "Imobilizado", "Exposto", "Guarda Quebrada",
+  "Sangramento", "Queimando", "Envenenado", "Silenciado", "Surdo",
+  "Desorientado", "Desarmado", "Flanqueado", "Enraizado", "Sono",
+  "Exausto", "Esgotado", "Cego (Visão Turva)", "Visão Dupla",
+];
+const CONDITION_FAMILY_ORDER = [
+  "Controle de ação", "Dano contínuo", "Posição e movimento", "Percepção e mente",
+  "Recursos", "Físicas e campanha", "Narrativas e poder", "Extrema", "Especial",
+];
+const CONDITION_FAMILY_BY_NAME = {
+  Atordoado: "Controle de ação", Colapsado: "Controle de ação", Dominado: "Controle de ação",
+  Hipnotizado: "Controle de ação", Imobilizado: "Controle de ação", Silenciado: "Controle de ação",
+  Sono: "Controle de ação", Confuso: "Percepção e mente", Paranoico: "Percepção e mente",
+  Pânico: "Percepção e mente", Apático: "Percepção e mente", "Quebrado Mentalmente": "Percepção e mente",
+  "Possuído (Parcial)": "Percepção e mente", Alucinado: "Percepção e mente",
+  "Cego (Visão Turva)": "Percepção e mente", "Visão Dupla": "Percepção e mente", Surdo: "Percepção e mente",
+  Desorientado: "Percepção e mente", Sangramento: "Dano contínuo", Queimando: "Dano contínuo",
+  Envenenado: "Dano contínuo", "Sangramento Interno": "Dano contínuo", Asfixiado: "Dano contínuo",
+  Infectado: "Físicas e campanha", Fome: "Físicas e campanha", Desidratado: "Físicas e campanha",
+  Fraturado: "Físicas e campanha", Mutilado: "Físicas e campanha", Caído: "Posição e movimento",
+  Flanqueado: "Posição e movimento", "Guarda Quebrada": "Posição e movimento", Exposto: "Posição e movimento",
+  Enraizado: "Posição e movimento", Ancorado: "Posição e movimento", "Deslocado": "Posição e movimento",
+  "Gravidade Alterada": "Posição e movimento", Desarmado: "Posição e movimento", Rastreado: "Posição e movimento",
+  "Fome de Mana": "Recursos", "Fome de Ki": "Recursos", "Excesso de Ki": "Recursos",
+  "Mana Corrompida": "Recursos", "Sobrecarga Mágica": "Recursos", "Vazio Arcano": "Recursos",
+  "Canalização Quebrada": "Recursos", Drenado: "Recursos", Esgotado: "Recursos", Exausto: "Recursos",
+  Instável: "Narrativas e poder", "Eco Arcano": "Narrativas e poder", "Eco Temporal": "Narrativas e poder",
+  Corrompido: "Narrativas e poder", "Marca do Caos": "Narrativas e poder", Desesperado: "Narrativas e poder",
+  Frenesi: "Narrativas e poder", "Instinto de Sobrevivência": "Narrativas e poder", Provocado: "Narrativas e poder",
+  "Contra-Atacado": "Narrativas e poder", Marcado: "Narrativas e poder", "Sob Pressão": "Narrativas e poder",
+  "À Beira da Morte": "Extrema", "Alma Fragmentada": "Extrema", "Quebrado Mentalmente": "Extrema",
+  "Mutilado": "Extrema", Colapsado: "Extrema", "Ancorado": "Especial", Deslocado: "Especial",
+  "Eco Temporal": "Especial", "Gravidade Alterada": "Especial", "Marca do Caos": "Especial",
+};
+const CONDITION_SEVERITY_ORDER = { Leve: 1, Média: 2, Mista: 3, Pesada: 4, Extrema: 5, Especial: 6 };
+
+function conditionFamily(name, type) {
+  return CONDITION_FAMILY_BY_NAME[name] || ({
+    Mental: "Percepção e mente", Física: "Físicas e campanha", Energética: "Recursos",
+    Tática: "Posição e movimento", Sensorial: "Percepção e mente", Extrema: "Extrema", Especial: "Especial",
+  }[type] || "Narrativas e poder");
+}
+
+function conditionTier(name, severity) {
+  if (CONDITION_COMMON_ORDER.includes(name)) return "Comum";
+  if (severity === "Extrema" || severity === "Especial") return severity;
+  return `Hierarquia ${severity}`;
+}
+
 const EDITOR_TABS = [
   { key: "ficha", label: "Ficha" },
   { key: "pericias", label: "Perícias" },
@@ -2434,11 +2487,27 @@ function renderWikiCsv(text, path) {
 
   const headers = Object.keys(rows[0]);
   const tableClass = headers.length > 6 ? "wiki-table wide" : "wiki-table";
+  const conditionsGuide = isConditionsPath(path) ? `
+    <aside class="condition-wiki-guide">
+      <strong>Como ler esta lista</strong>
+      <p>As condições <b>Comuns</b> aparecem primeiro. As demais ficam agrupadas por família e severidade para comparar efeitos parecidos sem transformar a organização em uma regra adicional.</p>
+      <div class="condition-tier-legend">
+        <span class="condition-tier tier-common">Comum</span>
+        <span class="condition-tier tier-leve">Hierarquia Leve</span>
+        <span class="condition-tier tier-media">Hierarquia Média</span>
+        <span class="condition-tier tier-pesada">Hierarquia Pesada</span>
+        <span class="condition-tier tier-extrema">Extrema</span>
+        <span class="condition-tier tier-especial">Especial</span>
+      </div>
+      <p class="tiny">Quando duas condições pertencem à mesma família, prefira subir ou descer na hierarquia em vez de acumular penalidades equivalentes. A duração e a remoção continuam definidas pelo mestre conforme a cena.</p>
+    </aside>
+  ` : "";
   return `
     <div class="wiki-csv-heading">
       <h1>${escapeHtml(wikiTitleFromPath(path))}</h1>
       <span class="badge">${rows.length} registros</span>
     </div>
+    ${conditionsGuide}
     <div class="table-wrap wiki-table-wrap">
       <table class="${tableClass}" style="--wiki-columns: ${headers.length}">
         <thead>
@@ -2447,7 +2516,7 @@ function renderWikiCsv(text, path) {
         <tbody>
           ${rows.map((row) => `
             <tr>
-              ${headers.map((header) => `<td>${escapeHtml(cleanWikiText(row[header] || ""))}</td>`).join("")}
+              ${headers.map((header) => `<td>${renderWikiCell(row[header] || "", header, path)}</td>`).join("")}
             </tr>
           `).join("")}
         </tbody>
@@ -2459,12 +2528,15 @@ function renderWikiCsv(text, path) {
 
 function prepareWikiRows(rows, path) {
   if (!isConditionsPath(path)) return rows;
-
-  return rows.map((row) => {
+  const prepared = rows.map((row) => {
     const balance = CONDITION_BALANCE[cleanWikiText(row.Nome)] || ["Média", "Nenhum.", "Aplicar penalidade conforme descrição.", "Usar por 1-3 turnos com teste de resistência apropriado."];
     const [severity, buff, debuff, value] = balance;
+    const name = cleanWikiText(row.Nome);
+    const family = conditionFamily(name, cleanWikiText(row.Tipo));
     return {
       ...row,
+      Família: family,
+      Hierarquia: conditionTier(name, severity),
       Severidade: severity,
       Buff: buff,
       Debuff: debuff,
@@ -2472,10 +2544,42 @@ function prepareWikiRows(rows, path) {
       "Referência de balanceamento": CONDITION_BALANCE_REFERENCES[severity] || CONDITION_BALANCE_REFERENCES.Média,
     };
   });
+  const commonRank = (name) => {
+    const index = CONDITION_COMMON_ORDER.indexOf(name);
+    return index === -1 ? CONDITION_COMMON_ORDER.length : index;
+  };
+  const familyRank = (family) => {
+    const index = CONDITION_FAMILY_ORDER.indexOf(family);
+    return index === -1 ? CONDITION_FAMILY_ORDER.length : index;
+  };
+  return prepared.sort((a, b) => {
+    const commonA = commonRank(cleanWikiText(a.Nome));
+    const commonB = commonRank(cleanWikiText(b.Nome));
+    if ((commonA < CONDITION_COMMON_ORDER.length) !== (commonB < CONDITION_COMMON_ORDER.length)) {
+      return commonA < CONDITION_COMMON_ORDER.length ? -1 : 1;
+    }
+    if (commonA !== commonB) return commonA - commonB;
+    const familyDelta = familyRank(a.Família) - familyRank(b.Família);
+    if (familyDelta) return familyDelta;
+    const severityDelta = (CONDITION_SEVERITY_ORDER[a.Severidade] || 99) - (CONDITION_SEVERITY_ORDER[b.Severidade] || 99);
+    return severityDelta || cleanWikiText(a.Nome).localeCompare(cleanWikiText(b.Nome), "pt-BR");
+  });
 }
 
 function isConditionsPath(path) {
   return normalizeText(path).includes("condicoes") || normalizeText(wikiTitleFromPath(path)) === "condicoes";
+}
+
+function renderWikiCell(value, header, path) {
+  const clean = cleanWikiText(value);
+  if (isConditionsPath(path) && header === "Hierarquia") {
+    const token = normalizeText(clean).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return `<span class="condition-tier tier-${escapeAttr(token)}">${escapeHtml(clean)}</span>`;
+  }
+  if (isConditionsPath(path) && header === "Família") {
+    return `<span class="condition-family">${escapeHtml(clean)}</span>`;
+  }
+  return escapeHtml(clean);
 }
 
 function renderWikiRecordCards(rows, headers) {

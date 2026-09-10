@@ -241,3 +241,31 @@ O sistema estará coerente quando um mestre diferente conseguir responder, sem i
 Cada personagem tem uma Ação Principal, uma Ação Secundária e uma Ação de Movimento. A ordem é escolhida pelo jogador; nenhuma ação é obrigatória; a Principal pode ser convertida em outra ação quando a ficção exigir (por exemplo, usar Principal + Movimento para correr). Magias e técnicas de Ki são Principal. Postura é Livre no início do turno e só pode mudar uma vez nesse momento.
 
 As campanhas são organização de dados, não uma nova regra de personagem: uma ficha pode pertencer a uma campanha ou ficar independente, e a mesma ficha continua podendo ser usada na simulação como membro repetido de um time.
+
+## 12. Auditoria atual das condições
+
+O catálogo continha 66 registros e uma duplicata literal de **Silenciado**; a duplicata foi removida, deixando 65 condições. O restante não é automaticamente “excesso”: condições de controle, percepção, dano, movimento, recursos e narrativa cumprem funções diferentes, mas algumas precisam de hierarquia para não disputarem o mesmo espaço.
+
+### Redundâncias e decisão recomendada
+
+| Grupo | Condições | Decisão |
+|---|---|---|
+| Visão | Cego, Visão Dupla | Manter as duas apenas como pesada versus leve |
+| Perda de agência | Atordoado, Colapsado, Quebrado Mentalmente | Escalonar; não permitir que todas removam o turno inteiro |
+| Controle mental | Dominado, Hipnotizado | Hipnotizado = comando limitado; Dominado = controle total raro |
+| Exaustão | Esgotado, Exausto | Moderado versus grave; evitar penalidades duplicadas |
+| Fome/recurso | Fome, Fome de Mana, Fome de Ki | Manter família com o mesmo modelo de drenagem |
+| Percepção/mente | Confuso, Paranoico, Alucinado | Diferenciar alvo, cooperação e percepção |
+| Sangramento | Sangramento, Sangramento Interno | Visível leve versus grave com cura reduzida |
+
+Condições adicionais só são necessárias quando um poder real precisar delas. As quatro lacunas mais úteis são Amedrontado, Abençoado/Protegido, Amaldiçoado e Concentrando. Não vale aumentar o catálogo sem uma habilidade que use cada estado.
+
+Sanidade, Energia Física e duração continuam narrativas: o mestre define perda, duração e remoção; a ficha apenas registra modificadores e valores atuais.
+
+## 13. Nota do sistema atual — hierarquia de condições
+
+Esta revisão transforma a organização das condições em uma ferramenta de leitura da wiki, não em uma nova camada obrigatória de regras. A ordem exibida agora prioriza os estados mais comuns e agrupa os demais por função; a coluna **Hierarquia** identifica a intensidade esperada do efeito e a coluna **Família** indica com quais estados ele deve ser comparado.
+
+O uso recomendado é aplicar um único estágio por função: um alvo pode subir de Hipnotizado para Dominado, mas não deve receber os dois controles simultaneamente só para somar penalidades. O mesmo vale para Cego/Visão Dupla, Esgotado/Exausto, Sangramento/Sangramento Interno e Fome/Fome de Mana/Fome de Ki. Isso reduz combinações acidentais sem tirar do mestre a decisão narrativa de duração, remoção e agravamento.
+
+As etiquetas Comum, Leve, Média, Pesada, Extrema e Especial são referências de impacto para criação e revisão de poderes. Elas não substituem resistência, imunidade, testes, custos ou contra-jogo. Toda nova condição deve entrar na wiki somente quando existir um poder, item ou cena que realmente a utilize, com efeito, remoção, duração narrativa e família definidos.

@@ -1223,6 +1223,48 @@ input[type="checkbox"] {
   width: 14rem;
 }
 
+.condition-wiki-guide {
+  margin: 0 0 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(142, 157, 255, .28);
+  border-radius: 12px;
+  background: rgba(29, 35, 68, .42);
+}
+
+.condition-wiki-guide p {
+  margin: .35rem 0;
+}
+
+.condition-tier-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: .7rem 0;
+}
+
+.condition-tier {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  padding: .18rem .5rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.condition-tier.tier-common { color: #d8f9e3; background: #1b7048; }
+.condition-tier.tier-hierarquia-leve,
+.condition-tier.tier-leve { color: #e7f4ff; background: #28618f; }
+.condition-tier.tier-hierarquia-media,
+.condition-tier.tier-media { color: #fff5d6; background: #80621d; }
+.condition-tier.tier-hierarquia-pesada,
+.condition-tier.tier-pesada { color: #ffe5d7; background: #8a3e2c; }
+.condition-tier.tier-extrema { color: #ffe2ed; background: #8e2853; }
+.condition-tier.tier-especial { color: #eee5ff; background: #5d3c91; }
+.condition-family { color: var(--muted, #aeb8d6); font-size: .8rem; }
+
 .wiki-table .selected-value {
   display: inline-flex;
   align-items: center;

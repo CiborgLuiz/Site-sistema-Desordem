@@ -1,225 +1,130 @@
-# 📋 Desordem - Sistema de Fichas
+# DESORDEM — fichas, campanhas e laboratório de combate
 
-Sistema de gerenciamento de fichas de personagem para o RPG Desordem, com armazenamento em banco de dados Supabase e suporte para deploy rápido no Vercel.
+Aplicação web do sistema de RPG Desordem. A ficha calcula atributos, perícias, recursos, posturas, subclasses, equipamentos, magias e técnicas de Ki. O projeto também organiza fichas em campanhas compartilhadas e oferece simulações em dois times.
 
-## ✨ Características
+## O que existe hoje
 
-- 📄 Criação e edição de fichas de personagem
-- 🎮 Sistema de atributos, perícias e recursos dinâmicos
-- 📚 Biblioteca compartilhada de itens, magias e técnicas
-- ☁️ Sincronização compartilhada via Supabase
-- 🚀 Deploy simples no Vercel (sem servidor para configurar)
-- 💾 Fallback para armazenamento local se o servidor estiver indisponível
+- Fichas sincronizadas pelo Supabase, com fallback local.
+- 4 classes, subclasses por nível e Restrição Celestial com pontos extras de atributo.
+- 30 perícias: qualquer teste usa `1d20 + perícia` contra a Defesa/CD definida pelo mestre.
+- Biblioteca de 292 equipamentos, 26 magias arcanas e 29 técnicas de Ki.
+- Poderes especiais mantidos como conteúdo do mestre, fora das fichas dos jogadores e da simulação.
+- Posturas jogáveis na ficha: Neutra, Ofensiva e Defensiva. Postura é ação Livre no início do turno e só pode mudar uma vez.
+- Economia de turno: 1 Ação Principal, 1 Secundária e 1 de Movimento. O jogador pode agir em qualquer ordem, não precisa gastar tudo e pode trocar a Principal por outra ação.
+- Campanhas: criar, abrir, mover fichas e excluir campanha; ao excluir, as fichas voltam para “sem campanha”.
+- Simulação no topo do site: Time 1 contra Time 2, qualquer quantidade de combatentes, fichas repetidas, fichas existentes ou aleatórias por nível.
+- Relatório da simulação com vitórias, derrotas, empates, iniciativa, acertos, críticos, dano, rodadas, sobreviventes e combinações vencedoras.
 
-## 🚀 Deploy no Vercel (Recomendado)
+## Regras operacionais resumidas
 
-### Pré-requisitos
+Magias e técnicas de Ki são Ação Principal. Posturas são Livre no início do turno. 20 natural dobra os dados de dano; empate favorece jogadores em PvE e o atacante em PvP; resistência reduz 50% e imunidade anula o tipo de dano. Sanidade, Energia Física e duração de condições são administradas narrativamente pelo mestre.
 
-1. **Conta Supabase** (gratuita)
-   - Acesse [supabase.com](https://supabase.com)
-   - Crie um novo projeto
-   - Copie a URL e a chave anon (Anonymous Key)
+## Perícias
 
-2. **Conta Vercel** (gratuita)
-   - Acesse [vercel.com](https://vercel.com)
-   - Conecte com sua conta GitHub
+As perícias são ferramentas gerais de teste, não apenas ações de combate. O atributo associado define o modificador.
 
-3. **Repositório Git**
-   - Este projeto já é um repositório
+| Atributo | Perícias |
+|---|---|
+| Força | Luta, Atletismo |
+| Destreza | Reflexos, Furtividade, Acrobacia, Iniciativa, Pontaria, Ladinagem |
+| Constituição | Vigor, Fortitude |
+| Inteligência | Misticismo, Investigação, Conhecimento, Natureza, Ofício |
+| Sabedoria | Vontade, Intuição, Percepção, Sobrevivência, Cura, Religião, Medicina, Navegação |
+| Carisma | Jogatina, Persuasão, Enganação, Diplomacia, Intimidação, Adestramento de animais, Etiqueta |
 
-### Passo a Passo
+Tática de Sobrevivência foi removida por sobreposição com Sobrevivência, Percepção e Navegação. Cura é voltada a primeiros socorros/ferimentos; Medicina identifica e trata doenças, condições e contaminações.
 
-#### 1. Preparar Supabase
+## Condições: análise, hierarquia e política atual
 
-1. Acesse sua conta Supabase
-2. Vá em **Project Settings** → **API**
-3. Copie:
-   - `Project URL` → `DESORDEM_SUPABASE_URL`
-   - `service_role` → `DESORDEM_SUPABASE_SERVICE_ROLE_KEY` (preferencial no backend)
-   - `anon public` → `DESORDEM_SUPABASE_ANON_KEY` (fallback)
+O catálogo possui 65 registros após a remoção da duplicata literal de **Silenciado**.
 
-4. Crie a tabela de fichas no SQL Editor executando o arquivo `setup-supabase.sql`.
+Na wiki, a lista é apresentada em ordem de consulta: condições comuns aparecem primeiro; em seguida, as demais são agrupadas por família (controle de ação, dano contínuo, posição/movimento, percepção/mente, recursos, físicas/campanha, narrativas/poder, extrema e especial). A coluna **Hierarquia** é um identificador visual de severidade — Comum, Leve, Média, Pesada, Extrema ou Especial — e não altera a regra por si só.
 
-```sql
-CREATE TABLE sheets (
-  id TEXT PRIMARY KEY,
-  data JSONB NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+As condições não precisam ser todas removidas: muitas representam fontes diferentes de decisão. Porém, devem ser organizadas em famílias para reduzir confusão:
 
-CREATE INDEX idx_sheets_updated_at ON sheets(updated_at DESC);
-```
+- **Controle de ação:** Atordoado, Colapsado, Dominado, Hipnotizado, Sono, Imobilizado, Silenciado.
+- **Percepção/mente:** Cego, Visão Dupla, Desorientado, Alucinado, Confuso, Paranoico, Pânico, Apático, Quebrado Mentalmente.
+- **Dano contínuo:** Queimando, Envenenado, Sangramento, Sangramento Interno, Asfixiado, Corpo/fluxo corrompido.
+- **Movimento/posição:** Caído, Enraizado, Ancorado, Deslocado, Gravidade Alterada, Flanqueado, Exposto, Guarda Quebrada.
+- **Recursos:** Fome, Desidratado, Fome de Mana, Fome de Ki, Drenado, Sobrecarga Mágica, Vazio Arcano, Excesso de Ki.
+- **Narrativas/poder:** Instável, Marca do Caos, Eco Temporal, Eco Arcano, Corrompido, Alma Fragmentada, Possuído.
 
-#### 2. Deploy no Vercel
+### Redundâncias que devem ser fundidas ou hierarquizadas
 
-1. Acesse [vercel.com](https://vercel.com)
-2. Clique em **Add New** → **Project**
-3. Selecione seu repositório GitHub
-4. Configure a integração Supabase do Vercel ou adicione as variáveis de ambiente:
-   - `DESORDEM_SUPABASE_URL` = URL do Supabase
-   - `DESORDEM_SUPABASE_SERVICE_ROLE_KEY` = chave service role do Supabase
-   - `DESORDEM_SUPABASE_ANON_KEY` = chave anon, se não usar service role
-5. Clique em **Deploy**
+- Cego e Visão Dupla: manter ambos apenas se Cego for controle pesado e Visão Dupla for penalidade leve.
+- Atordoado, Colapsado e Quebrado Mentalmente: criar uma escala de perda de ação em vez de três efeitos que removem agência de forma parecida.
+- Dominado e Hipnotizado: Hipnotizado deve ser comando limitado; Dominado, controle total e raro.
+- Esgotado e Exausto: manter um como penalidade moderada e outro como estágio grave acumulável.
+- Fome, Fome de Mana e Fome de Ki: manter a família, mas usar o mesmo modelo de drenagem.
+- Sangramento e Sangramento Interno: diferenciar dano visível leve de lesão grave com cura reduzida.
+- Confuso, Paranoico e Alucinado: diferenciar alvo/decisão, cooperação e percepção; caso contrário, fundir em uma progressão mental.
 
-Pronto! Seu site estará disponível em `https://seu-projeto.vercel.app`
+### Condições que faltam
 
-## 💻 Desenvolvimento Local
+Não é necessário criar dezenas de novas condições. As lacunas mais úteis são:
 
-### Pré-requisitos
+- **Amedrontado:** penalidade de aproximação/ataque contra a fonte, sem remover o turno.
+- **Abençoado/Protegido:** condição positiva simples para bônus temporário, caso o jogo precise registrar bênçãos.
+- **Amaldiçoado:** marcador narrativo/mecânico para efeitos persistentes que não são apenas Corrupção.
+- **Concentrando:** condição que identifica manutenção de magia/técnica e o que acontece ao sofrer dano.
 
-- Node.js 20+
-- npm ou yarn
+Essas quatro só devem ser adicionadas se aparecerem em poderes reais. Não criar condições apenas para aumentar o catálogo.
 
-### Instalação
+Quando duas condições cumprem a mesma função, use a hierarquia para escolher um único estágio (por exemplo, Hipnotizado antes de Dominado) em vez de empilhar penalidades equivalentes. A duração, a remoção e a transição entre estágios continuam sob decisão do mestre conforme a cena.
+
+## Campanhas e sincronização
+
+Campanhas e fichas usam a API Express em `/api`, com Supabase como persistência. A aplicação sincroniza periodicamente e também possui botão manual “Atualizar”. O vínculo da campanha fica dentro da ficha, com `campaignId` e `campaignName`, para permitir reconstrução segura em outro dispositivo.
+
+### Supabase
+
+Execute `setup-supabase.sql` no SQL Editor. O script cria `sheets`, `campaigns`, `deleted_sheets`, índices, triggers e políticas RLS. Depois faça redeploy para que os endpoints de campanha estejam disponíveis.
+
+Endpoints de campanha:
+
+- `GET /api/campaigns`
+- `POST /api/campaigns/:id`
+- `PUT /api/campaigns/:id`
+- `DELETE /api/campaigns/:id` — libera automaticamente as fichas associadas.
+
+## Desenvolvimento local
+
+Requer Node.js 20+.
 
 ```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/desordem-fichas.git
-cd desordem-fichas
-
-# Instale as dependências
 npm install
-
-# Configure as variáveis de ambiente
 cp .env.example .env.local
-# Edite .env.local com suas credenciais Supabase
+npm start
 ```
 
-### Variáveis de Ambiente
-
-Crie um arquivo `.env.local` na raiz do projeto:
+Variáveis:
 
 ```env
 DESORDEM_SUPABASE_URL=https://seu-projeto.supabase.co
 DESORDEM_SUPABASE_SERVICE_ROLE_KEY=sua-chave-service-role
 DESORDEM_SUPABASE_ANON_KEY=sua-chave-anonima
 PORT=3000
-NODE_ENV=development
 ```
 
-Os nomes antigos `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ANON_KEY` ainda funcionam para compatibilidade, mas o deploy integrado do Vercel deve usar os nomes com prefixo `DESORDEM_`.
-Se a integração fornecer `DESORDEM_SUPABASE_SECRET_KEY` em vez de `DESORDEM_SUPABASE_SERVICE_ROLE_KEY`, o backend também aceita esse nome.
+Os nomes antigos `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_ANON_KEY` continuam aceitos.
 
-### Executar Localmente
+## Testes e auditoria
 
 ```bash
-npm start
+node --check app.js
+node --check server.js
+node test-selfcheck.js
+node tools/playtest-1000.js
 ```
 
-O servidor iniciará em `http://localhost:3000`
+## Estrutura
 
-## 📱 Como Usar
-
-### Criar uma Nova Ficha
-
-1. Clique em **Nova Ficha**
-2. Preencha o nome do personagem, classe e descrição
-3. Clique em **Criar**
-
-### Editar Ficha
-
-1. Selecione a ficha na lista inicial
-2. Modifique os atributos, perícias e equipamentos
-3. As mudanças são salvas automaticamente
-
-### Biblioteca
-
-- **Itens**: Equipamentos, armas, armaduras
-- **Magias**: Magias arcanas (Mago/Híbrido)
-- **Ki**: Técnicas de ki (Ki/Híbrido)
-
-## 🏗️ Arquitetura
-
+```text
+app.js                 # interface, ficha, campanhas e simulação
+server.js              # API Express + Supabase
+api/[...path].js       # entrada serverless da Vercel
+styles.css             # interface
+setup-supabase.sql     # schema, RLS e triggers
+tools/playtest-1000.js # bateria determinística de duelos
+Sistema/               # wiki e catálogos CSV/HTML
 ```
-desordem-fichas/
-├── app.js                 # Aplicação browser (SPA)
-├── server.js              # Backend Node.js + Express
-├── api/[...path].js       # Entrada da API no Vercel
-├── index.html             # Página principal
-├── styles.css             # Estilos
-├── package.json           # Dependências npm
-├── vercel.json           # Config Vercel
-├── .env.example          # Template variáveis
-└── Sistema/              # Dados da wiki
-```
-
-### Fluxo de Dados
-
-```
-Browser (app.js)
-    ↓ (fetch)
-Server (server.js)
-    ↓ (SQL)
-Supabase (banco de dados)
-```
-
-## 🔄 Sincronização
-
-- **Criação/Edição**: salva automaticamente a cada mudança (com debounce de 350ms)
-- **Listagem pública**: todas as fichas salvas no Supabase aparecem para todos que acessarem o site
-- **Fallback**: Se o Supabase estiver offline, usa `localStorage`
-- **Compatibilidade**: Suporta múltiplos dispositivos/navegadores
-
-## 📦 APIs
-
-### GET `/api/sheets`
-Lista todas as fichas
-
-**Resposta:**
-```json
-[
-  {
-    "id": "123abc",
-    "name": "Aragorn",
-    "className": "Mago",
-    "level": 15,
-    ...
-  }
-]
-```
-
-### GET `/api/sheets/:id`
-Obtém uma ficha específica
-
-### PUT `/api/sheets/:id`
-Atualiza uma ficha
-
-### POST `/api/sheets/:id`
-Cria uma ficha
-
-### DELETE `/api/sheets/:id`
-Deleta uma ficha
-
-## 🐛 Troubleshooting
-
-### "Banco de dados não disponível"
-- Verifique as variáveis de ambiente no Vercel
-- Teste a conexão com Supabase localmente
-- Verifique se `DESORDEM_SUPABASE_URL` e uma chave (`DESORDEM_SUPABASE_SERVICE_ROLE_KEY` ou `DESORDEM_SUPABASE_ANON_KEY`) estão corretas
-
-### Mudanças não são salvas
-- Verifique a aba Network no DevTools
-- Confirme que as variáveis `DESORDEM_SUPABASE_*` estão configuradas no Vercel
-- Verifique o console do browser para erros
-
-### Vercel retorna 502
-- Verifique os logs do Vercel
-- Confirme que `server.js` está exportando a aplicação Express
-- Reinicie o deployment
-
-## 📄 Licença
-
-Este projeto usa dados do sistema Desordem. Respeite os direitos autorais.
-
-## 🤝 Contribuindo
-
-Relatório de bugs e sugestões são bem-vindos! Abra uma issue no GitHub.
-
-## 👤 Autor
-
-Desenvolvido para a comunidade Desordem RPG.
-
----
-
-**Dica**: Para suporte técnico sobre Supabase, visite [supabase.com/docs](https://supabase.com/docs)

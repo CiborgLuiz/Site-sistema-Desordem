@@ -39,3 +39,6 @@ dist/
 
 # Env
 .env
+
+# Auditoria
+AUDITORIA_PLAYTEST_DESORDEM.md
