@@ -81,6 +81,21 @@ async function listSheets() {
     });
 }
 
+async function listCampaigns() {
+  if (!supabase) throw new Error("Supabase não configurado");
+  const { data, error } = await supabase.from("campaigns").select("id,data,created_at,updated_at");
+  if (error) throw new Error(error.message);
+  return (data || []).map((row) => ({ ...(row.data || {}), id: row.id, createdAt: row.data?.createdAt || row.created_at || "", updatedAt: row.data?.updatedAt || row.updated_at || "" }));
+}
+
+async function writeCampaign(id, campaign) {
+  if (!supabase) throw new Error("Supabase não configurado");
+  if (!id || id !== campaign.id) throw new Error("ID inválido para gravação de campanha.");
+  const { error } = await supabase.from("campaigns").upsert({ id, data: campaign }, { onConflict: "id" });
+  if (error) throw new Error(error.message);
+  return campaign;
+}
+
 async function listDeletedSheets() {
   if (!supabase) throw new Error("Supabase não configurado");
 
@@ -192,6 +207,32 @@ apiRouter.get("/sheets", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
+});
+
+apiRouter.get("/campaigns", async (req, res) => {
+  try {
+    if (!supabase) return res.status(503).json({ error: "Banco de dados não disponível" });
+    res.json(await listCampaigns());
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+apiRouter.post("/campaigns/:id", async (req, res) => {
+  try {
+    if (!supabase) return res.status(503).json({ error: "Banco de dados não disponível" });
+    await writeCampaign(req.params.id, req.body);
+    res.status(201).json(req.body);
+  } catch (error) { res.status(400).json({ error: error.message }); }
+});
+
+apiRouter.put("/campaigns/:id", async (req, res) => {
+  try {
+    if (!supabase) return res.status(503).json({ error: "Banco de dados não disponível" });
+    await writeCampaign(req.params.id, req.body);
+    res.json(req.body);
+  } catch (error) { res.status(400).json({ error: error.message }); }
 });
 
 apiRouter.get("/deleted-sheets", async (req, res) => {

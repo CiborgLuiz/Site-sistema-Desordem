@@ -443,8 +443,7 @@ document.addEventListener("click", (event) => {
 
   if (action === "create-campaign") {
     const name = document.querySelector('[data-campaign-field="name"]')?.value.trim() || "Nova campanha";
-    state.campaigns ||= []; state.campaigns.push({ id: uid(), name, description: "", createdAt: new Date().toISOString() });
-    persistNow(); renderApp(); return;
+    createCampaign(name); return;
   }
 
   if (action === "open-campaign") {
@@ -920,7 +919,7 @@ function renderHeader() {
 function renderHome() {
   const activeCampaign = (state.campaigns || []).find((entry) => entry.id === state.activeCampaignId);
   if (state.activeCampaignId && !activeCampaign) state.activeCampaignId = null;
-  const visibleSheets = activeCampaign ? state.sheets.filter((sheet) => sheet.campaignId === activeCampaign.id) : state.sheets;
+  const visibleSheets = activeCampaign ? state.sheets.filter((sheet) => sheet.campaignId === activeCampaign.id) : state.sheets.filter((sheet) => !sheet.campaignId);
   const sheets = visibleSheets.map(renderSheetCard).join("");
   const campaign = activeCampaign;
   const campaignCards = (state.campaigns || []).map((entry) => renderCampaignCard(entry)).join("");
@@ -957,11 +956,11 @@ function renderHome() {
       </form>
       <section class="panel">
         <div class="panel-title">
-          <h2>${escapeHtml(campaign ? campaign.name : "Todas as fichas")}</h2>
+          <h2>${escapeHtml(campaign ? campaign.name : "Fichas sem campanha")}</h2>
           <div class="card-actions">
             <span class="badge ${serverOnline ? "hot" : ""}">${databaseStatusText()}</span>
             <span class="badge hot">${visibleSheets.length} fichas</span>
-            ${campaign ? `<button type="button" class="ghost-button" data-action="clear-campaign">Todas as fichas</button>` : ""}
+            ${campaign ? `<button type="button" class="ghost-button" data-action="clear-campaign">Fichas sem campanha</button>` : ""}
             <button type="button" class="ghost-button" data-action="refresh-sheets">Atualizar</button>
           </div>
         </div>
@@ -2515,6 +2514,12 @@ async function loadState() {
   const local = loadLocalState();
   try {
     const [serverSheets, deletedIds] = await Promise.all([loadServerSheets(), loadDeletedSheets(local.deletedSheets)]);
+    let campaigns = local.campaigns || [];
+    try {
+      const remoteCampaigns = await loadServerCampaigns();
+      campaigns = mergeCampaignLists(local.campaigns || [], remoteCampaigns);
+      await uploadLocalCampaigns(local.campaigns || [], remoteCampaigns);
+    } catch (error) { console.warn("Campanhas do banco indisponíveis; usando cache local.", error); }
     const sheets = mergeSheetLists(local.sheets, serverSheets, deletedIds);
     const uploadResult = await uploadLocalSheetsNewerThanServer(local.sheets, serverSheets);
     serverOnline = true;
@@ -2523,6 +2528,7 @@ async function loadState() {
       ...local,
       deletedSheets: state.deletedSheets,
       sheets,
+      campaigns,
       activeId: sheets.some((sheet) => sheet.id === local.activeId) ? local.activeId : sheets[0]?.id || null,
     };
   } catch (error) {
@@ -2530,6 +2536,31 @@ async function loadState() {
     serverOnline = false;
     lastSyncError = "";
     return local;
+  }
+}
+
+async function loadServerCampaigns() {
+  const response = await apiRequest("/campaigns");
+  const campaigns = await response.json();
+  return Array.isArray(campaigns) ? campaigns : [];
+}
+
+function mergeCampaignLists(localCampaigns, remoteCampaigns) {
+  const map = new Map((remoteCampaigns || []).map((campaign) => [campaign.id, campaign]));
+  for (const campaign of localCampaigns || []) {
+    const remote = map.get(campaign.id);
+    if (!remote || timestampValue(campaign.updatedAt) >= timestampValue(remote.updatedAt)) map.set(campaign.id, campaign);
+  }
+  return [...map.values()].sort((a, b) => timestampValue(b.updatedAt) - timestampValue(a.updatedAt));
+}
+
+async function uploadLocalCampaigns(localCampaigns, remoteCampaigns) {
+  const remote = new Map((remoteCampaigns || []).map((campaign) => [campaign.id, campaign]));
+  for (const campaign of localCampaigns || []) {
+    const serverCampaign = remote.get(campaign.id);
+    if (!serverCampaign || timestampValue(campaign.updatedAt) > timestampValue(serverCampaign.updatedAt)) {
+      await apiRequest(`/campaigns/${encodeURIComponent(campaign.id)}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(campaign) });
+    }
   }
 }
 
@@ -2766,6 +2797,18 @@ function createSheetFromForm() {
   persistNow();
   syncSheetOnServer(sheet);
   renderApp();
+}
+
+async function createCampaign(name) {
+  const campaign = { id: uid(), name, description: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  state.campaigns ||= []; state.campaigns.push(campaign); persistLocalOnly(); renderApp();
+  try {
+    await apiRequest(`/campaigns/${encodeURIComponent(campaign.id)}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(campaign) });
+    serverOnline = true; setSaveStatus("Campanha salva no banco");
+  } catch (error) {
+    console.warn("Campanha salva localmente; banco indisponível.", error);
+    setSaveStatus("Campanha salva localmente");
+  }
 }
 
 function deleteSheet(id) {

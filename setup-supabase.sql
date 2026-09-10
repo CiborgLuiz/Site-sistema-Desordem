@@ -32,6 +32,39 @@ END $$;
 
 CREATE INDEX IF NOT EXISTS idx_sheets_updated_at ON public.sheets(updated_at DESC);
 
+-- Campanhas compartilhadas: a ficha continua em sheets, e campaign_id fica
+-- dentro do JSON da ficha para manter compatibilidade com versões antigas.
+CREATE TABLE IF NOT EXISTS public.campaigns (
+  id TEXT PRIMARY KEY,
+  data JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_campaigns_updated_at ON public.campaigns(updated_at DESC);
+
+CREATE OR REPLACE FUNCTION public.set_campaigns_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_campaigns_updated_at ON public.campaigns;
+CREATE TRIGGER set_campaigns_updated_at
+BEFORE UPDATE ON public.campaigns
+FOR EACH ROW
+EXECUTE FUNCTION public.set_campaigns_updated_at();
+
+ALTER TABLE public.campaigns ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Campaigns are readable by everyone" ON public.campaigns;
+DROP POLICY IF EXISTS "Campaigns can be created by everyone" ON public.campaigns;
+DROP POLICY IF EXISTS "Campaigns can be updated by everyone" ON public.campaigns;
+CREATE POLICY "Campaigns are readable by everyone" ON public.campaigns FOR SELECT USING (true);
+CREATE POLICY "Campaigns can be created by everyone" ON public.campaigns FOR INSERT WITH CHECK (true);
+CREATE POLICY "Campaigns can be updated by everyone" ON public.campaigns FOR UPDATE USING (true) WITH CHECK (true);
+
 CREATE OR REPLACE FUNCTION public.set_sheets_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
