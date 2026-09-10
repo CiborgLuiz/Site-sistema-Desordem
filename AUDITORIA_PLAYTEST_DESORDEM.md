@@ -167,7 +167,7 @@ O próximo salto não é adicionar mais dano: é estruturar poderes não-danosos
 
 ## 10. Revisão completa de coerência e escopo
 
-Esta revisão considera o sistema como ele funciona hoje: ficha operacional, 4 classes, 16 subclasses, 23 perícias, 17 posturas, 292 equipamentos, 66 condições, 26 magias arcanas, 29 técnicas de Ki e 55 poderes especiais.
+Esta revisão considera o sistema como ele funciona hoje: ficha operacional, 4 classes, 16 subclasses, 30 perícias, 17 posturas, 292 equipamentos, 66 condições, 26 magias arcanas, 29 técnicas de Ki e 55 poderes especiais.
 
 ### Regras que precisam ser criadas
 

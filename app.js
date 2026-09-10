@@ -72,10 +72,18 @@ const SKILLS = [
   { key: "percepcao", label: "Percepção", attr: "wisdom" },
   { key: "sobrevivencia", label: "Sobrevivência", attr: "wisdom" },
   { key: "cura", label: "Cura", attr: "wisdom" },
+  { key: "religiao", label: "Religião", attr: "wisdom" },
+  { key: "medicina", label: "Medicina", attr: "wisdom" },
+  { key: "natureza", label: "Natureza", attr: "intelligence" },
+  { key: "navegacao", label: "Navegação", attr: "wisdom" },
   { key: "jogatina", label: "Jogatina", attr: "charisma" },
   { key: "persuasao", label: "Persuasão", attr: "charisma" },
   { key: "enganacao", label: "Enganação", attr: "charisma" },
   { key: "diplomacia", label: "Diplomacia", attr: "charisma" },
+  { key: "intimidacao", label: "Intimidação", attr: "charisma" },
+  { key: "adestramento", label: "Adestramento de animais", attr: "charisma" },
+  { key: "etiqueta", label: "Etiqueta", attr: "charisma" },
+  { key: "oficio", label: "Ofício", attr: "intelligence" },
 ];
 
 const RESOURCES = [

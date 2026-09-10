@@ -20,5 +20,12 @@ Diplomacia,Carisma,,"Negociação, conciliação e condução social favorável.
 Enganação,Carisma,,"Mentir, blefar, distrair e conduzir falsas leituras.",Social
 Persuasão,Carisma,,"Convencer, liderar, negociar e mover pessoas sem coerção direta.",Social
 Jogatina,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Blefar, ler apostas, manipular mesa e ganhar vantagem em jogos de risco.",Social
-Tática de Sobrevivência,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Ler terreno hostil, improvisar rota segura, administrar recursos e manter o grupo vivo.",Técnica
 Iniciativa,Destreza,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Determina velocidade de resposta, abertura de turno e leitura imediata de combate.",Técnica
+Religião,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Reconhecer crenças, ritos, símbolos, entidades e práticas espirituais.",Mental
+Medicina,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Diagnosticar ferimentos, estabilizar aliados, tratar doenças e conduzir primeiros socorros.",Técnica
+Natureza,Inteligência,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Identificar fauna, flora, fenômenos naturais e riscos ambientais.",Conhecimento
+Navegação,Sabedoria,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Orientar-se, traçar rotas, ler mapas, estrelas e condições de viagem.",Técnica
+Intimidação,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Pressionar, ameaçar e impor presença sem depender de violência direta.",Social
+Adestramento de animais,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Acalmar, conduzir, ensinar e interpretar animais e criaturas treináveis.",Social
+Etiqueta,Carisma,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Conhecer costumes, protocolos, hierarquias e comportamento adequado em sociedades.",Social
+Ofício,Inteligência,Modificador do atributo-chave + piso do Nível/2 + 5 se treinado.,"Executar uma profissão ou especialidade prática escolhida pelo personagem.",Técnica
