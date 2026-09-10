@@ -96,6 +96,20 @@ async function writeCampaign(id, campaign) {
   return campaign;
 }
 
+async function deleteCampaignRecord(id) {
+  if (!supabase) throw new Error("Supabase não configurado");
+  const { data: rows, error: listError } = await supabase.from("sheets").select("id,data");
+  if (listError) throw new Error(listError.message);
+  for (const row of rows || []) {
+    const sheet = row.data && typeof row.data === "object" ? { ...row.data } : {};
+    if (sheet.campaignId !== id) continue;
+    sheet.campaignId = "";
+    await writeSheet(row.id, sheet);
+  }
+  const { error } = await supabase.from("campaigns").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
 async function listDeletedSheets() {
   if (!supabase) throw new Error("Supabase não configurado");
 
@@ -232,6 +246,14 @@ apiRouter.put("/campaigns/:id", async (req, res) => {
     if (!supabase) return res.status(503).json({ error: "Banco de dados não disponível" });
     await writeCampaign(req.params.id, req.body);
     res.json(req.body);
+  } catch (error) { res.status(400).json({ error: error.message }); }
+});
+
+apiRouter.delete("/campaigns/:id", async (req, res) => {
+  try {
+    if (!supabase) return res.status(503).json({ error: "Banco de dados não disponível" });
+    await deleteCampaignRecord(req.params.id);
+    res.status(204).end();
   } catch (error) { res.status(400).json({ error: error.message }); }
 });
 

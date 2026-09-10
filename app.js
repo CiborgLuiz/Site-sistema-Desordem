@@ -457,6 +457,10 @@ document.addEventListener("click", (event) => {
     state.activeCampaignId = null; persistLocalOnly(); renderApp(); return;
   }
 
+  if (action === "delete-campaign") {
+    deleteCampaign(button.dataset.id); return;
+  }
+
   if (action === "move-sheet-campaign") {
     const targetSheet = state.sheets.find((entry) => entry.id === button.dataset.sheetId);
     if (targetSheet) { targetSheet.campaignId = button.dataset.campaignId || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
@@ -1142,7 +1146,7 @@ function renderSheetCard(sheet) {
 
 function renderCampaignCard(campaign) {
   const count = state.sheets.filter((sheet) => sheet.campaignId === campaign.id).length;
-  return `<article class="campaign-card"><h3>${escapeHtml(campaign.name)}</h3><span class="tiny">${count} ficha(s)</span><div class="card-actions"><button type="button" class="primary-button" data-action="open-campaign" data-id="${escapeAttr(campaign.id)}">Abrir campanha</button></div></article>`;
+  return `<article class="campaign-card"><h3>${escapeHtml(campaign.name)}</h3><span class="tiny">${count} ficha(s)</span><div class="card-actions"><button type="button" class="primary-button" data-action="open-campaign" data-id="${escapeAttr(campaign.id)}">Abrir campanha</button><button type="button" class="danger-button" data-action="delete-campaign" data-id="${escapeAttr(campaign.id)}">Excluir</button></div></article>`;
 }
 
 function renderEditor(sheet) {
@@ -2658,7 +2662,9 @@ async function refreshSheetsFromServer() {
   try {
     setSaveStatus("Atualizando...");
     const localSheets = state.sheets;
-    const [serverSheets, deletedIds, serverCampaigns] = await Promise.all([loadServerSheets(), loadDeletedSheets(), loadServerCampaigns()]);
+    const [serverSheets, deletedIds] = await Promise.all([loadServerSheets(), loadDeletedSheets()]);
+    let serverCampaigns = state.campaigns || [];
+    try { serverCampaigns = await loadServerCampaigns(); } catch (error) { console.warn("Campanhas indisponíveis durante atualização.", error); }
     const sheets = mergeSheetLists(localSheets, serverSheets, deletedIds);
     serverOnline = true;
     state.sheets = sheets;
@@ -2683,11 +2689,9 @@ async function refreshSheetsFromServer() {
 
 async function refreshSharedStateSilently() {
   try {
-    const [serverSheets, deletedIds, serverCampaigns] = await Promise.all([
-      loadServerSheets(),
-      loadDeletedSheets(state.deletedSheets),
-      loadServerCampaigns(),
-    ]);
+    const [serverSheets, deletedIds] = await Promise.all([loadServerSheets(), loadDeletedSheets(state.deletedSheets)]);
+    let serverCampaigns = state.campaigns || [];
+    try { serverCampaigns = await loadServerCampaigns(); } catch (error) { console.warn("Campanhas indisponíveis durante sincronização.", error); }
     const nextSheets = mergeSheetLists(state.sheets, serverSheets, deletedIds);
     const nextCampaigns = mergeCampaignLists(state.campaigns || [], serverCampaigns);
     const sheetsChanged = JSON.stringify(nextSheets) !== JSON.stringify(state.sheets);
@@ -2836,6 +2840,25 @@ async function createCampaign(name) {
   } catch (error) {
     console.warn("Campanha salva localmente; banco indisponível.", error);
     setSaveStatus("Campanha salva localmente");
+  }
+}
+
+async function deleteCampaign(id) {
+  const campaign = (state.campaigns || []).find((entry) => entry.id === id);
+  if (!campaign || !window.confirm(`Excluir a campanha "${campaign.name}"? As fichas serão movidas para sem campanha.`)) return;
+  state.sheets = state.sheets.map((sheet) => sheet.campaignId === id ? { ...sheet, campaignId: "" } : sheet);
+  state.campaigns = state.campaigns.filter((entry) => entry.id !== id);
+  if (state.activeCampaignId === id) state.activeCampaignId = null;
+  persistLocalOnly(); renderApp();
+  try {
+    await apiRequest(`/campaigns/${encodeURIComponent(id)}`, { method: "DELETE" });
+    for (const sheet of state.sheets.filter((entry) => !entry.campaignId)) {
+      if (sheet.updatedAt) await saveSheetOnServer(sheet);
+    }
+    serverOnline = true; setSaveStatus("Campanha excluída e fichas liberadas");
+  } catch (error) {
+    console.warn("Campanha removida localmente; banco pendente.", error);
+    setSaveStatus("Campanha removida localmente; sincronização pendente");
   }
 }
 

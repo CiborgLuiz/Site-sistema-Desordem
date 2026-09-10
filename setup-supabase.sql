@@ -61,9 +61,11 @@ ALTER TABLE public.campaigns ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Campaigns are readable by everyone" ON public.campaigns;
 DROP POLICY IF EXISTS "Campaigns can be created by everyone" ON public.campaigns;
 DROP POLICY IF EXISTS "Campaigns can be updated by everyone" ON public.campaigns;
+DROP POLICY IF EXISTS "Campaigns can be deleted by everyone" ON public.campaigns;
 CREATE POLICY "Campaigns are readable by everyone" ON public.campaigns FOR SELECT USING (true);
 CREATE POLICY "Campaigns can be created by everyone" ON public.campaigns FOR INSERT WITH CHECK (true);
 CREATE POLICY "Campaigns can be updated by everyone" ON public.campaigns FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Campaigns can be deleted by everyone" ON public.campaigns FOR DELETE USING (true);
 
 CREATE OR REPLACE FUNCTION public.set_sheets_updated_at()
 RETURNS TRIGGER AS $$
