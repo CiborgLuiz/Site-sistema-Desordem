@@ -245,6 +245,7 @@ const EDITOR_TABS = [
   { key: "poderes", label: "Poderes" },
   { key: "modificadores", label: "Modificadores" },
   { key: "estatisticas", label: "Estatística" },
+  { key: "simulacao", label: "Simulação" },
 ];
 
 const LIBRARY_TABS = [
@@ -272,7 +273,7 @@ const ALLOWED_TIER_CATEGORIES = new Set(["básico", "basico", "intermediário", 
 const POSTURE_RULES = {
   Neutra: { label: "Neutra" },
   "Postura Ofensiva": { attrPct: { strength: 20, dexterity: 20 }, defensePct: -15 },
-  "Postura Defensiva": { defensePct: 20, attrPct: { strength: -15 } },
+  "Postura Defensiva": { defensePct: 20 },
   "Postura de Caçador": { conditionalDamagePct: 15, survivalSkillPct: 20 },
   "Postura Estratégica": { mentalSkillPct: 20, damagePct: -10 },
   "Postura Impulsiva": { damagePct: 15, critPct: 15 },
@@ -356,6 +357,8 @@ function getInitialState() {
     wikiSearch: "",
     statObjectWeight: "",
     deletedSheets: [],
+    simulation: { count: 100, enemyMode: "free", enemyId: "", side: "player" },
+    simulationResult: null,
   };
 }
 
@@ -425,10 +428,24 @@ document.addEventListener("click", (event) => {
 
   if (!sheet) return;
 
+  if (target.matches("[data-sim-config]")) {
+    state.simulation ||= { count: 100, enemyMode: "free", enemyId: "", side: "player" };
+    const key = target.dataset.simConfig;
+    state.simulation[key] = key === "count" ? clamp(parseNumber(target.value, 100), 1, 10000) : target.value;
+    persistLocalOnly();
+    if (key === "enemyMode") renderApp();
+    return;
+  }
+
   if (action === "switch-tab") {
     state.activeTab = button.dataset.tab;
     persistNow();
     renderApp();
+    return;
+  }
+
+  if (action === "run-simulation") {
+    runSheetSimulation(sheet);
     return;
   }
 
@@ -1077,6 +1094,7 @@ function renderEditor(sheet) {
       ${renderAbilitiesTab(sheet)}
       ${renderModifiersTab(sheet)}
       ${renderStatsTab(sheet)}
+      ${renderSimulationTab(sheet)}
     </section>
   `;
 }
@@ -1144,7 +1162,7 @@ function renderSheetTab(sheet) {
         <div class="panel-title">
           <h3>Atributos</h3>
           <div class="skill-summary" data-attribute-summary>
-            <span class="badge hot" data-calc="attribute-budget">0/${INITIAL_ATTRIBUTE_POINTS}</span>
+            <span class="badge hot" data-calc="attribute-budget">0/${attributeBudgetFor(sheet)}</span>
             <span class="tiny">Base padrão 0. Modificador = piso((valor - 10) / 2)</span>
           </div>
         </div>
@@ -1646,7 +1664,7 @@ function renderStatsTab(sheet) {
             <li>Mana: ${rules.usesMana ? "sim" : "não"}; Ki: ${rules.usesKi ? "sim" : "não"}</li>
             <li>Perfil da classe fica na cor da classe; atributos finais ficam em linha clara.</li>
             <li data-calc="subclass-summary">Subclasses 0/0</li>
-            <li data-calc="attribute-budget">0/${INITIAL_ATTRIBUTE_POINTS}</li>
+            <li data-calc="attribute-budget">0/${attributeBudgetFor(sheet)}</li>
           </ul>
           <div class="stats-grid">
             <div class="stat-box"><span>Bônus de dano</span><strong data-calc="damage-bonus">0%</strong></div>
@@ -1676,6 +1694,88 @@ function renderStatsTab(sheet) {
       </div>
     </section>
   `;
+}
+
+function renderSimulationTab(sheet) {
+  const others = state.sheets.filter((entry) => entry.id !== sheet.id);
+  const cfg = state.simulation || { count: 100, enemyMode: "free", enemyId: "", side: "player" };
+  const result = state.simulationResult;
+  return `
+    <section class="tab-panel ${state.activeTab === "simulacao" ? "active" : ""}" data-panel="simulacao">
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title"><h3>Simulação de combate</h3><span class="badge">Sem alterar fichas</span></div>
+          <p class="tiny">Use fichas criadas ou gere inimigos hipotéticos. Resistências e imunidades entram no cálculo, mas não são reveladas como informação do alvo.</p>
+          <label class="field"><span>Número de simulações</span><input type="number" min="1" max="10000" data-sim-config="count" value="${escapeAttr(cfg.count || 100)}" /></label>
+          <label class="field"><span>Oponente</span><select data-sim-config="enemyMode"><option value="free" ${cfg.enemyMode === "free" ? "selected" : ""}>Inimigo hipotético (cenários variados)</option><option value="sheet" ${cfg.enemyMode === "sheet" ? "selected" : ""}>Ficha existente</option></select></label>
+          <label class="field" data-sim-sheet-wrap ${cfg.enemyMode !== "sheet" ? "hidden" : ""}><span>Ficha oponente</span><select data-sim-config="enemyId">${others.map((entry) => `<option value="${escapeAttr(entry.id)}" ${cfg.enemyId === entry.id ? "selected" : ""}>${escapeHtml(entry.name || entry.className)}</option>`).join("") || `<option value="">Nenhuma outra ficha</option>`}</select></label>
+          <button type="button" class="primary-button" data-action="run-simulation">Executar simulação</button>
+          <p class="tiny">A simulação considera classe, nível, atributos, subclasse registrada e postura da ficha. Poderes especiais ficam fora.</p>
+        </div>
+        <div class="panel simulation-results">
+          ${result ? renderSimulationResult(result) : `<div class="empty-state">Execute uma simulação para ver vitórias, duração, acertos e críticos.</div>`}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderSimulationResult(result) {
+  const max = Math.max(1, ...Object.values(result.wins || {}));
+  return `<div class="panel-title"><h3>Resultado</h3><span class="badge">${formatNumber(result.total)} testes</span></div>
+    <div class="stats-grid"><div class="stat-box"><span>Vitórias da ficha</span><strong>${formatNumber(result.wins.player || 0)}</strong></div><div class="stat-box"><span>Vitórias oponente</span><strong>${formatNumber(result.wins.enemy || 0)}</strong></div><div class="stat-box"><span>Empates</span><strong>${formatNumber(result.draws || 0)}</strong></div><div class="stat-box"><span>Rodadas médias</span><strong>${formatNumber(result.avgRounds, 2)}</strong></div><div class="stat-box"><span>Críticos</span><strong>${formatNumber(result.crits)}</strong></div><div class="stat-box"><span>Acertos</span><strong>${formatNumber(result.hits)}</strong></div></div>
+    <div class="simulation-bars">${Object.entries(result.wins || {}).map(([key, value]) => `<div class="simulation-bar-row"><span>${escapeHtml(key === "player" ? "Ficha" : key === "enemy" ? "Oponente" : key)}</span><div class="simulation-bar"><i style="width:${Math.round((value / max) * 100)}%"></i></div><strong>${formatNumber(value)}</strong></div>`).join("")}</div>
+    <p class="tiny">A ficha não recebe informação oculta sobre resistência/imunidade; o resultado apenas agrega os testes.</p>`;
+}
+
+function simulationFighter(sheet, calc, enemy = false, variant = 0) {
+  const main = sheet.className === "Ki" ? "wisdom" : sheet.className === "Restrição Celestial" ? "strength" : "intelligence";
+  const attackSkill = calc.skills[sheet.className === "Ki" || sheet.className === "Restrição Celestial" ? "luta" : "misticismo"] || 0;
+  const subclassPower = (calc.subclassTotal || 0) * (enemy ? 0.4 : 0.6);
+  const powerDamage = (sheet.abilities || []).filter((ability) => ability.active !== false).reduce((sum, ability) => sum + averageAbilityDamage(ability), 0);
+  const effectBonus = (sheet.abilities || []).filter((ability) => ability.active !== false).reduce((sum, ability) => sum + abilityEffectScore(ability), 0);
+  const damage = Math.max(1, 4 + (calc.attrMods[main] || 0) + subclassPower + powerDamage + effectBonus);
+  return { hp: Math.max(1, calc.resources.hp + effectBonus), defense: Math.max(1, calc.resources.defense + effectBonus), attack: attackSkill + Math.floor(subclassPower / 2) + Math.floor(effectBonus / 2), damage, resistance: enemy && variant % 3 === 0 ? 0.5 : 1, immunity: enemy && variant % 11 === 0 };
+}
+
+function averageAbilityDamage(ability) {
+  const text = String(ability.damage || "");
+  const dice = [...text.matchAll(/(\d+)d(\d+)/gi)];
+  if (!dice.length) return 0;
+  return dice.reduce((sum, match) => sum + Number(match[1]) * (Number(match[2]) + 1) / 2, 0);
+}
+
+function abilityEffectScore(ability) {
+  const text = normalizeText(`${ability.bonus || ""} ${ability.effect || ""} ${ability.note || ""}`);
+  let score = 0;
+  if (/(defesa|resistencia|barreira|escudo)/.test(text)) score += 2;
+  if (/(atordo|imobil|cego|silencio|lentida|paralis|domina|controle)/.test(text)) score += 2;
+  if (/(cura|regenera|vida|reduz dano)/.test(text)) score += 2;
+  return score;
+}
+
+function runSheetSimulation(sheet) {
+  const cfg = state.simulation || { count: 100, enemyMode: "free", enemyId: "" };
+  const count = clamp(parseNumber(cfg.count, 100), 1, 10000);
+  const enemySheet = cfg.enemyMode === "sheet" ? state.sheets.find((entry) => entry.id === cfg.enemyId) : null;
+  const playerCalc = calculateSheet(sheet);
+  const result = { total: count, wins: { player: 0, enemy: 0 }, draws: 0, rounds: 0, hits: 0, crits: 0, hiddenMitigations: 0, subclassLevel: playerCalc.subclassTotal || 0 };
+  let seed = 0x51a7e;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const roll = () => Math.floor(rand() * 20) + 1;
+  for (let i = 0; i < count; i++) {
+    const enemy = enemySheet ? simulationFighter(enemySheet, calculateSheet(enemySheet), true, i) : { hp: Math.max(1, Math.floor(playerCalc.resources.hp * (0.8 + (i % 5) * 0.1))), defense: Math.max(1, playerCalc.resources.defense + (i % 9) - 4), attack: playerCalc.skills.misticismo + (i % 7) - 3, damage: Math.max(1, playerCalc.resources.hp / (8 + (i % 5))), resistance: i % 3 === 0 ? 0.5 : 1, immunity: i % 11 === 0 };
+    const player = simulationFighter(sheet, playerCalc, false, i); let hpP = player.hp, hpE = enemy.hp, turns = 0;
+    while (hpP > 0 && hpE > 0 && turns < 100) {
+      turns++;
+      const pRoll = roll(); if (pRoll === 20 || pRoll + player.attack >= enemy.defense) { result.hits++; const amount = player.damage + 3 + Math.floor(rand() * 6) + (pRoll === 20 ? 3 + Math.floor(rand() * 6) : 0); if (pRoll === 20) result.crits++; if (!enemy.immunity) hpE -= amount * enemy.resistance; else result.hiddenMitigations++; }
+      if (hpE <= 0) break;
+      const eRoll = roll(); if (eRoll === 20 || eRoll + enemy.attack >= player.defense) { result.hits++; hpP -= enemy.damage + 3 + Math.floor(rand() * 6) + (eRoll === 20 ? 3 + Math.floor(rand() * 6) : 0); if (eRoll === 20) result.crits++; }
+    }
+    result.rounds += turns; if (hpP <= 0 && hpE <= 0) result.draws++; else if (hpE <= 0) result.wins.player++; else if (hpP <= 0) result.wins.enemy++; else result.draws++;
+  }
+  result.avgRounds = result.rounds / count;
+  state.simulationResult = result; state.activeTab = "simulacao"; persistLocalOnly(); renderApp();
 }
 
 function renderLibraryListOnly() {
@@ -1913,6 +2013,13 @@ function normalizeAbility(ability) {
     value: parseNumber(ability.value, 0),
     active: ability.active !== false,
     source: ability.source || "",
+    action: ability.action || "",
+    duration: ability.duration || "",
+    effect: ability.effect || "",
+    scaling: ability.scaling || "",
+    usageLimit: ability.usageLimit || "",
+    risk: ability.risk || "",
+    category: ability.category || "",
   };
   if (normalizeText(normalized.source) === "padrao" && normalizeText(normalized.name) === "raio de mana") {
     normalized.cost = "4 Mana";
@@ -1975,6 +2082,8 @@ function loadLocalState() {
       wikiSearch: raw.wikiSearch || "",
       statObjectWeight: raw.statObjectWeight || "",
       deletedSheets: Array.isArray(raw.deletedSheets) ? raw.deletedSheets : [],
+      simulation: raw.simulation || { count: 100, enemyMode: "free", enemyId: "", side: "player" },
+      simulationResult: null,
     };
   } catch (error) {
     console.error(error);
@@ -2569,11 +2678,17 @@ function getAttributeBaseSpent(sheet) {
 
 function enforceAttributeBudget(sheet, currentAttr, input) {
   const total = getAttributeBaseSpent(sheet);
-  if (total <= INITIAL_ATTRIBUTE_POINTS) return;
-  const excess = total - INITIAL_ATTRIBUTE_POINTS;
+  const budget = attributeBudgetFor(sheet);
+  if (total <= budget) return;
+  const excess = total - budget;
   const current = Math.max(0, parseNumber(sheet.attributes[currentAttr]?.base, 0));
   sheet.attributes[currentAttr].base = Math.max(0, current - excess);
   input.value = sheet.attributes[currentAttr].base;
+}
+
+function attributeBudgetFor(sheet) {
+  const level = clamp(parseNumber(sheet?.level, 1), 1, MAX_LEVEL);
+  return INITIAL_ATTRIBUTE_POINTS + (sheet?.className === "Restrição Celestial" ? level : 0);
 }
 
 function applyPostureSkillBonus(skills, posture) {
@@ -3027,7 +3142,7 @@ function refreshCalculations() {
   const trainedText = `Treinadas ${calc.trainedCount}/${calc.trainedMax}`;
   setCalc("trained-summary", trainedText);
   setCalc("subclass-summary", `Subclasses ${formatNumber(calc.subclassTotal)}/${formatNumber(calc.subclassMax)}`);
-  setCalc("attribute-budget", `Atributos ${formatNumber(calc.attributeBaseSpent)}/${INITIAL_ATTRIBUTE_POINTS}`);
+  setCalc("attribute-budget", `Atributos ${formatNumber(calc.attributeBaseSpent)}/${attributeBudgetFor(sheet)}`);
   setCalc("equipped-defense", `Defesa equipada ${signed(calc.equippedDefense)}`);
   setCalc("damage-bonus", `${signed(calc.combatStats.damagePct)}%`);
   setCalc("crit-bonus", `${signed(calc.combatStats.critPct)}%`);
@@ -3052,7 +3167,7 @@ function refreshCalculations() {
     node.classList.toggle("over-limit", calc.trainedCount > calc.trainedMax);
   });
   document.querySelectorAll("[data-attribute-summary]").forEach((node) => {
-    node.classList.toggle("over-limit", calc.attributeBaseSpent > INITIAL_ATTRIBUTE_POINTS);
+    node.classList.toggle("over-limit", calc.attributeBaseSpent > attributeBudgetFor(sheet));
   });
 
   for (const [itemId, damage] of Object.entries(calc.inventoryDamage)) {
@@ -3351,6 +3466,13 @@ function addAbilityFromLibrary(sheet, sourceKey, sourceIndex) {
     value: detected.value,
     active: Boolean(detected.target),
     source: DATA_SOURCES[sourceKey]?.label || "Wiki",
+    action: row.Ação || row["Tipo de Ação"] || "",
+    duration: row.Duração || "",
+    effect: cleanWikiText(row.Efeito || row["Efeito mecânico"] || row["Efeito secundário"] || ""),
+    scaling: cleanWikiText(row.Escalonamento || ""),
+    usageLimit: cleanWikiText(row["Limite de uso"] || ""),
+    risk: cleanWikiText(row.Risco || row.Penalidade || row["Desvantagem grave"] || ""),
+    category: cleanWikiText(row.Categoria || row.Tipo || ""),
   });
   touchAndRender(sheet);
 }

@@ -449,6 +449,13 @@ input[type="checkbox"] {
   display: none;
 }
 
+.simulation-results .stats-grid { margin-top: 1rem; }
+.simulation-bars { display: grid; gap: .65rem; margin-top: 1rem; }
+.simulation-bar-row { display: grid; grid-template-columns: 7rem 1fr 3rem; gap: .55rem; align-items: center; font-size: .85rem; }
+.simulation-bar { height: .65rem; background: var(--panel-muted, #20252d); border-radius: 999px; overflow: hidden; }
+.simulation-bar i { display: block; height: 100%; background: var(--accent, #ff1742); border-radius: inherit; }
+[data-sim-sheet-wrap].hidden { display: none; }
+
 .tab-panel.active {
   display: grid;
   gap: 1rem;
