@@ -463,7 +463,7 @@ document.addEventListener("click", (event) => {
 
   if (action === "move-sheet-campaign") {
     const targetSheet = state.sheets.find((entry) => entry.id === button.dataset.sheetId);
-    if (targetSheet) { targetSheet.campaignId = button.dataset.campaignId || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
+    if (targetSheet) { targetSheet.campaignId = button.dataset.campaignId || ""; targetSheet.campaignName = (state.campaigns || []).find((entry) => entry.id === targetSheet.campaignId)?.name || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
     return;
   }
 
@@ -625,7 +625,7 @@ document.addEventListener("input", (event) => {
 
   if (target.matches("[data-sheet-campaign]")) {
     const targetSheet = state.sheets.find((entry) => entry.id === target.dataset.sheetId);
-    if (targetSheet) { targetSheet.campaignId = target.value || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
+    if (targetSheet) { targetSheet.campaignId = target.value || ""; targetSheet.campaignName = (state.campaigns || []).find((entry) => entry.id === targetSheet.campaignId)?.name || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
     return;
   }
 
@@ -783,7 +783,7 @@ document.addEventListener("change", (event) => {
 
   if (target.matches("[data-sheet-campaign]")) {
     const targetSheet = state.sheets.find((entry) => entry.id === target.dataset.sheetId);
-    if (targetSheet) { targetSheet.campaignId = target.value || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
+    if (targetSheet) { targetSheet.campaignId = target.value || ""; targetSheet.campaignName = (state.campaigns || []).find((entry) => entry.id === targetSheet.campaignId)?.name || ""; touchSheet(targetSheet); persistNow(); renderApp(); }
     return;
   }
 
@@ -924,6 +924,7 @@ function renderHeader() {
 }
 
 function renderHome() {
+  ensureCampaignsFromSheets();
   const activeCampaign = (state.campaigns || []).find((entry) => entry.id === state.activeCampaignId);
   if (state.activeCampaignId && !activeCampaign) state.activeCampaignId = null;
   const visibleSheets = activeCampaign ? state.sheets.filter((sheet) => sheet.campaignId === activeCampaign.id) : state.sheets.filter((sheet) => !sheet.campaignId);
@@ -978,6 +979,16 @@ function renderHome() {
       </section>
     </section>
   `;
+}
+
+function ensureCampaignsFromSheets() {
+  state.campaigns ||= [];
+  const known = new Set(state.campaigns.map((campaign) => campaign.id));
+  for (const sheet of state.sheets || []) {
+    if (!sheet.campaignId || known.has(sheet.campaignId)) continue;
+    state.campaigns.push({ id: sheet.campaignId, name: sheet.campaignName || `Campanha sincronizada (${sheet.campaignId.slice(0, 8)})`, description: "Reconstruída a partir do vínculo da ficha.", createdAt: sheet.createdAt || new Date().toISOString(), updatedAt: sheet.updatedAt || new Date().toISOString(), recovered: true });
+    known.add(sheet.campaignId);
+  }
 }
 
 function renderWiki() {
@@ -2171,6 +2182,7 @@ function normalizeSheet(raw) {
   sheet.posture = sheet.posture || "Neutra";
   sheet.localOnly = Boolean(sheet.localOnly);
   sheet.campaignId = sheet.campaignId || "";
+  sheet.campaignName = sheet.campaignName || "";
   sheet.subclasses = Array.isArray(sheet.subclasses) ? sheet.subclasses : [];
   sheet.attributes = sheet.attributes || {};
   for (const attr of ATTRIBUTES) {
@@ -2846,7 +2858,7 @@ async function createCampaign(name) {
 async function deleteCampaign(id) {
   const campaign = (state.campaigns || []).find((entry) => entry.id === id);
   if (!campaign || !window.confirm(`Excluir a campanha "${campaign.name}"? As fichas serão movidas para sem campanha.`)) return;
-  state.sheets = state.sheets.map((sheet) => sheet.campaignId === id ? { ...sheet, campaignId: "" } : sheet);
+  state.sheets = state.sheets.map((sheet) => sheet.campaignId === id ? { ...sheet, campaignId: "", campaignName: "" } : sheet);
   state.campaigns = state.campaigns.filter((entry) => entry.id !== id);
   if (state.activeCampaignId === id) state.activeCampaignId = null;
   persistLocalOnly(); renderApp();
