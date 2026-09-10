@@ -381,6 +381,13 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (action === "open-simulation") {
+    state.view = "simulation";
+    persistNow();
+    renderApp();
+    return;
+  }
+
   if (action === "wiki-home") {
     openWikiPage(WIKI_ROOT_PATH, true);
     return;
@@ -428,15 +435,6 @@ document.addEventListener("click", (event) => {
 
   if (!sheet) return;
 
-  if (target.matches("[data-sim-config]")) {
-    state.simulation ||= { count: 100, enemyMode: "free", enemyId: "", side: "player" };
-    const key = target.dataset.simConfig;
-    state.simulation[key] = key === "count" ? clamp(parseNumber(target.value, 100), 1, 10000) : target.value;
-    persistLocalOnly();
-    if (key === "enemyMode") renderApp();
-    return;
-  }
-
   if (action === "switch-tab") {
     state.activeTab = button.dataset.tab;
     persistNow();
@@ -445,7 +443,8 @@ document.addEventListener("click", (event) => {
   }
 
   if (action === "run-simulation") {
-    runSheetSimulation(sheet);
+    const simulationSheet = sheet || state.sheets[0];
+    if (simulationSheet) runSheetSimulation(simulationSheet);
     return;
   }
 
@@ -600,6 +599,15 @@ document.addEventListener("input", (event) => {
   }
 
   if (!sheet) return;
+
+  if (target.matches("[data-sim-config]")) {
+    state.simulation ||= { count: 100, enemyMode: "free", enemyId: "", side: "player" };
+    const key = target.dataset.simConfig;
+    state.simulation[key] = key === "count" ? clamp(parseNumber(target.value, 100), 1, 10000) : target.value;
+    persistLocalOnly();
+    if (key === "enemyMode") renderApp();
+    return;
+  }
 
   if (target.matches("[data-stat-weight]")) {
     state.statObjectWeight = target.value;
@@ -810,6 +818,7 @@ function renderApp() {
 
 function renderMainContent() {
   if (state.view === "wiki") return renderWiki();
+  if (state.view === "simulation") return renderSimulationPage();
   if (state.view === "editor" && getActiveSheet()) return renderEditor(getActiveSheet());
   return renderHome();
 }
@@ -817,7 +826,7 @@ function renderMainContent() {
 function renderHeader() {
   const sheet = getActiveSheet();
   const isEditing = state.view === "editor" && sheet;
-  const title = state.view === "wiki" ? "Wiki" : isEditing ? escapeHtml(sheet.name || "Ficha sem nome") : "Fichas";
+  const title = state.view === "wiki" ? "Wiki" : state.view === "simulation" ? "Simulação" : isEditing ? escapeHtml(sheet.name || "Ficha sem nome") : "Fichas";
   return `
     <header class="topbar">
       <div class="brand">
@@ -831,6 +840,7 @@ function renderHeader() {
         <span class="save-status" data-save-status>Auto salvo</span>
         <button type="button" class="ghost-button" data-action="go-home">Fichas</button>
         <button type="button" class="ghost-button" data-action="open-wiki">Wiki</button>
+        <button type="button" class="ghost-button" data-action="open-simulation">Simulação</button>
         ${
           isEditing
             ? `<button type="button" class="primary-button" data-action="export-pdf">Exportar PDF</button>`
@@ -1701,7 +1711,7 @@ function renderSimulationTab(sheet) {
   const cfg = state.simulation || { count: 100, enemyMode: "free", enemyId: "", side: "player" };
   const result = state.simulationResult;
   return `
-    <section class="tab-panel ${state.activeTab === "simulacao" ? "active" : ""}" data-panel="simulacao">
+    <section class="tab-panel ${state.view === "simulation" || state.activeTab === "simulacao" ? "active" : ""}" data-panel="simulacao">
       <div class="two-col">
         <div class="panel">
           <div class="panel-title"><h3>Simulação de combate</h3><span class="badge">Sem alterar fichas</span></div>
@@ -1718,6 +1728,12 @@ function renderSimulationTab(sheet) {
       </div>
     </section>
   `;
+}
+
+function renderSimulationPage() {
+  const sheet = getActiveSheet() || state.sheets[0];
+  if (!sheet) return `<section class="panel empty-state"><h2>Simulação</h2><p>Crie pelo menos uma ficha para iniciar simulações.</p><button type="button" class="primary-button" data-action="go-home">Ir para fichas</button></section>`;
+  return `<section class="simulation-page"><div class="panel"><div class="panel-title"><h2>Laboratório de simulação</h2><span class="badge">Ficha ativa: ${escapeHtml(sheet.name || "Sem nome")}</span></div><p class="tiny">Escolha a ficha base no editor ou use a ficha ativa. Resistências e imunidades dos inimigos permanecem ocultas durante o teste.</p></div>${renderSimulationTab(sheet)}</section>`;
 }
 
 function renderSimulationResult(result) {
