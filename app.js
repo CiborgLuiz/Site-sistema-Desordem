@@ -333,6 +333,7 @@ let state = getInitialState();
 let saveTimer = 0;
 let serverOnline = false;
 let lastSyncError = "";
+let sharedSyncTimer = 0;
 
 initializeApp();
 
@@ -346,6 +347,8 @@ async function initializeApp() {
   const persisted = await loadState();
   state = { ...getInitialState(), ...persisted };
   renderApp();
+  if (sharedSyncTimer) window.clearInterval(sharedSyncTimer);
+  sharedSyncTimer = window.setInterval(() => refreshSharedStateSilently(), 10000);
 }
 
 function getInitialState() {
@@ -2655,10 +2658,11 @@ async function refreshSheetsFromServer() {
   try {
     setSaveStatus("Atualizando...");
     const localSheets = state.sheets;
-    const [serverSheets, deletedIds] = await Promise.all([loadServerSheets(), loadDeletedSheets()]);
+    const [serverSheets, deletedIds, serverCampaigns] = await Promise.all([loadServerSheets(), loadDeletedSheets(), loadServerCampaigns()]);
     const sheets = mergeSheetLists(localSheets, serverSheets, deletedIds);
     serverOnline = true;
     state.sheets = sheets;
+    state.campaigns = mergeCampaignLists(state.campaigns || [], serverCampaigns);
     if (!state.sheets.some((sheet) => sheet.id === state.activeId)) {
       state.activeId = state.sheets[0]?.id || null;
       if (!state.activeId) state.view = "home";
@@ -2674,6 +2678,30 @@ async function refreshSheetsFromServer() {
     lastSyncError = "";
     renderApp();
     setSaveStatus("Usando local");
+  }
+}
+
+async function refreshSharedStateSilently() {
+  try {
+    const [serverSheets, deletedIds, serverCampaigns] = await Promise.all([
+      loadServerSheets(),
+      loadDeletedSheets(state.deletedSheets),
+      loadServerCampaigns(),
+    ]);
+    const nextSheets = mergeSheetLists(state.sheets, serverSheets, deletedIds);
+    const nextCampaigns = mergeCampaignLists(state.campaigns || [], serverCampaigns);
+    const sheetsChanged = JSON.stringify(nextSheets) !== JSON.stringify(state.sheets);
+    const campaignsChanged = JSON.stringify(nextCampaigns) !== JSON.stringify(state.campaigns || []);
+    if (!sheetsChanged && !campaignsChanged) return;
+    state.sheets = nextSheets;
+    state.campaigns = nextCampaigns;
+    state.activeId = state.sheets.some((sheet) => sheet.id === state.activeId) ? state.activeId : state.sheets[0]?.id || null;
+    persistLocalOnly();
+    serverOnline = true;
+    if (state.view === "home" || state.view === "simulation") renderApp();
+  } catch (error) {
+    // A poll failure is transient; the current local state remains usable.
+    serverOnline = false;
   }
 }
 
