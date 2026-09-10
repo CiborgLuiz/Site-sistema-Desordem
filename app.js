@@ -245,7 +245,6 @@ const EDITOR_TABS = [
   { key: "poderes", label: "Poderes" },
   { key: "modificadores", label: "Modificadores" },
   { key: "estatisticas", label: "Estatística" },
-  { key: "simulacao", label: "Simulação" },
 ];
 
 const LIBRARY_TABS = [
@@ -357,7 +356,7 @@ function getInitialState() {
     wikiSearch: "",
     statObjectWeight: "",
     deletedSheets: [],
-    simulation: { count: 100, enemyMode: "free", enemyId: "", side: "player" },
+    simulation: { count: 100, side1: [{ mode: "random", sheetId: "", level: 10 }], side2: [{ mode: "random", sheetId: "", level: 10 }] },
     simulationResult: null,
   };
 }
@@ -433,18 +432,29 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (action === "run-simulation") {
+    runTeamSimulation();
+    return;
+  }
+
+  if (action === "add-sim-member" || action === "remove-sim-member") {
+    const side = button.dataset.simSide === "side2" ? "side2" : "side1";
+    state.simulation ||= { count: 100, side1: [], side2: [] };
+    state.simulation[side] ||= [];
+    if (action === "add-sim-member") state.simulation[side].push({ mode: "random", sheetId: "", level: 10 });
+    else {
+      state.simulation[side].splice(Number(button.dataset.index), 1);
+      if (!state.simulation[side].length) state.simulation[side].push({ mode: "random", sheetId: "", level: 10 });
+    }
+    persistLocalOnly(); renderApp(); return;
+  }
+
   if (!sheet) return;
 
   if (action === "switch-tab") {
     state.activeTab = button.dataset.tab;
     persistNow();
     renderApp();
-    return;
-  }
-
-  if (action === "run-simulation") {
-    const simulationSheet = sheet || state.sheets[0];
-    if (simulationSheet) runSheetSimulation(simulationSheet);
     return;
   }
 
@@ -598,16 +608,20 @@ document.addEventListener("input", (event) => {
     return;
   }
 
-  if (!sheet) return;
-
   if (target.matches("[data-sim-config]")) {
-    state.simulation ||= { count: 100, enemyMode: "free", enemyId: "", side: "player" };
+    state.simulation ||= { count: 100, side1: [], side2: [] };
     const key = target.dataset.simConfig;
-    state.simulation[key] = key === "count" ? clamp(parseNumber(target.value, 100), 1, 10000) : target.value;
+    const side = target.dataset.simSide === "side2" ? "side2" : "side1";
+    const index = Number(target.dataset.simIndex);
+    if (key === "count") state.simulation.count = clamp(parseNumber(target.value, 100), 1, 10000);
+    else if (key === "mode" || key === "sheetId") state.simulation[side][index][key] = target.value;
+    else if (key === "level") state.simulation[side][index].level = clamp(parseNumber(target.value, 10), 1, 50);
     persistLocalOnly();
-    if (key === "enemyMode") renderApp();
+    if (key === "mode") renderApp();
     return;
   }
+
+  if (!sheet) return;
 
   if (target.matches("[data-stat-weight]")) {
     state.statObjectWeight = target.value;
@@ -1104,7 +1118,6 @@ function renderEditor(sheet) {
       ${renderAbilitiesTab(sheet)}
       ${renderModifiersTab(sheet)}
       ${renderStatsTab(sheet)}
-      ${renderSimulationTab(sheet)}
     </section>
   `;
 }
@@ -1731,9 +1744,19 @@ function renderSimulationTab(sheet) {
 }
 
 function renderSimulationPage() {
-  const sheet = getActiveSheet() || state.sheets[0];
-  if (!sheet) return `<section class="panel empty-state"><h2>Simulação</h2><p>Crie pelo menos uma ficha para iniciar simulações.</p><button type="button" class="primary-button" data-action="go-home">Ir para fichas</button></section>`;
-  return `<section class="simulation-page"><div class="panel"><div class="panel-title"><h2>Laboratório de simulação</h2><span class="badge">Ficha ativa: ${escapeHtml(sheet.name || "Sem nome")}</span></div><p class="tiny">Escolha a ficha base no editor ou use a ficha ativa. Resistências e imunidades dos inimigos permanecem ocultas durante o teste.</p></div>${renderSimulationTab(sheet)}</section>`;
+  const cfg = normalizeSimulationConfig(state.simulation);
+  state.simulation = cfg;
+  return `<section class="simulation-page"><div class="panel"><div class="panel-title"><h2>Laboratório de simulação</h2><span class="badge">Time 1 × Time 2</span></div><p class="tiny">Adicione quantos combatentes quiser em cada lado. A mesma ficha pode aparecer várias vezes. A iniciativa é 1d20 + Iniciativa e cada combatente escolhe aleatoriamente um alvo inimigo válido.</p><label class="field"><span>Número de simulações</span><input type="number" min="1" max="10000" data-sim-config="count" value="${escapeAttr(cfg.count)}" /></label></div><div class="simulation-teams"><div class="panel"><div class="panel-title"><h3>Time 1</h3><button type="button" class="ghost-button" data-action="add-sim-member" data-sim-side="side1">Adicionar pessoa</button></div>${renderSimulationMembers("side1", cfg.side1)}</div><div class="panel"><div class="panel-title"><h3>Time 2</h3><button type="button" class="ghost-button" data-action="add-sim-member" data-sim-side="side2">Adicionar pessoa</button></div>${renderSimulationMembers("side2", cfg.side2)}</div></div>${state.simulationResult ? renderTeamSimulationResult(state.simulationResult) : `<div class="panel empty-state">Configure os dois times e execute os testes.</div>`}</section>`;
+}
+
+function renderSimulationMembers(side, members) {
+  const sheets = state.sheets;
+  return members.map((member, index) => `<div class="simulation-member"><strong>#${index + 1}</strong><select data-sim-config="mode" data-sim-side="${side}" data-sim-index="${index}"><option value="random" ${member.mode === "random" ? "selected" : ""}>Ficha aleatória por nível</option><option value="sheet" ${member.mode === "sheet" ? "selected" : ""}>Ficha existente</option></select>${member.mode === "sheet" ? `<select data-sim-config="sheetId" data-sim-side="${side}" data-sim-index="${index}">${sheets.map((sheet) => `<option value="${escapeAttr(sheet.id)}" ${member.sheetId === sheet.id ? "selected" : ""}>${escapeHtml(sheet.name || sheet.className)}</option>`).join("") || `<option value="">Nenhuma ficha</option>`}</select>` : ""}<label class="inline-field"><span>Nível</span><input type="number" min="1" max="50" data-sim-config="level" data-sim-side="${side}" data-sim-index="${index}" value="${escapeAttr(member.level || 10)}" /></label><button type="button" class="danger-button" data-action="remove-sim-member" data-sim-side="${side}" data-index="${index}">Remover</button></div>`).join("");
+}
+
+function renderTeamSimulationResult(result) {
+  const total = Math.max(1, result.total);
+  return `<div class="panel simulation-results"><div class="panel-title"><h3>Resultado agregado</h3><span class="badge">${formatNumber(total)} simulações</span></div><div class="stats-grid"><div class="stat-box"><span>Vitórias Time 1</span><strong>${formatNumber(result.wins.side1)}</strong></div><div class="stat-box"><span>Vitórias Time 2</span><strong>${formatNumber(result.wins.side2)}</strong></div><div class="stat-box"><span>Empates</span><strong>${formatNumber(result.draws)}</strong></div><div class="stat-box"><span>Rodadas médias</span><strong>${formatNumber(result.avgRounds)}</strong></div><div class="stat-box"><span>Acertos</span><strong>${formatNumber(result.hits)}</strong></div><div class="stat-box"><span>Críticos</span><strong>${formatNumber(result.crits)}</strong></div></div><h4>Combinações com maior taxa de vitória</h4><ol>${(result.combinations || []).slice(0, 10).map((row) => `<li><strong>${escapeHtml(row.label)}</strong>: ${formatNumber(row.winRate * 100)}% (${row.wins}/${row.tests})</li>`).join("") || "<li>Sem dados suficientes.</li>"}</ol><p class="tiny">Resistências e imunidades são aplicadas internamente e não são reveladas durante a simulação.</p></div>`;
 }
 
 function renderSimulationResult(result) {
@@ -1768,6 +1791,66 @@ function abilityEffectScore(ability) {
   if (/(atordo|imobil|cego|silencio|lentida|paralis|domina|controle)/.test(text)) score += 2;
   if (/(cura|regenera|vida|reduz dano)/.test(text)) score += 2;
   return score;
+}
+
+function runTeamSimulation() {
+  const cfg = normalizeSimulationConfig(state.simulation);
+  state.simulation = cfg;
+  const result = { total: cfg.count, wins: { side1: 0, side2: 0 }, draws: 0, rounds: 0, hits: 0, crits: 0, combinations: [] };
+  const comboMap = new Map(); let seed = 0x6d657461;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const d20 = () => Math.floor(rand() * 20) + 1;
+  for (let test = 0; test < cfg.count; test++) {
+    const side1 = cfg.side1.map((member, index) => makeTeamCombatant(member, test, index, "side1", rand));
+    const side2 = cfg.side2.map((member, index) => makeTeamCombatant(member, test, index, "side2", rand));
+    const label = `${side1.map((f) => `${f.className} Nv${f.level}`).join(" + ")} × ${side2.map((f) => `${f.className} Nv${f.level}`).join(" + ")}`;
+    const duel = simulateTeamFight(side1, side2, d20, rand);
+    result.rounds += duel.rounds; result.hits += duel.hits; result.crits += duel.crits;
+    if (duel.winner === "side1") result.wins.side1++; else if (duel.winner === "side2") result.wins.side2++; else result.draws++;
+    const row = comboMap.get(label) || { label, tests: 0, wins: 0 };
+    row.tests++; if (duel.winner === "side1") row.wins++; comboMap.set(label, row);
+  }
+  result.avgRounds = result.rounds / Math.max(1, result.total);
+  result.combinations = [...comboMap.values()].map((row) => ({ ...row, winRate: row.wins / row.tests })).sort((a, b) => b.winRate - a.winRate || b.tests - a.tests);
+  state.simulationResult = result; state.view = "simulation"; persistLocalOnly(); renderApp();
+}
+
+function makeTeamCombatant(member, test, index, side, rand) {
+  let sheet;
+  if (member.mode === "sheet") {
+    const source = state.sheets.find((entry) => entry.id === member.sheetId) || state.sheets[0];
+    sheet = source ? JSON.parse(JSON.stringify(source)) : createDefaultSheet({ className: "Mago" });
+    sheet.level = clamp(parseNumber(member.level, sheet.level || 1), 1, MAX_LEVEL);
+  } else {
+    const names = Object.keys(CLASS_RULES); const className = names[(test + index + (side === "side2" ? 1 : 0)) % names.length];
+    sheet = createDefaultSheet({ name: `Aleatório ${className}`, className, level: clamp(parseNumber(member.level, 10), 1, MAX_LEVEL) });
+    const profile = CLASS_RULES[className].profile;
+    for (const attr of ATTRIBUTES) sheet.attributes[attr.key].base = profile[attr.key] || 0;
+    if (className === "Restrição Celestial") for (const attr of ATTRIBUTES) sheet.attributes[attr.key].base += Math.floor(sheet.level / ATTRIBUTES.length);
+    if (rand) sheet.posture = rand() < 0.34 ? "Postura Ofensiva" : rand() < 0.5 ? "Postura Defensiva" : "Neutra";
+  }
+  const calc = calculateSheet(sheet); const main = sheet.className === "Ki" ? "wisdom" : sheet.className === "Restrição Celestial" ? "strength" : "intelligence";
+  const attackSkill = calc.skills[sheet.className === "Ki" || sheet.className === "Restrição Celestial" ? "luta" : "misticismo"] || 0;
+  const powerDamage = (sheet.abilities || []).filter((ability) => ability.active !== false).reduce((sum, ability) => sum + averageAbilityDamage(ability), 0);
+  const effectBonus = (sheet.abilities || []).filter((ability) => ability.active !== false).reduce((sum, ability) => sum + abilityEffectScore(ability), 0);
+  return { side, className: sheet.className, level: sheet.level, hp: Math.max(1, calc.resources.hp + effectBonus), defense: Math.max(1, calc.resources.defense + effectBonus), attack: attackSkill + Math.floor((calc.subclassTotal || 0) / 2) + Math.floor(effectBonus / 2), damage: Math.max(1, 4 + (calc.attrMods[main] || 0) + (calc.subclassTotal || 0) * 0.6 + powerDamage + effectBonus), initiative: calc.skills.iniciativa || 0, alive: true };
+}
+
+function simulateTeamFight(side1, side2, d20, rand) {
+  const all = [...side1, ...side2].map((fighter) => ({ ...fighter, initiative: d20() + fighter.initiative }));
+  let rounds = 0, hits = 0, crits = 0;
+  while (side1.some((f) => f.hp > 0) && side2.some((f) => f.hp > 0) && rounds < 100) {
+    rounds++;
+    for (const attacker of [...all].sort((a, b) => b.initiative - a.initiative)) {
+      if (attacker.hp <= 0) continue;
+      const enemies = attacker.side === "side1" ? side2.filter((f) => f.hp > 0) : side1.filter((f) => f.hp > 0);
+      if (!enemies.length) break;
+      const target = enemies[Math.floor(rand() * enemies.length)]; const roll = d20();
+      if (roll === 20 || roll + attacker.attack >= target.defense) { hits++; if (roll === 20) crits++; const damage = attacker.damage + 3 + Math.floor(rand() * 6) + (roll === 20 ? 3 + Math.floor(rand() * 6) : 0); target.hp -= damage; }
+    }
+  }
+  const alive1 = side1.some((f) => f.hp > 0), alive2 = side2.some((f) => f.hp > 0);
+  return { winner: alive1 && !alive2 ? "side1" : alive2 && !alive1 ? "side2" : "draw", rounds, hits, crits };
 }
 
 function runSheetSimulation(sheet) {
@@ -2098,7 +2181,7 @@ function loadLocalState() {
       wikiSearch: raw.wikiSearch || "",
       statObjectWeight: raw.statObjectWeight || "",
       deletedSheets: Array.isArray(raw.deletedSheets) ? raw.deletedSheets : [],
-      simulation: raw.simulation || { count: 100, enemyMode: "free", enemyId: "", side: "player" },
+      simulation: normalizeSimulationConfig(raw.simulation),
       simulationResult: null,
     };
   } catch (error) {
@@ -2117,6 +2200,13 @@ function loadLocalState() {
       wikiSearch: "",
     };
   }
+}
+
+function normalizeSimulationConfig(raw) {
+  const base = { count: 100, side1: [{ mode: "random", sheetId: "", level: 10 }], side2: [{ mode: "random", sheetId: "", level: 10 }] };
+  if (!raw || typeof raw !== "object") return base;
+  const normalizeSide = (side) => (Array.isArray(side) && side.length ? side : base.side1).map((member) => ({ mode: member.mode === "sheet" ? "sheet" : "random", sheetId: member.sheetId || "", level: clamp(parseNumber(member.level, 10), 1, 50) }));
+  return { count: clamp(parseNumber(raw.count, 100), 1, 10000), side1: normalizeSide(raw.side1), side2: normalizeSide(raw.side2) };
 }
 
 function openWikiPage(path, addHistory) {

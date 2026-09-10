@@ -450,11 +450,15 @@ input[type="checkbox"] {
 }
 
 .simulation-results .stats-grid { margin-top: 1rem; }
+.simulation-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.simulation-member { display: grid; grid-template-columns: 2rem minmax(10rem, 1fr) minmax(8rem, 1fr) auto; gap: .5rem; align-items: center; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+.simulation-member:last-child { border-bottom: 0; }
 .simulation-bars { display: grid; gap: .65rem; margin-top: 1rem; }
 .simulation-bar-row { display: grid; grid-template-columns: 7rem 1fr 3rem; gap: .55rem; align-items: center; font-size: .85rem; }
 .simulation-bar { height: .65rem; background: var(--panel-muted, #20252d); border-radius: 999px; overflow: hidden; }
 .simulation-bar i { display: block; height: 100%; background: var(--accent, #ff1742); border-radius: inherit; }
 [data-sim-sheet-wrap].hidden { display: none; }
+@media (max-width: 800px) { .simulation-teams { grid-template-columns: 1fr; } .simulation-member { grid-template-columns: 2rem 1fr; } .simulation-member .inline-field, .simulation-member .danger-button { grid-column: span 2; } }
 
 .tab-panel.active {
   display: grid;
